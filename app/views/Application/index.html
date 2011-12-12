@@ -1,0 +1,86 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+<!-- Main hero unit for a primary marketing message or call to action -->
+<div class="hero-unit" style="padding-bottom: 0; padding-top: 20px">
+      <form>
+        <fieldset>
+          <legend>Patient search</legend>
+          <div class="clearfix">
+            <label for="xlInput">Name</label>
+            <div class="input">
+              <input id="xlInput" name="xlInput" size="30" type="text">
+            </div>
+          </div><!-- /clearfix -->
+          <div class="clearfix">
+            <label for="xlInput">Age at scan</label>
+            <div class="input">
+              <input id="xlInput" name="xlInput" size="30" type="text">
+            </div>
+          </div><!-- /clearfix -->
+          <div class="clearfix">
+            <label for="xlInput">Protocol name</label>
+            <div class="input">
+              <input id="xlInput" name="xlInput" size="30" type="text">
+            </div>
+          </div><!-- /clearfix -->
+          <div class="actions">
+            <input type="submit" class="btn primary" value="Search">&nbsp;<button type="reset" class="btn">Cancel</button>
+          </div>
+        </fieldset>
+      </form>
+</div>
+
+<table class="bordered-table zebra-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Subject ID</th>
+            <th>Date of Birth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Some</td>
+            <td>One</td>
+            <td>English</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Joe</td>
+            <td>Two</td>
+            <td>English</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Stu</td>
+            <td>Dent</td>
+            <td>Code</td>
+          </tr>
+        </tbody>
+      </table>
+
+<ul class="media-grid">
+  <li>
+    <a href="#">
+      <img class="thumbnail" src="http://mridb/detail/90/104/1430/1/preview.png" alt="" height="90" width="90">
+    </a>
+  </li>
+  <li>
+    <a href="#">
+      <img class="thumbnail" src="http://mridb/detail/90/104/1431/1/preview.png" alt="" height="90" width="90">
+    </a>
+  </li>
+  <li>
+    <a href="#">
+      <img class="thumbnail" src="http://mridb/detail/90/104/1432/1/preview.png" alt="" height="90" width="90">
+    </a>
+  </li>
+  <li>
+    <a href="#">
+      <img class="thumbnail" src="http://mridb/detail/90/104/1433/1/preview.png" alt="" height="90" width="90">
+    </a>
+  </li>
+</ul>
