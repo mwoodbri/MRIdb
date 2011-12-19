@@ -3,3 +3,10 @@
 require:
     - play
     - play -> secure
+    - dcm4che.tool -> dcm4che-tool-dcmqr 2.0.25
+repositories:
+    - dcm4che:
+        type: iBiblio
+        root: "http://www.dcm4che.org/maven2"
+        contains:
+            - dcm4che

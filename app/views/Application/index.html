@@ -9,19 +9,19 @@
           <div class="clearfix">
             <label for="xlInput">Name</label>
             <div class="input">
-              <input id="xlInput" name="xlInput" size="30" type="text">
+              <input id="xlInput" name="name" size="30" type="text" value="${flash['name']}">
             </div>
           </div><!-- /clearfix -->
           <div class="clearfix">
             <label for="xlInput">Age at scan</label>
             <div class="input">
-              <input id="xlInput" name="xlInput" size="30" type="text">
+              <input size="30" type="text">
             </div>
           </div><!-- /clearfix -->
           <div class="clearfix">
             <label for="xlInput">Protocol name</label>
             <div class="input">
-              <input id="xlInput" name="xlInput" size="30" type="text">
+              <input size="30" type="text">
             </div>
           </div><!-- /clearfix -->
           <div class="actions">
@@ -32,36 +32,27 @@
 </div>
 
 <table class="bordered-table zebra-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Subject ID</th>
-            <th>Date of Birth</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>Some</td>
-            <td>One</td>
-            <td>English</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Joe</td>
-            <td>Two</td>
-            <td>English</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Stu</td>
-            <td>Dent</td>
-            <td>Code</td>
-          </tr>
-        </tbody>
-      </table>
+	<thead>
+	  <tr>
+	    <th>#</th>
+	    <th>Name</th>
+	    <th>Sex</th>
+	    <th>Date of Birth</th>
+	  </tr>
+	</thead>
+	<tbody>
+	#{list patients}
+	<tr>
+	    <td>${_index}</td>
+	    <td>${_.getString(org.dcm4che2.data.Tag.PatientName)}</td>
+	    <td>${_.getString(org.dcm4che2.data.Tag.PatientSex)}</td>
+	    <td>${_.getString(org.dcm4che2.data.Tag.PatientBirthDate)}</td>
+	</tr>
+	#{/list}
+	</tbody>
+</table>
 
+*{
 <ul class="media-grid">
   <li>
     <a href="#">
@@ -84,3 +75,4 @@
     </a>
   </li>
 </ul>
+*}
