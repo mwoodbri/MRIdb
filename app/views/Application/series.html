@@ -1,0 +1,12 @@
+#{extends 'main.html' /}
+#{set title:'Series' /}
+
+<ul class="media-grid">
+  #{list images}
+  <li>
+    <a href="http://localhost:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=${_.getString(org.dcm4che2.data.Tag.SOPInstanceUID)}">
+      <img class="thumbnail" src="http://localhost:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=${_.getString(org.dcm4che2.data.Tag.SOPInstanceUID)}&columns=128" alt="">
+    </a>
+  </li>
+  #{/list}
+</ul>

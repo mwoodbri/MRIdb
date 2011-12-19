@@ -35,7 +35,7 @@
 	<thead>
 	  <tr>
 	    <th>#</th>
-	    <th>Name</th>
+	    <th>ID</th>
 	    <th>Sex</th>
 	    <th>Date of Birth</th>
 	  </tr>
@@ -44,35 +44,10 @@
 	#{list patients}
 	<tr>
 	    <td>${_index}</td>
-	    <td>${_.getString(org.dcm4che2.data.Tag.PatientName)}</td>
+	    <td>#{a @patient(_.getString(org.dcm4che2.data.Tag.PatientID))}${_.getString(org.dcm4che2.data.Tag.PatientID)}#{/a}</td>
 	    <td>${_.getString(org.dcm4che2.data.Tag.PatientSex)}</td>
 	    <td>${_.getString(org.dcm4che2.data.Tag.PatientBirthDate)}</td>
 	</tr>
 	#{/list}
 	</tbody>
 </table>
-
-*{
-<ul class="media-grid">
-  <li>
-    <a href="#">
-      <img class="thumbnail" src="http://mridb/detail/90/104/1430/1/preview.png" alt="" height="90" width="90">
-    </a>
-  </li>
-  <li>
-    <a href="#">
-      <img class="thumbnail" src="http://mridb/detail/90/104/1431/1/preview.png" alt="" height="90" width="90">
-    </a>
-  </li>
-  <li>
-    <a href="#">
-      <img class="thumbnail" src="http://mridb/detail/90/104/1432/1/preview.png" alt="" height="90" width="90">
-    </a>
-  </li>
-  <li>
-    <a href="#">
-      <img class="thumbnail" src="http://mridb/detail/90/104/1433/1/preview.png" alt="" height="90" width="90">
-    </a>
-  </li>
-</ul>
-*}
