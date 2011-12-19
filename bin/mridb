@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# chkconfig: 3 80 20
+# description: MRIdb web application
+
+NAME=`basename $0`
+
+. /etc/rc.d/init.d/functions
+
+export JAVA_HOME=/opt/jre1.6.0_30
+PLAY=/opt/play-1.2.4/play
+APP_PATH=/media/sf_MRIdb/
+
+case "$1" in
+start)
+    echo -n $"Starting $NAME: "
+    ${PLAY} $1 $APP_PATH --%prod > /dev/null
+    RETVALUE=$? 
+    if [ $RETVALUE -eq 0 ]
+    then
+        echo_success
+    else
+        echo_failure
+    fi
+    echo
+    ;;  
+stop)
+    echo -n $"Stopping $NAME: "
+    ${PLAY} $1 $APP_PATH > /dev/null
+    RETVALUE=$? 
+    if [ $RETVALUE -eq 0 ]
+    then
+        echo_success
+    else
+        echo_failure
+    fi
+    echo
+    ;;
+restart)
+    echo -n $"Restarting $NAME: "
+    ${PLAY} $1 $APP_PATH --%prod > /dev/null
+    RETVALUE=$? 
+    if [ $RETVALUE -eq 0 ]
+    then
+        echo_success
+    else
+        echo_failure
+    fi
+    echo
+    ;;
+*)
+    echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
+    exit 1
+    ;;
+esac
+
+exit $?

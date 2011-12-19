@@ -11,8 +11,11 @@ import util.DicomQuery;
 
 public class Application extends SecureController {
 
-    public static void index(String name) throws Exception {
-    	params.flash();
+    public static void index() throws Exception {
+        render();
+    }
+    
+    public static void patients(String name) throws Exception {
     	List<DicomObject> patients = DicomQuery.patient(name);
         render(patients);
     }

@@ -1,0 +1,25 @@
+#{extends 'main.html' /}
+#{set title:'Patients' /}
+
+<h1>Patients</h1>
+
+<table class="bordered-table zebra-striped">
+	<thead>
+	  <tr>
+	    <th>#</th>
+	    <th>ID</th>
+	    <th>Sex</th>
+	    <th>Date of Birth</th>
+	  </tr>
+	</thead>
+	<tbody>
+	#{list patients}
+	<tr>
+	    <td>${_index}</td>
+	    <td>#{a @patient(_.getString(org.dcm4che2.data.Tag.PatientID))}${_.getString(org.dcm4che2.data.Tag.PatientID)}#{/a}</td>
+	    <td>${_.getString(org.dcm4che2.data.Tag.PatientSex)}</td>
+	    <td>${_.getString(org.dcm4che2.data.Tag.PatientBirthDate)}</td>
+	</tr>
+	#{/list}
+	</tbody>
+</table>
