@@ -10,3 +10,4 @@ repositories:
         root: "http://www.dcm4che.org/maven2"
         contains:
             - dcm4che
+            - dcm4che.tool

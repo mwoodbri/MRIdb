@@ -3,7 +3,7 @@
 # chkconfig: - 80 20
 # description: MRIdb web application
 
-NAME=`basename $0`
+prog="mridb"
 
 . /etc/rc.d/init.d/functions
 
@@ -25,19 +25,19 @@ run(){
 
 case "$1" in
 start)
-    echo -n $"Starting $NAME: "
+    echo -n $"Starting $prog: "
     run $1
     ;;  
 stop)
-    echo -n $"Stopping $NAME: "
+    echo -n $"Stopping $prog: "
     run $1
     ;;
 restart)
-    echo -n $"Restarting $NAME: "
+    echo -n $"Restarting $prog: "
     run $1
     ;;
 *)
-    echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
+    echo "Usage: $prog {start|stop|restart}" >&2
     exit 1
     ;;
 esac
