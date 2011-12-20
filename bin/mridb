@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# chkconfig: 3 80 20
+# chkconfig: - 80 20
 # description: MRIdb web application
 
 NAME=`basename $0`
@@ -11,42 +11,30 @@ export JAVA_HOME=/opt/jre1.6.0_30
 PLAY=/opt/play-1.2.4/play
 APP_PATH=/opt/MRIdb/
 
+run(){
+    ${PLAY} $1 $APP_PATH --%prod --pid_file=/var/lock/subsys/mridb > /dev/null
+    RETVALUE=$? 
+    if [ $RETVALUE -eq 0 ]
+    then
+        echo_success
+    else
+        echo_failure
+    fi
+    echo
+}
+
 case "$1" in
 start)
     echo -n $"Starting $NAME: "
-    ${PLAY} $1 $APP_PATH --%prod > /dev/null
-    RETVALUE=$? 
-    if [ $RETVALUE -eq 0 ]
-    then
-        echo_success
-    else
-        echo_failure
-    fi
-    echo
+    run $1
     ;;  
 stop)
     echo -n $"Stopping $NAME: "
-    ${PLAY} $1 $APP_PATH > /dev/null
-    RETVALUE=$? 
-    if [ $RETVALUE -eq 0 ]
-    then
-        echo_success
-    else
-        echo_failure
-    fi
-    echo
+    run $1
     ;;
 restart)
     echo -n $"Restarting $NAME: "
-    ${PLAY} $1 $APP_PATH --%prod > /dev/null
-    RETVALUE=$? 
-    if [ $RETVALUE -eq 0 ]
-    then
-        echo_success
-    else
-        echo_failure
-    fi
-    echo
+    run $1
     ;;
 *)
     echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
