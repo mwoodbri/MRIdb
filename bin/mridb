@@ -12,7 +12,7 @@ PLAY=/opt/play-1.2.4/play
 APP_PATH=/opt/MRIdb/
 
 run(){
-    ${PLAY} $1 $APP_PATH --%prod --pid_file=/var/lock/subsys/mridb > /dev/null
+    ${PLAY} $1 $APP_PATH --%prod --pid_file=/var/lock/subsys/mridb >/dev/null
     RETVALUE=$? 
     if [ $RETVALUE -eq 0 ]
     then
