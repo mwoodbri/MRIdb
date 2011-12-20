@@ -17,12 +17,9 @@ public class Security extends Secure.Security {
 		if (Play.mode.isDev() && Properties.getString("ldap.server") == null && password.equals(username)) {
 			authenticated = true;
 		} else {
-			System.out.println("LDAP");
 			if (!"".equals(password)) {
 				Hashtable<String, String> env = new Hashtable<String, String>();
 				env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-				//TODO put these in settings file
-				//TODO don't allow blank username or password
 				env.put(Context.PROVIDER_URL, Properties.getString("ldap.server"));
 				env.put(Context.SECURITY_PRINCIPAL, username + "@" + Properties.getString("ldap.domain"));
 				env.put(Context.SECURITY_CREDENTIALS, password);
@@ -30,7 +27,6 @@ public class Security extends Secure.Security {
 					new InitialDirContext(env);
 					authenticated = true;
 				} catch (NamingException e) {
-					e.printStackTrace();
 				}
 			}
 		}
