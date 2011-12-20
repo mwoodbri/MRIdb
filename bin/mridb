@@ -9,7 +9,7 @@ NAME=`basename $0`
 
 export JAVA_HOME=/opt/jre1.6.0_30
 PLAY=/opt/play-1.2.4/play
-APP_PATH=/media/sf_MRIdb/
+APP_PATH=/opt/MRIdb/
 
 case "$1" in
 start)
