@@ -3,9 +3,10 @@
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
     <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
-    <link rel="stylesheet" href="@{'/public/stylesheets/main.css'}">
-    #{get 'moreStyles' /}
+    <!--link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css"-->
+    #{stylesheet 'bootstrap.min.css'/}
+    #{stylesheet 'main.css'/}
+    #{get 'moreStyles'/}
   </head>
   <body>
 
@@ -53,7 +54,8 @@
       </div>
     </div>
 
-    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <!--script src="http://code.jquery.com/jquery-1.7.1.min.js"></script-->
+    #{script 'jquery.min.js'/}
     #{get 'moreScripts'/}
   </body>
 </html>
