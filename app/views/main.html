@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
-        <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
-        <link rel="stylesheet" href="@{'/public/stylesheets/main.css'}">
-        #{get 'moreStyles' /}
-    </head>
-    <body>
+  <head>
+    <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
+    <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+    <link rel="stylesheet" href="@{'/public/stylesheets/main.css'}">
+    #{get 'moreStyles' /}
+  </head>
+  <body>
 
     <div class="topbar">
       <div class="topbar-inner">
         <div class="container-fluid">
           <a class="brand" href="@{Application.index}">${play.configuration.getProperty("application.name")}</a>
           <ul class="nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @Application.index()}Home#{/a}
+            <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @Application.help()}Help#{/a}
           </ul>
           <p class="pull-right">Logged in as ${session.username} <a href='@{Secure.logout()}'>Log out</a></p>
         </div>
@@ -51,13 +50,10 @@
       </div>
       <div class="content">
         #{doLayout/}
-        <footer>
-          <p>&copy; Imperial College London 2011</p>
-        </footer>
       </div>
     </div>
 
-        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-        #{get 'moreScripts'/}
-    </body>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    #{get 'moreScripts'/}
+  </body>
 </html>

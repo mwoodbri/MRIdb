@@ -16,6 +16,10 @@ public class Application extends SecureController {
     public static void index() throws Exception {
         render();
     }
+
+    public static void help() throws Exception {
+        render();
+    }
     
     public static void patients(String name) throws Exception {
     	List<DicomObject> patients = DicomQuery.patient(name);
