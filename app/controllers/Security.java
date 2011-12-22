@@ -14,8 +14,8 @@ public class Security extends Secure.Security {
 
 	static boolean authenticate(String username, String password) {
 		boolean authenticated = false;
-		if (Play.mode.isDev() && Properties.getString("ldap.server") == null && password.equals(username)) {
-			authenticated = true;
+		if (Play.mode.isDev() && Properties.getString("ldap.server") == null) {
+			authenticated = password.equals(username);
 		} else {
 			if (!"".equals(password)) {
 				Hashtable<String, String> env = new Hashtable<String, String>();
@@ -27,10 +27,10 @@ public class Security extends Secure.Security {
 					new InitialDirContext(env);
 					authenticated = true;
 				} catch (NamingException e) {
+					Logger.info("LDAP authentication failed for %s", username);
 				}
 			}
 		}
-		Logger.info(username + " authenticated " + authenticated);
 		return authenticated;
 	}
 }
