@@ -1,25 +1,33 @@
-#{extends 'main.html' /}
-#{set title:'Patient' /}
+#{extends 'main.html'/}
+#{set title:'Patient'/}
+#{set 'moreStyles'}
+<style>
+.caption {
+	font-size: 11px;
+	color: white;
+	background-color: #333;
+	text-align: center;
+}
+li a:hover {
+	text-decoration: none;
+}
+</style>
+#{/set}
 
-<h1>Studies</h1>
+*{<h1>#{get 'title'/}</h1>}*
 
-<table class="bordered-table zebra-striped">
-	<thead>
-	  <tr>
-	    <th>#</th>
-	    <th>ID</th>
-	    <th>Description</th>
-	    <th>Date</th>
-	  </tr>
-	</thead>
-	<tbody>
-	#{list studies}
-	<tr>
-	    <td>${_index}</td>
-	    <td>#{a @study(_.getString(org.dcm4che2.data.Tag.StudyID))}${_.getString(org.dcm4che2.data.Tag.StudyID)}#{/a}
-	    <td>${_.getString(org.dcm4che2.data.Tag.StudyDescription)}
-	    <td>${_.getString(org.dcm4che2.data.Tag.StudyDate)}
-	</tr>
+<h2>${patient.pat_id} - ${patient.pat_name} - ${patient.pat_birthdate}</h2>
+
+#{list patient.studies, as: 'study'}
+<h3>${patient.pat_id} ${study.study_desc} ${study.study_datetime.format()}</h3>
+<ul class="media-grid">
+	#{list study.series, as: 'series'}
+	<li>
+		#{a @series(series.pk)}
+			<img class="thumbnail" src="@{image(series.instances.iterator().next().sop_iuid, 128)}" alt="">
+			<div class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(20)}</div>
+		#{/a}
+	</li>
 	#{/list}
-	</tbody>
-</table>
+</ul>
+#{/list}

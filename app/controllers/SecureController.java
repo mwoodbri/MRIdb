@@ -1,7 +1,6 @@
 package controllers;
 
 import play.Logger;
-import play.cache.Cache;
 import play.mvc.Before;
 import play.mvc.Controller;
 import play.mvc.With;

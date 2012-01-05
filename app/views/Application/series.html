@@ -1,14 +1,99 @@
-#{extends 'main.html' /}
-#{set title:'Series' /}
+#{extends 'main.html'/}
+#{set title:'Series'/}
 
-<h1>Images</h1>
+<h2>${series.study.patient.pat_id} - ${series.study.patient.pat_name} - ${series.study.study_datetime.format()} - ${series.series_custom1}(${series.series_no})</h2>
+#{a @download(series.pk)}Download#{/a}
 
-<ul class="media-grid">
-  #{list images}
-  <li>
-    #{a @image(_.getString(org.dcm4che2.data.Tag.SOPInstanceUID))}
-      <img class="thumbnail" src="@{image(_.getString(org.dcm4che2.data.Tag.SOPInstanceUID), 128)}" alt="">
-    #{/a}
-  </li>
-  #{/list}
-</ul>
+<h3>Subject details</h3>
+<table class="bordered-table">
+	<thead>
+		<tr>
+			<th>PatientID</th>
+			<th>Name</th>
+			<th>Sex</th>
+			<th>Date of birth</th>
+			<th>Weight</th>
+			<th>Age</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>${series.study.patient.pat_id}</td>
+			<td>${series.study.patient.pat_name}</td>
+			<td>${series.study.patient.pat_sex}</td>
+			<td>${series.study.patient.pat_birthdate}</td>
+			<td>${series.study.patient.pat_attrs.get('PatientWeight')} kg</td>
+			<td>TODO</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Study details</h3>
+<table class="bordered-table">
+	<thead>
+		<tr>
+			<th>Study description</th>
+			<th>Date of scan</th>
+			<th>Time of scan</th>
+			<th>Study ID</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>${series.study.study_desc}</td>
+			<td>${series.study.study_datetime.format()}</td>
+			<td>${series.study.study_datetime.time()}</td>
+			<td>${series.study.study_id}</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Image description</h3>
+<table class="bordered-table">
+	<thead>
+		<tr>
+			<th>Matrix (cols / rows / slices)</th>
+			<th>Pixel spacing (x / y / z)</th>
+			<th>In plane phase encoding</th>
+			<th>Phase encoding steps</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>${series.instances.iterator().next().inst_attrs.get('Columns')} / ${series.instances.iterator().next().inst_attrs.get('Rows')} / ${series.instances.iterator().next().inst_attrs.get('NumberOfFrames')}</td>
+			<td>TODO</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRFOVGeometrySeq).getString(org.dcm4che.dict.Tags.InPlanePhaseEncodingDirection)}</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRFOVGeometrySeq).getString(org.dcm4che.dict.Tags.MRAcquisitionPhaseEncodingStepsInPlane)}</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Sequence description</h3>
+<table class="bordered-table">
+	<thead>
+		<tr>
+			<th>Seq #</th>
+			<th>Protocol name</th>
+			<th>Sequence</th>
+			<th>Variant</th>
+			<th>Receive coil</th>
+			<th>Repetition time</th>
+			<th>Echo time</th>
+			<th>Number of echoes</th>
+			<th>Temporal positions</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>${series.series_no}</td>
+			<td>${series.series_custom1}</td>
+			<td>Scanning Sequence</td>
+			<td>Sequence Variant</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRReceiveCoilSeq).getString(org.dcm4che.dict.Tags.ReceiveCoilName)}</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRTimingAndRelatedParametersSeq).getFloat(org.dcm4che.dict.Tags.RepetitionTime)} ms</td>
+			<td>Echo Time</td>
+			<td>Echo Number(s)</td>
+			<td>Number of Temporal Positions</td>
+		</tr>
+	</tbody>
+</table>

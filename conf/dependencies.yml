@@ -3,11 +3,10 @@
 require:
     - play
     - play -> secure
-    - dcm4che.tool -> dcm4che-tool-dcmqr 2.0.25
+    - dcm4che14 -> dcm4che 1.4.31
 repositories:
-    - dcm4che:
-        type: iBiblio
-        root: "http://www.dcm4che.org/maven2"
+    - local:
+        type: local
+        artifact: "${application.path}/repo/[organisation]/[module]-[revision].jar"
         contains:
-            - dcm4che
-            - dcm4che.tool
+            - dcm4che14

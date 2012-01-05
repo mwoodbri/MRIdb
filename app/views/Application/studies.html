@@ -1,0 +1,27 @@
+#{extends 'main.html'/}
+#{set title:'Studies'/}
+
+<h2>Search results (${studies.size()} matching subjects)</h2>
+
+<table id="studies" class="bordered-table zebra-striped sortable">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Subject ID</th>
+			<th>Date of Birth</th>
+			<th>Study Description</th>
+			<th>Date of Study</th>
+		</tr>
+	</thead>
+	<tbody>
+		#{list studies}
+		<tr>
+			<td>#{a @patient(_.pk)}${_.patient.pat_name}#{/a}</td>
+			<td>${_.patient.pat_id}</td>
+			<td>${_.patient.pat_birthdate}</td>
+			<td>${_.study_desc}</td>
+			<td>${_.study_datetime.format()}</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>

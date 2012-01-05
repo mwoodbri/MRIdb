@@ -4,6 +4,7 @@
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
     <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
     <!--link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css"-->
+    #{stylesheet 'flick/jquery-ui-1.8.16.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
     #{stylesheet 'main.css'/}
     #{get 'moreStyles'/}
@@ -15,7 +16,7 @@
         <div class="container-fluid">
           <a class="brand" href="@{Application.index}">${play.configuration.getProperty("application.name")}</a>
           <ul class="nav">
-            <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @Application.index()}Home#{/a}
+            <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @Application.index()}Search#{/a}
             <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @Application.help()}Help#{/a}
           </ul>
           <p class="pull-right">Logged in as ${session.username} <a href='@{Secure.logout()}'>Log out</a></p>
@@ -24,7 +25,7 @@
     </div>
 
     <div class="container-fluid">
-      <div class="sidebar">
+      <!--div class="sidebar">
         <div class="well">
           <h5>Sidebar</h5>
           <ul>
@@ -48,14 +49,27 @@
             <li><a href="#">Link</a></li>
           </ul>
         </div>
-      </div>
-      <div class="content">
+      </div-->
+      <div class="content" style="margin-left: 0">
         #{doLayout/}
       </div>
     </div>
 
     <!--script src="http://code.jquery.com/jquery-1.7.1.min.js"></script-->
     #{script 'jquery.min.js'/}
+    #{script 'jquery-ui-1.8.16.custom.min.js'/}
+    *{#{script 'jquery.ui.datepicker-en-GB.js'/}}*
+    #{script 'jquery.tablesorter.min.js'/}
+    <script>
+		$(function() {
+			$("table.sortable").tablesorter();
+			$.datepicker.setDefaults({
+				dateFormat: 'yy-mm-dd',
+				changeMonth: true,
+				changeYear: true
+			});
+		});
+    </script>
     #{get 'moreScripts'/}
   </body>
 </html>

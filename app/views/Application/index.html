@@ -1,32 +1,115 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-<!-- Main hero unit for a primary marketing message or call to action -->
+#{set 'moreScripts'}
+<script>
+	$(function() {
+		$('#before,#on,#after,#since').datepicker();
+		$('#before,#on,#after').datepicker('option', 'maxDate', 0).datepicker('setDate', new Date()).click(function() {
+			$('input:radio[value=' + this.id + ']').attr('checked', true);
+		});
+		$('#since').datepicker('setDate', $('#relative').val());
+		$('#relative').change(function() {
+			$('input:radio[value=since]').attr('checked', true);
+			$('#since').datepicker('setDate', $(this).val());
+		});
+	});
+</script>
+#{/set}
+
 <div class="hero-unit" style="padding-bottom: 0; padding-top: 20px">
-      #{form @patients(), method: 'GET'}
-        <fieldset>
-          <legend>Patient search</legend>
-          <div class="clearfix">
-            <label for="xlInput">Name</label>
-            <div class="input">
-              <input id="xlInput" name="name" size="30" type="text">
-            </div>
-          </div><!-- /clearfix -->
-          <div class="clearfix">
-            <label for="xlInput">Age at scan</label>
-            <div class="input">
-              <input size="30" type="text">
-            </div>
-          </div><!-- /clearfix -->
-          <div class="clearfix">
-            <label for="xlInput">Protocol name</label>
-            <div class="input">
-              <input size="30" type="text">
-            </div>
-          </div><!-- /clearfix -->
-          <div class="actions">
-            <input type="submit" class="btn primary" value="Search">&nbsp;<button type="reset" class="btn">Cancel</button>
-          </div>
-        </fieldset>
-      #{/form}
+	#{form @studies(), id: 'search', method: 'GET'}
+		<fieldset>
+			<legend>Patient search</legend>
+			<div class="clearfix">
+				<label for="name">Name</label>
+				<div class="input">
+					<input id="name" name="name" type="text">
+				</div>
+			</div>
+			<div class="clearfix">
+				<label for="id">PatientID</label>
+				<div class="input">
+					<input id="id" name="id" type="text">
+				</div>
+			</div>
+			<div class="clearfix">
+				<label for="age">Age at scan</label>
+				<div class="input">
+					<input id="age" name="age" type="text">
+				</div>
+			</div>
+			<div class="clearfix">
+				<label for="age">Sex</label>
+				<div class="input">
+					<select id="sex" name="sex" class="small">
+						<option></option>
+						<option value="M">Male</option>
+						<option value="F">Female</option>
+					</select>
+				</div>
+			</div>
+			<div class="clearfix">
+				<label for="protocol">Protocol name</label>
+				<div class="input">
+					<input id="protocol" name="protocol" type="text">
+				</div>
+			</div>
+			<div class="clearfix">
+				<label>Acquisition</label>
+				<div class="input">
+					<ul class="inputs-list">
+						<li>
+							<label>
+								<input type="radio" name="acquisition" value="before" checked>
+								<span>Before</span>
+							</label>
+							<input id="before" name="before" class="small" type="text">
+						</li>
+						<li>
+							<label>
+								<input type="radio" name="acquisition" value="on">
+								<span>On</span>
+							</label>
+							<input id="on" name="on" class="small" type="text">
+						</li>
+						<li>
+							<label>
+								<input type="radio" name="acquisition" value="after">
+								<span>After</span>
+							</label>
+							<input id="after" name="after" class="small" type="text">
+						</li>
+						<li>
+							<label>
+								<input type="radio" name="acquisition" value="since">
+								<span>In the last</span>
+							</label>
+							<input id="since" name="since" class="small" type="hidden">
+						</li>
+						<li>
+							<select id="relative" class="small">
+								<option value="-1d">1 Day</option>
+								<option value="-2d">2 Days</option>
+								<option value="-3d">3 Days</option>
+								<option value="-1w">Week</option>
+								<option value="-2w">2 Weeks</option>
+								<option value="-1m">Month</option>
+							</select>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="clearfix">
+				<label for="study">Study description</label>
+				<div class="input">
+					<input id="study" name="study" type="text">
+				</div>
+			</div>
+			<div class="actions">
+				<input type="submit" class="btn primary" value="Search">&nbsp;<button type="reset" class="btn">Cancel</button>
+			</div>
+		</fieldset>
+		<input name="date" type="hidden"/>
+	#{/form}
 </div>

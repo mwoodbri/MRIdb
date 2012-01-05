@@ -8,6 +8,7 @@ import javax.naming.directory.InitialDirContext;
 
 import play.Logger;
 import play.Play;
+import util.PersistentLogger;
 import util.Properties;
 
 public class Security extends Secure.Security {
@@ -32,5 +33,9 @@ public class Security extends Secure.Security {
 			}
 		}
 		return authenticated;
+	}
+
+	static void onAuthenticated() {
+		PersistentLogger.log("Logged in");
 	}
 }
