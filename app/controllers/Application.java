@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,9 +14,9 @@ import models.Patient;
 import models.Series;
 import models.Study;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
-import org.dcm4che.dict.Tags;
 
 import play.libs.IO;
 import util.Dicom;
@@ -146,7 +147,18 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	public static void download(long pk) {
-		renderBinary(Dicom.file(Series.<Series>findById(pk)));
+	//TODO anonymise all downloads
+	public static void download(long pk, String format) throws InterruptedException, IOException {
+		File dicom = Dicom.file(Series.<Series>findById(pk));
+		if ("nii".equals(format)) {
+			//TODO do as a background job
+			File tmp = new File(System.getProperty("java.io.tmpdir"));
+			File nii = new File(tmp, String.format("%s.nii", dicom.getName()));
+			nii.delete();
+			new ProcessBuilder(Properties.getString("dcm2nii"), "-a", "n", "-g", "n", "-v", "n", "-f", "y", "-e", "n", "-d", "n", "-p", "n", "-o", tmp.getPath(), dicom.getPath()).start().waitFor();
+			renderBinary(nii);
+		} else {
+			renderBinary(dicom);
+		}
 	}
 }
