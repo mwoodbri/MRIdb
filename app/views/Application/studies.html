@@ -18,7 +18,7 @@
 		<tr>
 			<td>#{a @patient(_.pk)}${_.patient.pat_name}#{/a}</td>
 			<td>${_.patient.pat_id}</td>
-			<td>${_.patient.pat_birthdate}</td>
+			<td>${_.patient.birthdate().format()}</td>
 			<td>${_.study_desc}</td>
 			<td>${_.study_datetime.format()}</td>
 		</tr>

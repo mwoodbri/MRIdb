@@ -27,6 +27,13 @@ public class Dicom {
 		dataset.readFile(Dicom.file(series), null, -1);
 		return dataset;
 	}
+	
+	public static Dataset privateDataset(Dataset dataset) throws IOException {
+		Dataset privateDataset = DcmObjectFactory.getInstance().newDataset();
+		byte[] buf = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
+		privateDataset.readFile(new ByteArrayInputStream(buf), null, -1);
+		return privateDataset;
+	}
 
 	//	public static String attribute(Instance instance, String tag) throws IOException {
 	//		Dataset d = DcmObjectFactory.getInstance().newDataset();

@@ -61,7 +61,7 @@ Download as #{a @download(series.pk)}dicom#{/a} #{a @download(series.pk, 'nii')}
 	<tbody>
 		<tr>
 			<td>${series.instances.iterator().next().inst_attrs.get('Columns')} / ${series.instances.iterator().next().inst_attrs.get('Rows')} / ${series.instances.iterator().next().inst_attrs.get('NumberOfFrames')}</td>
-			<td>TODO</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.PerFrameFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.PixelMeasuresSeq).getFloats(org.dcm4che.dict.Tags.PixelSpacing)[0]} / ${dataset.getItem(org.dcm4che.dict.Tags.PerFrameFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.PixelMeasuresSeq).getFloats(org.dcm4che.dict.Tags.PixelSpacing)[0]} / ${dataset.getString(org.dcm4che.dict.Tags.SpacingBetweenSlices)}</td>
 			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRFOVGeometrySeq).getString(org.dcm4che.dict.Tags.InPlanePhaseEncodingDirection)}</td>
 			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRFOVGeometrySeq).getString(org.dcm4che.dict.Tags.MRAcquisitionPhaseEncodingStepsInPlane)}</td>
 		</tr>
@@ -87,13 +87,13 @@ Download as #{a @download(series.pk)}dicom#{/a} #{a @download(series.pk, 'nii')}
 		<tr>
 			<td>${series.series_no}</td>
 			<td>${series.series_custom1}</td>
-			<td>Scanning Sequence</td>
-			<td>Sequence Variant</td>
+			<td>${privateDataset.getString(org.dcm4che.dict.Tags.ScanningSeq)}</td>
+			<td>${privateDataset.getString(org.dcm4che.dict.Tags.SeqVariant)}</td>
 			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRReceiveCoilSeq).getString(org.dcm4che.dict.Tags.ReceiveCoilName)}</td>
 			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRTimingAndRelatedParametersSeq).getFloat(org.dcm4che.dict.Tags.RepetitionTime)} ms</td>
-			<td>Echo Time</td>
-			<td>Echo Number(s)</td>
-			<td>Number of Temporal Positions</td>
+			<td>${privateDataset.getString(org.dcm4che.dict.Tags.EchoTime)} ms</td>
+			<td>${privateDataset.getString(org.dcm4che.dict.Tags.EchoNumber)}</td>
+			<td>${privateDataset.getString(org.dcm4che.dict.Tags.NumberOfTemporalPositions)}</td>
 		</tr>
 	</tbody>
 </table>
