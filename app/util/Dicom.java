@@ -28,18 +28,18 @@ public class Dicom {
 		return dataset;
 	}
 
-	public static Dataset privateDataset(Dataset dataset) throws IOException {
-		Dataset privateDataset;
-		Dataset perFrameFunctionalGroupsSeq = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
-		if (perFrameFunctionalGroupsSeq.get(Tags.valueOf("(2005,140F)")).hasItems()) {
-			privateDataset = perFrameFunctionalGroupsSeq.getItem(Tags.valueOf("(2005,140F)"));
-		} else {
-			byte[] buf = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
-			privateDataset = DcmObjectFactory.getInstance().newDataset();
-			privateDataset.readFile(new ByteArrayInputStream(buf), null, -1);
-		}
-		return privateDataset;
-	}
+//	public static Dataset privateDataset(Dataset dataset) throws IOException {
+//		Dataset privateDataset;
+//		Dataset perFrameFunctionalGroupsSeq = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
+//		if (perFrameFunctionalGroupsSeq.get(Tags.valueOf("(2005,140F)")).hasItems()) {
+//			privateDataset = perFrameFunctionalGroupsSeq.getItem(Tags.valueOf("(2005,140F)"));
+//		} else {
+//			byte[] buf = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
+//			privateDataset = DcmObjectFactory.getInstance().newDataset();
+//			privateDataset.readFile(new ByteArrayInputStream(buf), null, -1);
+//		}
+//		return privateDataset;
+//	}
 
 	//	public static String attribute(Instance instance, String tag) throws IOException {
 	//		Dataset d = DcmObjectFactory.getInstance().newDataset();

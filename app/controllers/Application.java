@@ -112,8 +112,8 @@ public class Application extends SecureController {
 	public static void series(long pk) throws Exception {
 		Series series = Series.findById(pk);
 		Dataset dataset = Dicom.dataset(series);
-		Dataset privateDataset = Dicom.privateDataset(dataset);
-		render(series, dataset, privateDataset);
+		//Dataset privateDataset = Dicom.privateDataset(dataset);
+		render(series, dataset);
 	}
 
 	public static void image(String objectUID, Integer columns) throws MalformedURLException, IOException {

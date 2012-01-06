@@ -4,49 +4,62 @@
 <h2>${series.study.patient.pat_id} - ${series.study.patient.pat_name} - ${series.study.study_datetime.format()} - ${series.series_custom1}(${series.series_no})</h2>
 Download as #{a @download(series.pk)}dicom#{/a} #{a @download(series.pk, 'nii')}nifti#{/a}
 
-<h3>Subject details</h3>
-<table class="bordered-table">
-	<thead>
-		<tr>
-			<th>PatientID</th>
-			<th>Name</th>
-			<th>Sex</th>
-			<th>Date of birth</th>
-			<th>Weight</th>
-			<th>Age</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>${series.study.patient.pat_id}</td>
-			<td>${series.study.patient.pat_name}</td>
-			<td>${series.study.patient.pat_sex}</td>
-			<td>${series.study.patient.pat_birthdate?.formatAsDate()}</td>
-			<td>${series.study.patient.pat_attrs.get('PatientWeight')} kg</td>
-			<td>${series.study.patient.pat_birthdate?.formatAsAge()}</td>
-		</tr>
-	</tbody>
-</table>
-
-<h3>Study details</h3>
-<table class="bordered-table">
-	<thead>
-		<tr>
-			<th>Study description</th>
-			<th>Date of scan</th>
-			<th>Time of scan</th>
-			<th>Study ID</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>${series.study.study_desc}</td>
-			<td>${series.study.study_datetime.format()}</td>
-			<td>${series.study.study_datetime.time()}</td>
-			<td>${series.study.study_id}</td>
-		</tr>
-	</tbody>
-</table>
+<div class="row">
+	<div class="span14">
+		<h3>Subject details</h3>
+		<table class="bordered-table">
+			<thead>
+				<tr>
+					<th>PatientID</th>
+					<th>Name</th>
+					<th>Sex</th>
+					<th>Date of birth</th>
+					<th>Weight</th>
+					<th>Age</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>${series.study.patient.pat_id}</td>
+					<td>${series.study.patient.pat_name}</td>
+					<td>${series.study.patient.pat_sex}</td>
+					<td>${series.study.patient.pat_birthdate?.formatAsDate()}</td>
+					<td>${series.study.patient.pat_attrs.get('PatientWeight')} kg</td>
+					<td>${series.study.patient.pat_birthdate?.formatAsAge()}</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<h3>Study details</h3>
+		<table class="bordered-table">
+			<thead>
+				<tr>
+					<th>Study description</th>
+					<th>Date of scan</th>
+					<th>Time of scan</th>
+					<th>Study ID</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>${series.study.study_desc}</td>
+					<td>${series.study.study_datetime.format()}</td>
+					<td>${series.study.study_datetime.time()}</td>
+					<td>${series.study.study_id}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="span1 offset1">
+		<ul class="media-grid">
+			<li>
+				<a href="#">
+					<img class="thumbnail" src="@{image(series.instances.iterator().next().sop_iuid, 256)}" alt="">
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
 
 <h3>Image description</h3>
 <table class="bordered-table">
@@ -87,13 +100,13 @@ Download as #{a @download(series.pk)}dicom#{/a} #{a @download(series.pk, 'nii')}
 		<tr>
 			<td>${series.series_no}</td>
 			<td>${series.series_custom1}</td>
-			<td>${privateDataset.getString(org.dcm4che.dict.Tags.ScanningSeq)}</td>
-			<td>${privateDataset.getString(org.dcm4che.dict.Tags.SeqVariant)}</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.PerFrameFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.valueOf("(2005,140F)")).getString(org.dcm4che.dict.Tags.ScanningSeq)}</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.PerFrameFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.valueOf("(2005,140F)")).getString(org.dcm4che.dict.Tags.SeqVariant)}</td>
 			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRReceiveCoilSeq).getString(org.dcm4che.dict.Tags.ReceiveCoilName)}</td>
 			<td>${dataset.getItem(org.dcm4che.dict.Tags.SharedFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.MRTimingAndRelatedParametersSeq).getFloat(org.dcm4che.dict.Tags.RepetitionTime)} ms</td>
-			<td>${privateDataset.getString(org.dcm4che.dict.Tags.EchoTime)} ms</td>
-			<td>${privateDataset.getString(org.dcm4che.dict.Tags.EchoNumber)}</td>
-			<td>${privateDataset.getString(org.dcm4che.dict.Tags.NumberOfTemporalPositions)}</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.PerFrameFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.valueOf("(2005,140F)")).getString(org.dcm4che.dict.Tags.EchoTime)} ms</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.PerFrameFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.valueOf("(2005,140F)")).getString(org.dcm4che.dict.Tags.EchoNumber)}</td>
+			<td>${dataset.getItem(org.dcm4che.dict.Tags.PerFrameFunctionalGroupsSeq).getItem(org.dcm4che.dict.Tags.valueOf("(2005,140F)")).getString(org.dcm4che.dict.Tags.NumberOfTemporalPositions)}</td>
 		</tr>
 	</tbody>
 </table>
