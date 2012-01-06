@@ -21,6 +21,7 @@ import org.dcm4che.data.Dataset;
 
 import play.libs.IO;
 import util.Dicom;
+import util.PersistentLogger;
 import util.Properties;
 
 public class Application extends SecureController {
@@ -126,6 +127,7 @@ public class Application extends SecureController {
 
 	//TODO anonymise all downloads
 	public static void download(long pk, String format) throws InterruptedException, IOException {
+		PersistentLogger.log("Downloaded series %s", pk);
 		File dicom = Dicom.file(Series.<Series>findById(pk));
 		if ("nii".equals(format)) {
 			//TODO do as a background job
