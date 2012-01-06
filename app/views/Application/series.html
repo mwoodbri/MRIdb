@@ -21,9 +21,9 @@ Download as #{a @download(series.pk)}dicom#{/a} #{a @download(series.pk, 'nii')}
 			<td>${series.study.patient.pat_id}</td>
 			<td>${series.study.patient.pat_name}</td>
 			<td>${series.study.patient.pat_sex}</td>
-			<td>${series.study.patient.birthdate().format()}</td>
+			<td>${series.study.patient.pat_birthdate?.formatAsDate()}</td>
 			<td>${series.study.patient.pat_attrs.get('PatientWeight')} kg</td>
-			<td>${series.study.patient.age()}</td>
+			<td>${series.study.patient.pat_birthdate?.formatAsAge()}</td>
 		</tr>
 	</tbody>
 </table>
