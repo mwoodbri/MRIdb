@@ -3,7 +3,6 @@
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
     <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-    <!--link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css"-->
     #{stylesheet 'flick/jquery-ui-1.8.16.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
     #{stylesheet 'main.css'/}
@@ -55,20 +54,19 @@
       </div>
     </div>
 
-    <!--script src="http://code.jquery.com/jquery-1.7.1.min.js"></script-->
     #{script 'jquery.min.js'/}
     #{script 'jquery-ui-1.8.16.custom.min.js'/}
     *{#{script 'jquery.ui.datepicker-en-GB.js'/}}*
     #{script 'jquery.tablesorter.min.js'/}
     <script>
-		$(function() {
-			$("table.sortable").tablesorter();
-			$.datepicker.setDefaults({
-				dateFormat: 'yy-mm-dd',
-				changeMonth: true,
-				changeYear: true
-			});
-		});
+        $(function() {
+            $("table.sortable").tablesorter();
+            $.datepicker.setDefaults({
+                dateFormat: 'yy-mm-dd',
+                changeMonth: true,
+                changeYear: true
+            });
+        });
     </script>
     #{get 'moreScripts'/}
   </body>

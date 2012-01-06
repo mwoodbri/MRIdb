@@ -3,16 +3,25 @@
 
 #{set 'moreScripts'}
 <script>
+	function reset() {
+		$('#before,#on,#after').datepicker('setDate', new Date());
+		$('#since').datepicker('setDate', $('#relative').val());
+	}
 	$(function() {
 		$('#before,#on,#after,#since').datepicker();
-		$('#before,#on,#after').datepicker('option', 'maxDate', 0).datepicker('setDate', new Date()).click(function() {
+		$('#before,#on,#after').datepicker('option', 'maxDate', 0).click(function() {
 			$('input:radio[value=' + this.id + ']').attr('checked', true);
 		});
-		$('#since').datepicker('setDate', $('#relative').val());
 		$('#relative').change(function() {
 			$('input:radio[value=since]').attr('checked', true);
 			$('#since').datepicker('setDate', $(this).val());
 		});
+		$(":reset").on("click", function(event) {
+			$('#search')[0].reset();
+			reset();
+			return false;
+		});
+		reset();
 	});
 </script>
 #{/set}
