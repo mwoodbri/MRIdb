@@ -1,10 +1,17 @@
 package models;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.Years;
 
 import play.db.jpa.GenericModel;
 
@@ -20,6 +27,15 @@ public class Patient extends GenericModel {
 	public byte[] pat_attrs;
 	@OneToMany(mappedBy = "patient")
 	public Set<Study> studies;
+	
+	public Date birthdate() throws ParseException {
+		return new SimpleDateFormat("yyyyMMdd").parse(pat_birthdate);
+	}
+	
+	public int age() throws ParseException {
+		DateMidnight birthdate = new DateMidnight(birthdate());
+		return Years.yearsBetween(birthdate, new DateTime()).getYears();
+	}
 
 	@Override
 	public String toString() {

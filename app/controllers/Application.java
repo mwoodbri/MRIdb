@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +16,6 @@ import models.Patient;
 import models.Series;
 import models.Study;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
@@ -60,7 +61,6 @@ public class Application extends SecureController {
 		put("after", ">");
 		put("since", ">");
 	}};
-	//TODO need patient data for date of birth, sex and weight
 	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study) throws Exception {
 		List<String> from = new ArrayList<String>();
 		from.add("Study study");
@@ -76,6 +76,14 @@ public class Application extends SecureController {
 			where.add("(patient.pat_id like ? or study_custom1 like ?)");
 			args.add("%" + id + "%");
 			args.add("%" + id + "%");
+		}
+		if (age != null) {
+			Calendar now = Calendar.getInstance();
+			where.add("patient.pat_birthdate <= ? and patient.pat_birthdate > ?");
+			now.add(Calendar.YEAR, -age);
+			args.add(new SimpleDateFormat("yyyyMMdd").format(now.getTime()));
+			now.add(Calendar.YEAR, -1);
+			args.add(new SimpleDateFormat("yyyyMMdd").format(now.getTime()));
 		}
 		if (sex != null) {
 			where.add("patient.pat_sex = ?");
