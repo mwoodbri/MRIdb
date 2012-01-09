@@ -81,7 +81,7 @@ public class FastTags extends play.templates.FastTags {
 		if (!dataset.contains(tag)) {
 			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.valueOf("(2005,140F)"));
 		}
-		out.println(dataset.getString(tag));
+		out.println(Boolean.TRUE.equals(args.get("float")) ? dataset.getFloat(tag) : dataset.getString(tag));
 	}
 
 }
