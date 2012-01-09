@@ -6,21 +6,23 @@
 <table id="studies" class="bordered-table zebra-striped sortable">
 	<thead>
 		<tr>
-			<th>Name</th>
-			<th>Subject ID</th>
-			<th>Date of Birth</th>
-			<th>Study Description</th>
-			<th>Date of Study</th>
+			<th>pk
+			<th>Name
+			<th>Subject ID
+			<th>Date of Birth
+			<th>Study Description
+			<th>Date of Study
 		</tr>
 	</thead>
 	<tbody>
 		#{list studies}
 		<tr>
-			<td>#{a @patient(_.pk)}${_.patient.pat_name}#{/a}</td>
-			<td>${_.patient.pat_id}</td>
-			<td>${_.patient.pat_birthdate?.formatAsDate()}</td>
-			<td>${_.study_desc}</td>
-			<td>${_.study_datetime.format()}</td>
+			<td>#{a @patient(_.pk)}${_.patient.pk}#{/a}
+			<td>#{a @patient(_.pk)}${_.patient.pat_name}#{/a}
+			<td>${_.patient.pat_id}
+			<td>${_.patient.pat_birthdate?.formatAsDate()}
+			<td>${_.study_desc}
+			<td>${_.study_datetime.format()}
 		</tr>
 		#{/list}
 	</tbody>
