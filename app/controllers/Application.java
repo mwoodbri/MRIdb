@@ -62,13 +62,13 @@ public class Application extends SecureController {
 		List<Object> args = new ArrayList<Object>();
 
 		if (!name.isEmpty()) {
-			where.add("patient.pat_name like ?");
-			args.add("%" + name + "%");
+			where.add("lower(patient.pat_name) like ?");
+			args.add("%" + name.toLowerCase() + "%");
 		}
 		if (!id.isEmpty()) {
-			where.add("(patient.pat_id like ? or study_custom1 like ?)");
-			args.add("%" + id + "%");
-			args.add("%" + id + "%");
+			where.add("(lower(patient.pat_id) like ? or lower(study_custom1) like ?)");
+			args.add("%" + id.toLowerCase() + "%");
+			args.add("%" + id.toLowerCase() + "%");
 		}
 		if (age != null) {
 			Calendar now = Calendar.getInstance();
@@ -84,12 +84,12 @@ public class Application extends SecureController {
 		}
 		if (!protocol.isEmpty()) {
 			from.add("in(study.series) series");
-			where.add("series.series_custom1 like ?");
-			args.add("%" + protocol + "%");
+			where.add("lower(series.series_custom1) like ?");
+			args.add("%" + protocol.toLowerCase() + "%");
 		}
 		if (!study.isEmpty()) {
-			where.add("study_desc like ?");
-			args.add("%" + study + "%");
+			where.add("lower(study_desc) like ?");
+			args.add("%" + study.toLowerCase() + "%");
 		}
 		if (!acquisition.isEmpty()) {
 			where.add(String.format("cast(study_datetime as date) %s ?", comparators.get(acquisition)));
