@@ -2,15 +2,19 @@ package tags;
 
 import groovy.lang.Closure;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+
+import models.Series;
 
 import org.dcm4che.data.Dataset;
 import org.dcm4che.dict.Tags;
 
 import play.templates.GroovyTemplate.ExecutableTemplate;
+import util.Dicom;
 
-public class FastTags extends play.templates.FastTags {
+public class DicomTags extends play.templates.FastTags {
 
 	public static void _PixelSpacing(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
@@ -51,8 +55,9 @@ public class FastTags extends play.templates.FastTags {
 			} else {
 				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
 			}
+			numberOfPhaseEncodingSteps = dataset.getInteger(Tags.MRAcquisitionPhaseEncodingStepsInPlane);
 		}
-		out.println(dataset.getInteger(Tags.MRAcquisitionPhaseEncodingStepsInPlane));
+		out.println(numberOfPhaseEncodingSteps);
 	}
 
 	public static void _ReceiveCoilName(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
@@ -84,4 +89,13 @@ public class FastTags extends play.templates.FastTags {
 		out.println(Boolean.TRUE.equals(args.get("float")) ? dataset.getFloat(tag) : dataset.getString(tag));
 	}
 
+	public static void _NumberOfFrames(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
+		Series series = (Series) args.get("arg");
+		String numberOfFrames = Dicom.attribute(series.instances.iterator().next().inst_attrs, "NumberOfFrames");
+		if (numberOfFrames == null) {
+			numberOfFrames = String.valueOf(series.instances.size());
+		}
+		out.println(numberOfFrames);
+	}
+	
 }

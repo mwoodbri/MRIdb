@@ -73,7 +73,7 @@ Download as #{a @download(series.pk)}dicom#{/a} #{a @download(series.pk, 'nii')}
 	</thead>
 	<tbody>
 		<tr>
-			<td>${series.instances.iterator().next().inst_attrs.get('Columns')} / ${series.instances.iterator().next().inst_attrs.get('Rows')} / ${series.instances.iterator().next().inst_attrs.get('NumberOfFrames')}</td>
+			<td>${series.instances.iterator().next().inst_attrs.get('Columns')} / ${series.instances.iterator().next().inst_attrs.get('Rows')} / #{NumberOfFrames series/}</td>
 			<td>#{PixelSpacing dataset, axis: 'X'/} / #{PixelSpacing dataset, axis: 'Y'/} / #{SliceThickness dataset/}</td>
 			<td>#{InPlanePhaseEncodingDirection dataset/}</td>
 			<td>#{MRAcquisitionPhaseEncodingStepsInPlane dataset/}</td>
