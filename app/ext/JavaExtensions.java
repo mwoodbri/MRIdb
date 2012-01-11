@@ -26,8 +26,8 @@ public class JavaExtensions extends play.templates.JavaExtensions {
 		return Dicom.attribute(dataset, tag);
 	}
 
-	public static String formatAsAge(String string) {
-		return "" + Years.yearsBetween(DateTimeFormat.forPattern("yyyyMMdd").parseDateTime(string), new DateTime()).getYears();
+	public static String formatAsRelativeAge(String string, Date date) {
+		return String.valueOf(Years.yearsBetween(DateTimeFormat.forPattern("yyyyMMdd").parseDateTime(string), new DateTime(date)).getYears());
 	}
 
 	public static String formatAsDate(String string) throws ParseException {
