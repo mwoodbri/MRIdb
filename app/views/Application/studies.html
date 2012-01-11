@@ -18,7 +18,7 @@
 		#{list studies}
 		<tr>
 			<td>#{a @patient(_.pk)}${_.patient.pk}#{/a}
-			<td>#{a @patient(_.pk)}${_.patient.pat_name}#{/a}
+			<td>#{a @patient(_.pk)}${_.patient.pat_name?.formatAsName()}#{/a}
 			<td>${_.patient.pat_id}
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
 			<td>${_.study_desc}

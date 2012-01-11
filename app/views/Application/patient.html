@@ -16,7 +16,7 @@ li a:hover {
 
 *{<h1>#{get 'title'/}</h1>}*
 
-<h2>${patient.pat_id} - ${patient.pat_name} - ${patient.pat_birthdate?.formatAsDate()}</h2>
+<h2>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h2>
 
 #{list patient.studies, as: 'study'}
 <h3>${patient.pat_id} ${study.study_desc} ${study.study_datetime.format()}</h3>
