@@ -17,8 +17,6 @@ import models.Patient;
 import models.Series;
 import models.Study;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
@@ -148,15 +146,15 @@ public class Application extends SecureController {
 				new ProcessBuilder(Properties.getString("dcm2nii"), "-g", "n", "-v", "n", "-f", "y", "-e", "n", "-d", "n", "-p", "n", "-o", tmpDir.getPath(), dcm.getPath()).start().waitFor();
 				renderBinary(nii);
 			} else {
-				//TODO anonymise
-				renderBinary(dcm);
+				File anon = new File(tmpDir, String.format("%s.dcm", dcm.getName()));
+				Dicom.anonymise(dcm, anon);
+				renderBinary(anon);
 			}
 		} else {
 			File dir = new File(tmpDir, series.series_iuid);
 			dir.mkdir();
-			for (File file : Dicom.files(Series.<Series>findById(pk))) {
-				//TODO anonymise
-				FileUtils.copyFileToDirectory(file, dir);
+			for (File dcm : Dicom.files(Series.<Series>findById(pk))) {
+				Dicom.anonymise(dcm, new File(dir, String.format("%s.dcm", dcm.getName())));
 			}
 			File zip = new File(tmpDir, String.format("%s.zip", series.series_iuid));
 			Files.zip(dir, zip);

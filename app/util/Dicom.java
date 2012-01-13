@@ -50,6 +50,20 @@ public class Dicom {
 		}
 		return echoes;
 	}
+	
+	public static void anonymise(File from, File to) throws IOException {
+		Dataset dataset = DcmObjectFactory.getInstance().newDataset();
+		dataset.readFile(from, null, -1);
+		dataset.remove(Tags.PatientName);
+		dataset.remove(Tags.PatientSex);
+		dataset.remove(Tags.PatientBirthDate);
+		dataset.remove(Tags.PatientAddress);
+		dataset.remove(Tags.ReferringPhysicianName);
+		dataset.remove(Tags.InstitutionName);
+		dataset.remove(Tags.StationName);
+		dataset.remove(Tags.ManufacturerModelName);
+		dataset.writeFile(to, null);
+	}
 
 	//	public static Dataset privateDataset(Dataset dataset) throws IOException {
 	//		Dataset privateDataset;
