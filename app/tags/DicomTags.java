@@ -97,5 +97,5 @@ public class DicomTags extends play.templates.FastTags {
 		}
 		out.println(numberOfFrames);
 	}
-	
+
 }

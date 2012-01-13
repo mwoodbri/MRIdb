@@ -104,8 +104,8 @@ Download as #{a @download(series.pk)}dicom#{/a} #{a @download(series.pk, 'nii')}
 			<td>#{attr dataset, tag:'SeqVariant'/}
 			<td>#{ReceiveCoilName dataset/}
 			<td>#{RepetitionTime dataset/} ms
-			<td>#{attr dataset, tag:'EchoTime', float:true/} ms
-			<td>#{attr dataset, tag:'EchoNumber'/}
+			<td>${echoes.collect{it + ' ms'}.join(' / ')}
+			<td>${echoes.size()}
 			<td>#{attr dataset, tag:'NumberOfTemporalPositions'/}
 		</tr>
 	</tbody>

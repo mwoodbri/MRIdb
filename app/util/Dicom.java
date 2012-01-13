@@ -3,6 +3,8 @@ package util;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import models.Series;
 
@@ -28,18 +30,30 @@ public class Dicom {
 		return dataset;
 	}
 
-//	public static Dataset privateDataset(Dataset dataset) throws IOException {
-//		Dataset privateDataset;
-//		Dataset perFrameFunctionalGroupsSeq = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
-//		if (perFrameFunctionalGroupsSeq.get(Tags.valueOf("(2005,140F)")).hasItems()) {
-//			privateDataset = perFrameFunctionalGroupsSeq.getItem(Tags.valueOf("(2005,140F)"));
-//		} else {
-//			byte[] buf = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
-//			privateDataset = DcmObjectFactory.getInstance().newDataset();
-//			privateDataset.readFile(new ByteArrayInputStream(buf), null, -1);
-//		}
-//		return privateDataset;
-//	}
+	public static Set<Double> echoes(Dataset dataset) {
+		Set<Double> echoes = new HashSet<Double>();
+		if (dataset.contains(Tags.EchoTime)) {
+			echoes.add(Double.parseDouble(dataset.getString(Tags.EchoTime)));
+		} else {
+			for (int i = 0; i < dataset.get(Tags.PerFrameFunctionalGroupsSeq).countItems(); i++) {
+				echoes.add(dataset.getItem(Tags.PerFrameFunctionalGroupsSeq, i).getItem(Tags.MREchoSeq).getDouble(Tags.EffectiveEchoTime));
+			}
+		}
+		return echoes;
+	}
+
+	//	public static Dataset privateDataset(Dataset dataset) throws IOException {
+	//		Dataset privateDataset;
+	//		Dataset perFrameFunctionalGroupsSeq = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
+	//		if (perFrameFunctionalGroupsSeq.get(Tags.valueOf("(2005,140F)")).hasItems()) {
+	//			privateDataset = perFrameFunctionalGroupsSeq.getItem(Tags.valueOf("(2005,140F)"));
+	//		} else {
+	//			byte[] buf = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
+	//			privateDataset = DcmObjectFactory.getInstance().newDataset();
+	//			privateDataset.readFile(new ByteArrayInputStream(buf), null, -1);
+	//		}
+	//		return privateDataset;
+	//	}
 
 	//	public static String attribute(Instance instance, String tag) throws IOException {
 	//		Dataset d = DcmObjectFactory.getInstance().newDataset();

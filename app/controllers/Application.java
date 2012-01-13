@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import models.Patient;
 import models.Series;
@@ -113,7 +114,8 @@ public class Application extends SecureController {
 		Series series = Series.findById(pk);
 		Dataset dataset = Dicom.dataset(series);
 		//Dataset privateDataset = Dicom.privateDataset(dataset);
-		render(series, dataset);
+		Set<Double> echoes = Dicom.echoes(dataset);
+		render(series, dataset,echoes);
 	}
 
 	public static void image(String objectUID, Integer columns) throws MalformedURLException, IOException {
