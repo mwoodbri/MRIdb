@@ -16,6 +16,7 @@ public class Series extends GenericModel {
 	@Id
 	public long pk;
 	public String series_no;
+	public String series_iuid;
 	public String series_custom1;
 	@ManyToOne
 	@JoinColumn(name="study_fk")

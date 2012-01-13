@@ -3,9 +3,12 @@ package util;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import models.Instance;
 import models.Series;
 
 import org.dcm4che.data.Dataset;
@@ -20,13 +23,19 @@ public class Dicom {
 		return d.getString(Tags.forName(tag));
 	}
 
-	public static File file(Series series) {
-		return new File(Properties.getString("archive"), series.instances.iterator().next().files.iterator().next().filepath);
+	public static List<File> files(Series series) {
+		List<File> files = new ArrayList<File>();
+		for (Instance instance : series.instances) {
+			files.add(new File(Properties.getString("archive"), instance.files.iterator().next().filepath));
+		}
+		return files;
 	}
 
+	//retrieve attributes that aren't in the table or blob by looking in the file
 	public static Dataset dataset(Series series) throws IOException {
 		Dataset dataset = DcmObjectFactory.getInstance().newDataset();
-		dataset.readFile(Dicom.file(series), null, -1);
+		//TODO this (incorrectly?) only looks at the first file of a series
+		dataset.readFile(Dicom.files(series).get(0), null, -1);
 		return dataset;
 	}
 

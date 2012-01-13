@@ -17,9 +17,13 @@ import models.Patient;
 import models.Series;
 import models.Study;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
+import play.Play;
+import play.libs.Files;
 import play.libs.IO;
 import util.Dicom;
 import util.PersistentLogger;
@@ -127,19 +131,33 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	//TODO anonymise all downloads
 	public static void download(long pk, String format) throws InterruptedException, IOException {
 		PersistentLogger.log("Downloaded series %s", pk);
-		File dicom = Dicom.file(Series.<Series>findById(pk));
-		if ("nii".equals(format)) {
-			//TODO do as a background job
-			File tmp = new File(System.getProperty("java.io.tmpdir"));
-			File nii = new File(tmp, String.format("%s.nii", dicom.getName()));
-			nii.delete();
-			new ProcessBuilder(Properties.getString("dcm2nii"), "-a", "n", "-g", "n", "-v", "n", "-f", "y", "-e", "n", "-d", "n", "-p", "n", "-o", tmp.getPath(), dicom.getPath()).start().waitFor();
-			renderBinary(nii);
+		File tmpDir = new File(Play.tmpDir, "downloads");
+		tmpDir.mkdir();
+		Series series = Series.<Series>findById(pk);
+		if (series.instances.size() == 1) {
+			File dcm = Dicom.files(Series.<Series>findById(pk)).get(0);
+			if ("nii".equals(format)) {
+				//TODO do as a background job
+				File nii = new File(tmpDir, String.format("%s.nii", dcm.getName()));
+				nii.delete();
+				new ProcessBuilder(Properties.getString("dcm2nii"), "-g", "n", "-v", "n", "-f", "y", "-e", "n", "-d", "n", "-p", "n", "-o", tmpDir.getPath(), dcm.getPath()).start().waitFor();
+				renderBinary(nii);
+			} else {
+				//TODO anonymise
+				renderBinary(dcm);
+			}
 		} else {
-			renderBinary(dicom);
+			File dir = new File(tmpDir, series.series_iuid);
+			dir.mkdir();
+			for (File file : Dicom.files(Series.<Series>findById(pk))) {
+				//TODO anonymise
+				FileUtils.copyFileToDirectory(file, dir);
+			}
+			File zip = new File(tmpDir, String.format("%s.zip", series.series_iuid));
+			Files.zip(dir, zip);
+			renderBinary(zip);
 		}
 	}
 }
