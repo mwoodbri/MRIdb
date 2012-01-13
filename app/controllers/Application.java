@@ -122,11 +122,14 @@ public class Application extends SecureController {
 		render(series, dataset,echoes);
 	}
 
-	public static void image(String objectUID, Integer columns) throws MalformedURLException, IOException {
+	public static void image(String objectUID, Integer columns, Integer frameNumber) throws MalformedURLException, IOException {
 		notFoundIfNull(objectUID);
 		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s", Properties.getString("dicom.host"), objectUID);
 		if (columns != null) {
 			url += String.format("&columns=%s", columns);
+		}
+		if (frameNumber != null) {
+			url += String.format("&frameNumber=%s", frameNumber);
 		}
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}

@@ -52,11 +52,13 @@ Download as #{a @download(series.pk)}dicom#{/a} #{if series.instances.size() == 
 	</div>
 	<div class="span1 offset1">
 		<ul class="media-grid">
+			#{list echoes}
 			<li>
 				<a href="#">
-					<img class="thumbnail" src="@{image(series.instances.iterator().next().sop_iuid, 256)}" alt="">
+					<img class="thumbnail" src="@{image(series.instances.iterator().next().sop_iuid, 128, _index + 1)}" alt="">
 				</a>
 			</li>
+			#{/list}
 		</ul>
 	</div>
 </div>
