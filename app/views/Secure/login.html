@@ -3,10 +3,12 @@
 <div id="login">
 	
 	<h1>&{'secure.title'}</h1>
-		
-	<p>This database contains confidential information and is for authorised users only</p>
 
 	#{form @authenticate()}
+		
+		<img style="display: block; margin: 0 auto 10px auto" width="460" src="@{'/public/images/tigris.jpg'}">
+		
+		<p style="text-align: center">This database contains confidential information<br>and is for authorised users only</p>
 		
 		#{if flash.error}
 			<p class="error">
