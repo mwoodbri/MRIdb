@@ -21,7 +21,7 @@ li a:hover {
 #{list patient.studies, as: 'study'}
 <h3>${patient.pat_id} ${study.study_desc} ${study.study_datetime.format()}</h3>
 <ul class="media-grid">
-	#{list study.series.sort{it.series_no}, as: 'series'}
+	#{list study.series.sort{it.series_no as int}, as: 'series'}
 	<li>
 		#{a @series(series.pk)}
 			<img class="thumbnail" src="@{image(series.instances.iterator().next().sop_iuid, 128)}" alt="">
