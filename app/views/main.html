@@ -3,7 +3,7 @@
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
     <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-    #{stylesheet 'flick/jquery-ui-1.8.16.custom.css'/}
+    #{stylesheet 'flick/jquery-ui-1.8.17.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
     #{stylesheet 'main.css'/}
     #{get 'moreStyles'/}
@@ -24,38 +24,18 @@
     </div>
 
     <div class="container-fluid">
-      <!--div class="sidebar">
+      <div class="sidebar">
         <div class="well">
-          <h5>Sidebar</h5>
-          <ul>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-          </ul>
-          <h5>Sidebar</h5>
-          <ul>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-          </ul>
-          <h5>Sidebar</h5>
-          <ul>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-          </ul>
+          #{include 'Application/clipboard.html'/}
         </div>
-      </div-->
-      <div class="content" style="margin-left: 0">
+      </div>
+      <div class="content">
         #{doLayout/}
       </div>
     </div>
 
-    #{script 'jquery.min.js'/}
-    #{script 'jquery-ui-1.8.16.custom.min.js'/}
+    #{script 'jquery-1.7.1.min.js'/}
+    #{script 'jquery-ui-1.8.17.custom.min.js'/}
     *{#{script 'jquery.ui.datepicker-en-GB.js'/}}*
     #{script 'jquery.tablesorter.min.js'/}
     <script>

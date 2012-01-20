@@ -1,3 +1,14 @@
 body {
   padding-top: 60px;
 }
+
+.container-fluid > .sidebar {
+  position: absolute;
+  right: 20px;
+  left: auto;
+}
+
+.container-fluid > .content {
+  margin-right: 240px;
+  margin-left: 0;
+}
