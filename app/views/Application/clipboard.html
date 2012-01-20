@@ -1,8 +1,14 @@
-<h5>Clipboard</h5>
+<h5 style="display: inline">Clipboard</h5>
+#{if clipboard.items}
+[#{a @unclipboard()}x#{/a}]
 <ul>
-  <li><a href="#">Link</a></li>
-  <li><a href="#">Link</a></li>
-  <li><a href="#">Link</a></li>
-  <li><a href="#">Link</a></li>
+  #{list clipboard.items}
+  <li>
+    #{if _.type == 'S'}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk)}</a>#{/if}
+    #{if _.type == 's'}#{a @series(_.pk)}${models.Series.findById(_.pk)}#{/a}#{/if}
+    [#{a @unclipboard(_)}x#{/a}]
+  </li>
+  #{/list}
 </ul>
-<a href="#">[Clear]</a><a href="#">[Export encrypted file]</a>
+*{<a href="#">Export encrypted files</a>}*
+#{/if}

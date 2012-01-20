@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import models.Patient;
 import models.Series;
@@ -23,13 +24,21 @@ import org.dcm4che.data.Dataset;
 import play.Play;
 import play.libs.Files;
 import play.libs.IO;
+import play.mvc.Before;
+import util.Clipboard;
 import util.Dicom;
 import util.PersistentLogger;
 import util.Properties;
 
 public class Application extends SecureController {
+	private static final String CLIPBOARD = "clipboard";
 
-	public static void index() throws Exception {
+	@Before
+	static void before() {
+		renderArgs.put(CLIPBOARD, new Clipboard(session.get(CLIPBOARD)));
+	}
+
+	public static void index(String reset) throws Exception {
 		//Query query = JPA.em().createNativeQuery("select * from study");
 		//List results = query.getResultList();
 		//System.out.println(Arrays.toString((Object[]) results.get(0)));
@@ -43,6 +52,10 @@ public class Application extends SecureController {
 		//}
 
 		//System.out.println(Tags.toString(Tags.valueOf("(2005,140F)")));
+
+		//		if (reset != null) {
+		//			session.put(CLIPBOARD, "S51,s55");
+		//		}
 
 		render();
 	}
@@ -117,7 +130,7 @@ public class Application extends SecureController {
 		Dataset dataset = Dicom.dataset(series);
 		//Dataset privateDataset = Dicom.privateDataset(dataset);
 		Set<Double> echoes = Dicom.echoes(dataset);
-		render(series, dataset,echoes);
+		render(series, dataset, echoes);
 	}
 
 	public static void image(String objectUID, Integer columns, Integer frameNumber) throws MalformedURLException, IOException {
@@ -134,13 +147,12 @@ public class Application extends SecureController {
 
 	public static void download(long pk, String format) throws InterruptedException, IOException {
 		PersistentLogger.log("Downloaded series %s", pk);
-		File tmpDir = new File(Play.tmpDir, "downloads");
+		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		Series series = Series.<Series>findById(pk);
 		if (series.instances.size() == 1) {
 			File dcm = Dicom.files(Series.<Series>findById(pk)).get(0);
 			if ("nii".equals(format)) {
-				//TODO do as a background job
 				File nii = new File(tmpDir, String.format("%s.nii", dcm.getName()));
 				nii.delete();
 				new ProcessBuilder(Properties.getString("dcm2nii"), "-g", "n", "-v", "n", "-f", "y", "-e", "n", "-d", "n", "-p", "n", "-o", tmpDir.getPath(), dcm.getPath()).start().waitFor();
@@ -160,5 +172,15 @@ public class Application extends SecureController {
 			Files.zip(dir, zip);
 			renderBinary(zip);
 		}
+	}
+
+	public static void clipboard(String type, long pk) {
+		session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).add(type, pk));
+		redirect(request.headers.get("referer").value());
+	}
+
+	public static void unclipboard(Clipboard.Item item) {
+		session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).remove(item));
+		redirect(request.headers.get("referer").value());
 	}
 }

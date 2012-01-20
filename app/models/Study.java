@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import ext.JavaExtensions;
+
 import play.db.jpa.GenericModel;
 
 @Entity
@@ -29,6 +31,6 @@ public class Study extends GenericModel {
 
 	@Override
 	public String toString() {
-		return String.format("%s %s %s %s %s", pk, study_desc, study_datetime, study_custom1, patient);
+		return String.format("%s on %s", patient.pat_name == null ? "" : JavaExtensions.formatAsName(patient.pat_name), JavaExtensions.format(study_datetime));
 	}
 }

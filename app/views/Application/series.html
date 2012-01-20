@@ -1,8 +1,8 @@
 #{extends 'main.html'/}
 #{set title:'Series'/}
 
-<h2>${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime.format()} - ${series.series_custom1}(${series.series_no})</h2>
-Download as #{a @download(series.pk)}dicom#{/a} #{if series.instances.size() == 1}#{a @download(series.pk, 'nii')}nifti#{/a}#{/if}
+<h2 style="display: inline">${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime.format()} - ${series.series_custom1}(${series.series_no})</h2> [#{a @clipboard(series.class.simpleName, series.pk)}+#{/a}]
+<p>Download as #{a @download(series.pk)}dicom#{/a} #{if series.instances.size() == 1}#{a @download(series.pk, 'nii')}nifti#{/a}#{/if}<p>
 
 <div class="row">
 	<div class="span14">

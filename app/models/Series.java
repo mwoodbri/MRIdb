@@ -26,6 +26,6 @@ public class Series extends GenericModel {
 
 	@Override
 	public String toString() {
-		return String.format("%s %s %s", pk, series_custom1, study);
+		return String.format("%s of %s", series_custom1, study);
 	}
 }
