@@ -29,8 +29,7 @@ public class Study extends GenericModel {
 	@OneToMany(mappedBy = "study")
 	public Set<Series> series;
 
-	@Override
-	public String toString() {
+	public String toClipboardString() {
 		return String.format("%s on %s", patient.pat_name == null ? "" : JavaExtensions.formatAsName(patient.pat_name), JavaExtensions.format(study_datetime));
 	}
 }

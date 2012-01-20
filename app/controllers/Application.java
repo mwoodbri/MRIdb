@@ -153,22 +153,22 @@ public class Application extends SecureController {
 		if (series.instances.size() == 1) {
 			File dcm = Dicom.files(Series.<Series>findById(pk)).get(0);
 			if ("nii".equals(format)) {
-				File nii = new File(tmpDir, String.format("%s.nii", dcm.getName()));
+				File nii = new File(tmpDir, String.format("%s.nii", series.toDownloadString()));
 				nii.delete();
 				new ProcessBuilder(Properties.getString("dcm2nii"), "-g", "n", "-v", "n", "-f", "y", "-e", "n", "-d", "n", "-p", "n", "-o", tmpDir.getPath(), dcm.getPath()).start().waitFor();
 				renderBinary(nii);
 			} else {
-				File anon = new File(tmpDir, String.format("%s.dcm", dcm.getName()));
+				File anon = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
 				Dicom.anonymise(dcm, anon);
 				renderBinary(anon);
 			}
 		} else {
 			File dir = new File(tmpDir, series.series_iuid);
 			dir.mkdir();
-			for (File dcm : Dicom.files(Series.<Series>findById(pk))) {
+			for (File dcm : Dicom.files(series)) {
 				Dicom.anonymise(dcm, new File(dir, String.format("%s.dcm", dcm.getName())));
 			}
-			File zip = new File(tmpDir, String.format("%s.zip", series.series_iuid));
+			File zip = new File(tmpDir, String.format("%s.zip", series.toDownloadString()));
 			Files.zip(dir, zip);
 			renderBinary(zip);
 		}
@@ -180,7 +180,11 @@ public class Application extends SecureController {
 	}
 
 	public static void unclipboard(Clipboard.Item item) {
-		session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).remove(item));
+		if (item == null) {
+			session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).clear());
+		} else {
+			session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).remove(item));
+		}
 		redirect(request.headers.get("referer").value());
 	}
 }

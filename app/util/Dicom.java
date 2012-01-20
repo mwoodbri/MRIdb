@@ -50,7 +50,7 @@ public class Dicom {
 		}
 		return echoes;
 	}
-	
+
 	public static void anonymise(File from, File to) throws IOException {
 		Dataset dataset = DcmObjectFactory.getInstance().newDataset();
 		dataset.readFile(from, null, -1);

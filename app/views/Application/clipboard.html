@@ -4,8 +4,8 @@
 <ul>
   #{list clipboard.items}
   <li>
-    #{if _.type == 'S'}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk)}</a>#{/if}
-    #{if _.type == 's'}#{a @series(_.pk)}${models.Series.findById(_.pk)}#{/a}#{/if}
+    #{if _.type == 'S'}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
+    #{if _.type == 's'}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
     [#{a @unclipboard(_)}x#{/a}]
   </li>
   #{/list}

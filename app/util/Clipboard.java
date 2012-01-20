@@ -37,6 +37,11 @@ public class Clipboard {
 		return this;
 	}
 
+	public Clipboard clear() {
+		items.clear();
+		return this;
+	}
+	
 	@Override
 	public String toString() {
 		return StringUtils.join(items, SEPARATOR);
