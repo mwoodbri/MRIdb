@@ -158,9 +158,7 @@ public class Application extends SecureController {
 			//TODO check that ISD_dicom_tool doesn't handle anonymisation
 			if ("nii".equals(format)) {
 				File nii = new File(String.format("%s.nii", FilenameUtils.removeExtension(anon.getPath())));
-				ProcessBuilder builder = new ProcessBuilder(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), anon.getPath(), nii.getPath());
-				builder.environment().put("PYTHONPATH", "/opt/pynifti-0.20100607.1:/opt/ISD_dicom_tool");
-				builder.start().waitFor();
+				new ProcessBuilder(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), anon.getPath(), nii.getPath()).start().waitFor();
 				renderBinary(nii);
 			} else {
 				renderBinary(anon);
