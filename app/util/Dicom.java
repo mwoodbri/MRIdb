@@ -30,6 +30,14 @@ public class Dicom {
 		}
 		return files;
 	}
+	
+	public static File folder(Series series) {
+		File folder = new File(Properties.getString("archive"), series.instances.iterator().next().files.iterator().next().filepath).getParentFile();
+		if (folder.list().length != series.instances.size()) {
+			throw new RuntimeException(String.format("Folder contains %s files but series only has %s!", folder.list().length, series.instances.size()));
+		}
+		return folder;
+ 	}
 
 	//retrieve attributes that aren't in the table or blob by looking in the file
 	public static Dataset dataset(Series series) throws IOException {

@@ -18,6 +18,7 @@ import models.Patient;
 import models.Series;
 import models.Study;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
@@ -152,25 +153,40 @@ public class Application extends SecureController {
 		Series series = Series.<Series>findById(pk);
 		if (series.instances.size() == 1) {
 			File dcm = Dicom.files(Series.<Series>findById(pk)).get(0);
+			File anon = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
+			Dicom.anonymise(dcm, anon);
+			//TODO check that ISD_dicom_tool doesn't handle anonymisation
 			if ("nii".equals(format)) {
-				File nii = new File(tmpDir, String.format("%s.nii", series.toDownloadString()));
-				nii.delete();
-				new ProcessBuilder(Properties.getString("dcm2nii"), "-g", "n", "-v", "n", "-f", "y", "-e", "n", "-d", "n", "-p", "n", "-o", tmpDir.getPath(), dcm.getPath()).start().waitFor();
+				File nii = new File(String.format("%s.nii", FilenameUtils.removeExtension(anon.getPath())));
+				ProcessBuilder builder = new ProcessBuilder(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), anon.getPath(), nii.getPath());
+				builder.environment().put("PYTHONPATH", "/opt/pynifti-0.20100607.1:/opt/ISD_dicom_tool");
+				builder.start().waitFor();
 				renderBinary(nii);
 			} else {
-				File anon = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
-				Dicom.anonymise(dcm, anon);
 				renderBinary(anon);
 			}
 		} else {
 			File dir = new File(tmpDir, series.series_iuid);
 			dir.mkdir();
-			for (File dcm : Dicom.files(series)) {
-				Dicom.anonymise(dcm, new File(dir, String.format("%s.dcm", dcm.getName())));
+			if ("nii".equals(format)) {
+				new ProcessBuilder(Properties.getString("dcm2nii"),
+						"-d", "n",//don't put date in filename
+						"-e", "n",//don't put series/acq in filename
+						"-g", "n",//don't gzip
+						"-i", "y",//use id in filename
+						"-o", dir.getPath(),//don't put destination file in same directory as source
+						"-p", "n",//don't put protocol in filename
+						Dicom.folder(Series.<Series>findById(pk)).getPath()).start().waitFor();
+				renderBinary(dir.listFiles()[0], String.format("%s.nii", series.toDownloadString()));
+			} else {
+				//TODO selective echo
+				for (File dcm : Dicom.files(series)) {
+					Dicom.anonymise(dcm, new File(dir, String.format("%s.dcm", dcm.getName())));
+				}
+				File zip = new File(tmpDir, String.format("%s.zip", series.toDownloadString()));
+				Files.zip(dir, zip);
+				renderBinary(zip);
 			}
-			File zip = new File(tmpDir, String.format("%s.zip", series.toDownloadString()));
-			Files.zip(dir, zip);
-			renderBinary(zip);
 		}
 	}
 
