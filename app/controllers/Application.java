@@ -128,9 +128,9 @@ public class Application extends SecureController {
 
 	public static void series(long pk) throws Exception {
 		Series series = Series.findById(pk);
-		Dataset dataset = Dicom.dataset(series);
+		Dataset dataset = Dicom.dataset(Dicom.file(series.instances.iterator().next()));
 		//Dataset privateDataset = Dicom.privateDataset(dataset);
-		Set<Double> echoes = Dicom.echoes(dataset);
+		Set<String> echoes = Dicom.echoes(dataset);
 		render(series, dataset, echoes);
 	}
 
@@ -146,13 +146,13 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	public static void download(long pk, String format) throws InterruptedException, IOException {
+	public static void download(long pk, String format, String echo) throws InterruptedException, IOException {
 		PersistentLogger.log("Downloaded series %s", pk);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		Series series = Series.<Series>findById(pk);
 		if (series.instances.size() == 1) {
-			File dcm = Dicom.files(Series.<Series>findById(pk)).get(0);
+			File dcm = Dicom.file(Series.<Series>findById(pk).instances.iterator().next());
 			File anon = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
 			Dicom.anonymise(dcm, anon);
 			//TODO check that ISD_dicom_tool doesn't handle anonymisation
@@ -177,8 +177,7 @@ public class Application extends SecureController {
 						Dicom.folder(Series.<Series>findById(pk)).getPath()).start().waitFor();
 				renderBinary(dir.listFiles()[0], String.format("%s.nii", series.toDownloadString()));
 			} else {
-				//TODO selective echo
-				for (File dcm : Dicom.files(series)) {
+				for (File dcm : Dicom.files(series, echo)) {
 					Dicom.anonymise(dcm, new File(dir, String.format("%s.dcm", dcm.getName())));
 				}
 				File zip = new File(tmpDir, String.format("%s.zip", series.toDownloadString()));
