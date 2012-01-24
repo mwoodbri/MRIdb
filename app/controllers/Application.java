@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,16 +12,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import jobs.Exporter;
 import models.Patient;
 import models.Series;
 import models.Study;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
 import play.Play;
-import play.libs.Files;
 import play.libs.IO;
 import play.mvc.Before;
 import util.Clipboard;
@@ -88,12 +85,9 @@ public class Application extends SecureController {
 			args.add("%" + id.toLowerCase() + "%");
 		}
 		if (age != null) {
-			Calendar now = Calendar.getInstance();
-			where.add("patient.pat_birthdate <= ? and patient.pat_birthdate > ?");
-			now.add(Calendar.YEAR, -age);
-			args.add(new SimpleDateFormat("yyyyMMdd").format(now.getTime()));
-			now.add(Calendar.YEAR, -1);
-			args.add(new SimpleDateFormat("yyyyMMdd").format(now.getTime()));
+			where.add("cast(study_datetime as date) - cast(patient.pat_birthdate as date) >= ? and cast(study_datetime as date) - cast(patient.pat_birthdate as date) < ?");
+			args.add(365D * age);
+			args.add(365D * (age + 1));
 		}
 		if (sex != null) {
 			where.add("patient.pat_sex = ?");
@@ -151,40 +145,7 @@ public class Application extends SecureController {
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		Series series = Series.<Series>findById(pk);
-		if (series.instances.size() == 1) {
-			File dcm = Dicom.file(Series.<Series>findById(pk).instances.iterator().next());
-			File anon = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
-			Dicom.anonymise(dcm, anon);
-			//TODO check that ISD_dicom_tool doesn't handle anonymisation
-			if ("nii".equals(format)) {
-				File nii = new File(String.format("%s.nii", FilenameUtils.removeExtension(anon.getPath())));
-				new ProcessBuilder(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), anon.getPath(), nii.getPath()).start().waitFor();
-				renderBinary(nii);
-			} else {
-				renderBinary(anon);
-			}
-		} else {
-			File dir = new File(tmpDir, series.series_iuid);
-			dir.mkdir();
-			if ("nii".equals(format)) {
-				new ProcessBuilder(Properties.getString("dcm2nii"),
-						"-d", "n",//don't put date in filename
-						"-e", "n",//don't put series/acq in filename
-						"-g", "n",//don't gzip
-						"-i", "y",//use id in filename
-						"-o", dir.getPath(),//don't put destination file in same directory as source
-						"-p", "n",//don't put protocol in filename
-						Dicom.folder(Series.<Series>findById(pk)).getPath()).start().waitFor();
-				renderBinary(dir.listFiles()[0], String.format("%s.nii", series.toDownloadString()));
-			} else {
-				for (File dcm : Dicom.files(series, echo)) {
-					Dicom.anonymise(dcm, new File(dir, String.format("%s.dcm", dcm.getName())));
-				}
-				File zip = new File(tmpDir, String.format("%s.zip", series.toDownloadString()));
-				Files.zip(dir, zip);
-				renderBinary(zip);
-			}
-		}
+		renderBinary(await(new Exporter(series, format, echo, tmpDir).now()));
 	}
 
 	public static void clipboard(String type, long pk) {
