@@ -1,12 +1,12 @@
 <h5 style="display: inline">Clipboard</h5>
 #{if clipboard.items}
-[#{a @unclipboard()}x#{/a}]
+[#{a @clipboard(null, null, true), class: 'clipboard'}x#{/a}]
 <ul>
   #{list clipboard.items}
   <li>
-    #{if _.type == 'S'}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
-    #{if _.type == 's'}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
-    [#{a @unclipboard(_)}x#{/a}]
+    #{if _.type == models.Study.class}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
+    #{if _.type == models.Series.class}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
+    [#{a @clipboard(_.type.simpleName, _.pk, true), class: 'clipboard'}x#{/a}]
   </li>
   #{/list}
 </ul>

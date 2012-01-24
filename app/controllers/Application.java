@@ -149,21 +149,22 @@ public class Application extends SecureController {
 		PersistentLogger.log("Downloaded series %s", pk);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		Series series = Series.<Series>findById(pk);
-		renderBinary(await(new Exporter(series, format, echo, tmpDir).now()));
+		renderBinary(await(new Exporter(pk, format, echo, tmpDir).now()));
 	}
 
-	public static void clipboard(String type, long pk) {
-		session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).add(type, pk));
-		redirect(request.headers.get("referer").value());
-	}
-
-	public static void unclipboard(Clipboard.Item item) {
-		if (item == null) {
-			session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).clear());
+	public static void clipboard(String type, long pk, boolean remove) throws ClassNotFoundException {
+		if (remove) {
+			if (type == null) {
+				session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).clear());
+			} else {
+				session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).remove(type, pk));
+			}
 		} else {
-			session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).remove(item));
+			session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).add(type, pk));
 		}
-		redirect(request.headers.get("referer").value());
+		if (!request.isAjax()) {
+			redirect(request.headers.get("referer").value());
+		}
+		render();
 	}
 }

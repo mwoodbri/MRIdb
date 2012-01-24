@@ -19,7 +19,7 @@ li a:hover {
 <h2>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h2>
 
 #{list patient.studies, as: 'study'}
-<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime.format()}</h3> [#{a @clipboard(study.class.simpleName, study.pk)}+#{/a}]
+<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime.format()}</h3> [#{a @clipboard(study.class.simpleName, study.pk), class: 'clipboard'}+#{/a}]
 <ul class="media-grid">
 	#{list study.series.sort{it.series_no as int}, as: 'series'}
 	<li>

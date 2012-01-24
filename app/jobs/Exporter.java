@@ -14,15 +14,15 @@ import util.Dicom;
 import util.Properties;
 
 public class Exporter extends Job<File> {
-	private enum Format { DCM, NII };
+	public static enum Format { dcm, nii };
 
 	private Series series;
 	private Format format;
 	private String echo;
 	private File tmpDir;
 
-	public Exporter(Series series, String format, String echo, File tmpDir) {
-		this.series = series;
+	public Exporter(long pk, String format, String echo, File tmpDir) {
+		this.series = Series.<Series>findById(pk);;
 		this.format = Format.valueOf(format);
 		this.echo = echo;
 		this.tmpDir = tmpDir;

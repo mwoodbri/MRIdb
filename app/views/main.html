@@ -25,7 +25,7 @@
 
     <div class="container-fluid">
       <div class="sidebar">
-        <div class="well">
+        <div class="well" id="clipboard">
           #{include 'Application/clipboard.html'/}
         </div>
       </div>
@@ -46,7 +46,21 @@
                 changeMonth: true,
                 changeYear: true
             });
+            var clipboard = function(event){
+                $('#clipboard').load('@{Application.clipboard()}', params(event.target.href));
+                return false;
+            };
+            $("#clipboard").on("click", "a", clipboard);
+            $("a.clipboard").on("click", clipboard);
         });
+        function params(url) {
+            var e,
+                p = {},
+                r = /[?&](\w+)=?(\w*)/g;
+            while (e = r.exec(url))
+                p[e[1]] = e[2];
+            return p;
+        }
     </script>
     #{get 'moreScripts'/}
   </body>

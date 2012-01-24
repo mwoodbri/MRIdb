@@ -1,8 +1,8 @@
 package util;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import models.Series;
@@ -27,13 +27,13 @@ public class Clipboard {
 		}
 	}
 
-	public Clipboard add(String type, long pk) {
+	public Clipboard add(String type, long pk) throws ClassNotFoundException {
 		items.add(new Item(type, pk));
 		return this;
 	}
 
-	public Clipboard remove(Item item) {
-		items.remove(item);
+	public Clipboard remove(String type, long pk) throws ClassNotFoundException {
+		items.remove(new Item(type, pk));
 		return this;
 	}
 
@@ -41,25 +41,22 @@ public class Clipboard {
 		items.clear();
 		return this;
 	}
-	
+
 	@Override
 	public String toString() {
 		return StringUtils.join(items, SEPARATOR);
 	}
 
-	private static Map<String, String> types = new HashMap<String, String>() {{
-		put("Study", "S");
-		put("Series", "s");
-	}};
 	public static class Item {
-		public String type;
+		private static List types = Arrays.asList(Study.class, Series.class);
+		public Class type;
 		public long pk;
 		public Item(String item) {
-			type = item.substring(0, 1);
+			type = (Class) types.get(Integer.parseInt(item.substring(0, 1)));
 			pk = Long.parseLong(item.substring(1));
 		}
-		public Item(String type, long pk) {
-			this.type = types.get(type);
+		public Item(String type, long pk) throws ClassNotFoundException {
+			this.type = Class.forName(String.format("models.%s", type));
 			this.pk = pk;
 		}
 		@Override
@@ -72,7 +69,7 @@ public class Clipboard {
 		}
 		@Override
 		public String toString() {
-			return String.format("%s%s", type, pk);
+			return String.format("%s%s", types.indexOf(type), pk);
 		}
 	}
 }
