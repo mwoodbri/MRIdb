@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import jobs.Exporter;
+import models.Instance;
 import models.Patient;
 import models.Series;
 import models.Study;
@@ -128,9 +129,13 @@ public class Application extends SecureController {
 		render(series, dataset, echoes);
 	}
 
-	public static void image(String objectUID, Integer columns, Integer frameNumber) throws MalformedURLException, IOException {
-		notFoundIfNull(objectUID);
-		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s", Properties.getString("dicom.host"), objectUID);
+	public static void image(long pk, Integer columns, Integer frameNumber) throws MalformedURLException, IOException {
+		Series series = Series.findById(pk);
+		Instance instance = series.instances.iterator().next();
+		if (!instance.sop_cuid.equals("1.2.840.10008.5.1.4.1.1.4") && !instance.sop_cuid.equals("1.2.840.10008.5.1.4.1.1.7")) {
+			renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
+		}
+		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s", Properties.getString("dicom.host"), instance.sop_iuid);
 		if (columns != null) {
 			url += String.format("&columns=%s", columns);
 		}
