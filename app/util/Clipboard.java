@@ -44,7 +44,10 @@ public class Clipboard {
 	public Set<GenericModel> getObjects() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		Set<GenericModel> objects = new HashSet<GenericModel>();
 		for (Item item : items) {
-			objects.add((GenericModel) item.type.getMethod("findById", Object.class).invoke(null, item.pk));
+			GenericModel object = (GenericModel) item.type.getMethod("findById", Object.class).invoke(null, item.pk);
+			if (!(object instanceof Series) || !objects.contains(((Series) object).study)) {
+				objects.add(object);
+			}
 		}
 		return objects;
 	}

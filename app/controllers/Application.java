@@ -8,14 +8,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import jobs.Downloader;
+import jobs.Downloader.Format;
 import jobs.Exporter;
-import jobs.Exporter.Format;
 import models.Instance;
 import models.Patient;
 import models.Person;
@@ -27,11 +27,10 @@ import org.dcm4che.data.Dataset;
 
 import play.Play;
 import play.cache.Cache;
-import play.db.jpa.GenericModel;
+import play.libs.Files;
 import play.libs.IO;
 import play.mvc.Before;
 import util.Clipboard;
-import util.Clipboard.Item;
 import util.Dicom;
 import util.PersistentLogger;
 import util.Properties;
@@ -48,14 +47,6 @@ public class Application extends SecureController {
 	}
 
 	public static void index() throws Exception {
-		//List results = JPA.em().createNativeQuery("select * from study").getResultList();
-		//System.out.println(Arrays.toString((Object[]) results.get(0)));
-
-		//results = JPA.em().createNamedQuery("nativeSQL").getResultList();
-		//System.out.println(results);
-
-		//System.out.println(Tags.toString(Tags.valueOf("(2005,140F)")));
-
 		render();
 	}
 
@@ -148,21 +139,18 @@ public class Application extends SecureController {
 		PersistentLogger.log("Downloaded series %s", pk);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		renderBinary(await(new Exporter(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
+		renderBinary(await(new Downloader(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
 	}
-	
+
 	public static void export() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		PersistentLogger.log("Export clipboard %s", getUser().clipboard);
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
-		Set<GenericModel> objects = clipboard.getObjects();
-		for (GenericModel object : objects) {
-			if (object instanceof Series) {
-				if (!objects.contains(((Series) object).study)) {
-					System.out.println(object);
-				}
-			} else {
-				System.out.println(object);
-			}
-		}
+		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
+		tmpDir.mkdir();
+		await(new Exporter(clipboard, tmpDir).now());
+		File zipFile = new File(new File(Play.tmpDir, "downloads"), String.format("%s.zip", tmpDir.getName()));
+		Files.zip(tmpDir, zipFile);
+		renderBinary(zipFile);
 	}
 
 	public static void clipboard(String type, long pk, boolean remove) throws ClassNotFoundException {
