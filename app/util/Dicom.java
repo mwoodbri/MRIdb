@@ -3,7 +3,9 @@ package util;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +16,8 @@ import models.Series;
 import org.dcm4che.data.Dataset;
 import org.dcm4che.data.DcmObjectFactory;
 import org.dcm4che.dict.Tags;
+
+import play.Play;
 
 public class Dicom {
 
@@ -84,6 +88,11 @@ public class Dicom {
 		dataset.remove(Tags.StationName);
 		dataset.remove(Tags.ManufacturerModelName);
 		dataset.writeFile(to, null);
+	}
+	
+	private static final List<String> validCUIDs = Arrays.asList("1.2.840.10008.5.1.4.1.1.4", "1.2.840.10008.5.1.4.1.1.4.1", "1.2.840.10008.5.1.4.1.1.7");
+	public static boolean renderable(Series series) {
+		return validCUIDs.contains(series.instances.iterator().next().sop_cuid);
 	}
 
 	//	public static Dataset privateDataset(Dataset dataset) throws IOException {

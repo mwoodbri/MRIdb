@@ -11,10 +11,11 @@ import models.Series;
 import org.dcm4che.data.Dataset;
 import org.dcm4che.dict.Tags;
 
+import play.templates.FastTags;
 import play.templates.GroovyTemplate.ExecutableTemplate;
 import util.Dicom;
 
-public class DicomTags extends play.templates.FastTags {
+public class DicomTags extends FastTags {
 
 	public static void _PixelSpacing(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");

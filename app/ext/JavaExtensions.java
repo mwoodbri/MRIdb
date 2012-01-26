@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.Years;
 import org.joda.time.format.DateTimeFormat;
 
@@ -27,7 +28,17 @@ public class JavaExtensions extends play.templates.JavaExtensions {
 	}
 
 	public static String formatAsRelativeAge(String string, Date date) {
-		return String.valueOf(Years.yearsBetween(DateTimeFormat.forPattern("yyyyMMdd").parseDateTime(string), new DateTime(date)).getYears());
+		int years = Years.yearsBetween(DateTimeFormat.forPattern("yyyyMMdd").parseDateTime(string), new DateTime(date)).getYears();
+		if (years > 0) {
+			return String.format("%s", years);
+		} else {
+			int days = Days.daysBetween(DateTimeFormat.forPattern("yyyyMMdd").parseDateTime(string), new DateTime(date)).getDays();
+			if (days <= 29) {
+				return String.format("%s days", days);
+			} else {
+				return String.format("%s weeks, %s days", days / 7, days % 7);
+			}
+		}
 	}
 
 	public static String formatAsDate(String string) throws ParseException {

@@ -13,13 +13,13 @@ import play.libs.Files;
 @Every("1d")
 public class TmpWatch extends Job {
 
-	private static List<String> watchedFolders = Arrays.asList("downloads");
+	private static final List<String> watchedFolders = Arrays.asList("downloads");
 	public void doJob() {
 		for (String folderName : watchedFolders) {
 			File folder = new File(Play.tmpDir, folderName);
 			if (folder.exists()) {
 				for (File file : folder.listFiles()) {
-					if (TimeUnit.DAYS.toMinutes(System.currentTimeMillis() - file.lastModified()) > 1) {
+					if (TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - file.lastModified()) > 1) {
 						Files.delete(file);
 					}
 				}

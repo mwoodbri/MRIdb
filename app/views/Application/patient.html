@@ -23,10 +23,10 @@ li a:hover {
 <ul class="media-grid">
 	#{list study.series.sort{it.series_no as int}, as: 'series'}
 	<li>
-		#{a @series(series.pk)}
-			<img class="thumbnail" src="@{image(series.pk, 128)}" alt="">
+		<a href="#{if util.Dicom.renderable(series)}@{series(series.pk)}#{/if}#{else}##{/else}">
+			<img class="thumbnail" width="128" height="128" src="#{if util.Dicom.renderable(series)}@{'/public/images/spinner.gif'}#{/if}#{else}@{'/public/images/128x128.gif'}#{/else}" alt="@{image(series.pk, 128)}">
 			<div class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(20)}</div>
-		#{/a}
+		</a>
 	</li>
 	#{/list}
 </ul>

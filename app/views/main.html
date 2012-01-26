@@ -47,11 +47,14 @@
                 changeYear: true
             });
             var clipboard = function(event){
-                $('#clipboard').load('@{Application.clipboard()}', params(event.target.href));
+                $('#clipboard').load(this.href);
                 return false;
             };
-            $("#clipboard").on("click", "a", clipboard);
             $("a.clipboard").on("click", clipboard);
+            $("#clipboard").on("click", "a.clipboard", clipboard);
+            $(".thumbnail").each(function() {
+                this.src = this.alt;
+            });
         });
         function params(url) {
             var e,

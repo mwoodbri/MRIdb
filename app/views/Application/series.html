@@ -2,7 +2,7 @@
 #{set title:'Series'/}
 
 <h2 style="display: inline">${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime.format()} - ${series.series_custom1}(${series.series_no})</h2> [#{a @clipboard(series.class.simpleName, series.pk), class: 'clipboard'}+#{/a}]
-<p>Download as #{if echoes.size() > 1 && series.instances.size() > 1}#{list echoes}#{a @download(series.pk, "dcm", _index)}dicom${_index}#{/a} #{/list}#{/if}#{else}#{a @download(series.pk)}dicom#{/a} #{/else}#{a @download(series.pk, 'nii')}nifti#{/a}<p>
+<p>#{stats series}%s files (%s)#{/stats} Download as #{if echoes.size() > 1 && series.instances.size() > 1}#{list echoes}#{a @download(series.pk, "dcm", _index)}dicom${_index}#{/a} #{/list}#{/if}#{else}#{a @download(series.pk)}dicom#{/a} #{/else}#{a @download(series.pk, 'nii')}nifti#{/a}<p>
 
 <div class="row">
 	<div class="span14">
@@ -55,7 +55,7 @@
 			#{list echoes}
 			<li>
 				<a href="#">
-					<img class="thumbnail" src="@{image(series.pk, 128, _index)}" alt="">
+					<img class="thumbnail" src="@{'/public/images/128x128.gif'}" alt="@{image(series.pk, 128, _index)}">
 				</a>
 			</li>
 			#{/list}

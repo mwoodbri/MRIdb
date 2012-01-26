@@ -6,6 +6,7 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 
+import models.Person;
 import play.Logger;
 import play.Play;
 import util.PersistentLogger;
@@ -18,11 +19,11 @@ public class Security extends Secure.Security {
 		if (Play.mode.isDev() && Properties.getString("ldap.server") == null) {
 			authenticated = password.equals(username);
 		} else {
-			if (!"".equals(password)) {
+			if (!password.isEmpty()) {
 				Hashtable<String, String> env = new Hashtable<String, String>();
 				env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 				env.put(Context.PROVIDER_URL, Properties.getString("ldap.server"));
-				env.put(Context.SECURITY_PRINCIPAL, username + "@" + Properties.getString("ldap.domain"));
+				env.put(Context.SECURITY_PRINCIPAL, String.format("%s@%s", username, Properties.getString("ldap.domain")));
 				env.put(Context.SECURITY_CREDENTIALS, password);
 				try {
 					new InitialDirContext(env);
@@ -36,6 +37,11 @@ public class Security extends Secure.Security {
 	}
 
 	static void onAuthenticated() {
+		Person person = Person.findById(Security.connected());
+		if (person == null) {
+			person = new Person(Security.connected());
+			person.validateAndCreate();
+		}
 		PersistentLogger.log("Logged in");
 	}
 }

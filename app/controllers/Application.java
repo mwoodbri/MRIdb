@@ -2,11 +2,13 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +17,7 @@ import java.util.UUID;
 import jobs.Exporter;
 import models.Instance;
 import models.Patient;
+import models.Person;
 import models.Series;
 import models.Study;
 
@@ -22,39 +25,35 @@ import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
 import play.Play;
+import play.cache.Cache;
+import play.db.jpa.GenericModel;
 import play.libs.IO;
 import play.mvc.Before;
 import util.Clipboard;
+import util.Clipboard.Item;
 import util.Dicom;
 import util.PersistentLogger;
 import util.Properties;
+import controllers.Secure.Security;
 
 public class Application extends SecureController {
 	private static final String CLIPBOARD = "clipboard";
 
 	@Before
 	static void before() {
-		renderArgs.put(CLIPBOARD, new Clipboard(session.get(CLIPBOARD)));
+		if (Security.isConnected()) {
+			renderArgs.put(CLIPBOARD, new Clipboard(getUser().clipboard));
+		}
 	}
 
-	public static void index(String reset) throws Exception {
-		//Query query = JPA.em().createNativeQuery("select * from study");
-		//List results = query.getResultList();
+	public static void index() throws Exception {
+		//List results = JPA.em().createNativeQuery("select * from study").getResultList();
 		//System.out.println(Arrays.toString((Object[]) results.get(0)));
 
-		//query = JPA.em().createNamedQuery("nativeSQL");
-		//results = query.getResultList();
+		//results = JPA.em().createNamedQuery("nativeSQL").getResultList();
 		//System.out.println(results);
 
-		//for (Study study : Study.<Study>findAll()) {
-		//	System.out.printf("%s\t%s\t%s\t%s\t%s%n", study.patient.pat_name, study.patient.pat_id, study.patient.pat_birthdate, study.study_desc, study.study_datetime);
-		//}
-
 		//System.out.println(Tags.toString(Tags.valueOf("(2005,140F)")));
-
-		//		if (reset != null) {
-		//			session.put(CLIPBOARD, "S51,s55");
-		//		}
 
 		render();
 	}
@@ -124,7 +123,6 @@ public class Application extends SecureController {
 	public static void series(long pk) throws Exception {
 		Series series = Series.findById(pk);
 		Dataset dataset = Dicom.dataset(Dicom.file(series.instances.iterator().next()));
-		//Dataset privateDataset = Dicom.privateDataset(dataset);
 		Set<String> echoes = Dicom.echoes(dataset);
 		render(series, dataset, echoes);
 	}
@@ -132,7 +130,7 @@ public class Application extends SecureController {
 	public static void image(long pk, Integer columns, Integer frameNumber) throws MalformedURLException, IOException {
 		Series series = Series.findById(pk);
 		Instance instance = series.instances.iterator().next();
-		if (!instance.sop_cuid.equals("1.2.840.10008.5.1.4.1.1.4") && !instance.sop_cuid.equals("1.2.840.10008.5.1.4.1.1.7")) {
+		if (!Dicom.renderable(series)) {
 			renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 		}
 		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s", Properties.getString("dicom.host"), instance.sop_iuid);
@@ -151,17 +149,36 @@ public class Application extends SecureController {
 		tmpDir.mkdir();
 		renderBinary(await(new Exporter(pk, format, echo, tmpDir).now()));
 	}
+	
+	public static void export() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
+		Set<GenericModel> objects = clipboard.getObjects();
+		for (GenericModel object : objects) {
+			if (object instanceof Series) {
+				if (!objects.contains(((Series) object).study)) {
+					System.out.println(object);
+				}
+			} else {
+				System.out.println(object);
+			}
+		}
+	}
 
 	public static void clipboard(String type, long pk, boolean remove) throws ClassNotFoundException {
+		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		if (remove) {
 			if (type == null) {
-				session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).clear());
+				clipboard.clear();
 			} else {
-				session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).remove(type, pk));
+				clipboard.remove(type, pk);
 			}
 		} else {
-			session.put(CLIPBOARD, ((Clipboard) renderArgs.get(CLIPBOARD)).add(type, pk));
+			clipboard.add(type, pk);
 		}
+		Person person = Person.findById(Security.connected());
+		person.clipboard = clipboard.toString();
+		person.save();
+		Cache.set(Security.connected(), person);
 		if (!request.isAjax()) {
 			redirect(request.headers.get("referer").value());
 		}

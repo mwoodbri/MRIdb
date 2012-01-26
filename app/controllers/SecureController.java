@@ -1,6 +1,8 @@
 package controllers;
 
+import models.Person;
 import play.Logger;
+import play.cache.Cache;
 import play.mvc.Before;
 import play.mvc.Controller;
 import play.mvc.With;
@@ -16,13 +18,13 @@ public class SecureController extends Controller {
 		}
 	}
 
-//	public static User getUser() {
-//		User user = Cache.get(Security.connected(), User.class);
-//		if (user == null) {
-//			user = User.find("byIdentifier", Security.connected()).first();
-//			Cache.set(Security.connected(), user);
-//		}
-//		return user;
-//	}
+	public static Person getUser() {
+		Person person = Cache.get(Security.connected(), Person.class);
+		if (person == null) {
+			person = Person.findById(Security.connected());
+			Cache.set(Security.connected(), person);
+		}
+		return person;
+	}
 
 }

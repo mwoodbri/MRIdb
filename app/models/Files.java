@@ -13,6 +13,7 @@ public class Files extends GenericModel {
 	@Id
 	public long pk;
 	public String filepath;
+	public long file_size;
 	@ManyToOne
 	@JoinColumn(name="instance_fk")
 	public Instance instance;
