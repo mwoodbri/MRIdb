@@ -44,7 +44,7 @@ public class JavaExtensions extends play.templates.JavaExtensions {
 	public static String formatAsDate(String string) throws ParseException {
 		return play.templates.JavaExtensions.format(new SimpleDateFormat("yyyyMMdd").parse(string));
 	}
-	
+
 	public static String formatAsName(String string) {
 		String[] parts = string.split("\\^", -1);
 		return String.format("%s %s %s %s %s", parts[3], parts[0], parts[1], parts[2], parts[4]);

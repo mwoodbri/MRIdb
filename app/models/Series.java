@@ -29,7 +29,7 @@ public class Series extends GenericModel {
 	public String toDownloadString() {
 		return String.format("%s_%s-%s_%s", study.patient.pat_id, series_custom1, series_no, JavaExtensions.format(study.study_datetime));
 	}
-	
+
 	public String toClipboardString() {
 		return String.format("%s of %s", series_custom1, study.toClipboardString());
 	}

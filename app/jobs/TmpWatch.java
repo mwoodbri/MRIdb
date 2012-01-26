@@ -14,6 +14,8 @@ import play.libs.Files;
 public class TmpWatch extends Job {
 
 	private static final List<String> watchedFolders = Arrays.asList("downloads");
+	
+	@Override
 	public void doJob() {
 		for (String folderName : watchedFolders) {
 			File folder = new File(Play.tmpDir, folderName);

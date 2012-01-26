@@ -26,6 +26,7 @@ public class Downloader extends Job<File> {
 		this.tmpDir = tmpDir;
 	}
 
+	@Override
 	public File doJobWithResult() {
 		File result;
 		try {

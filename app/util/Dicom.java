@@ -27,11 +27,11 @@ public class Dicom {
 	public static File file(Instance instance) {
 		return new File(Properties.getString("archive"), instance.files.iterator().next().filepath);
 	}
-//
-//	public static List<File> files(Series series) throws IOException {
-//		return files(series, null);
-//	}
-//
+	//
+	//	public static List<File> files(Series series) throws IOException {
+	//		return files(series, null);
+	//	}
+	//
 	public static List<File> files(Series series, String echo) throws IOException {
 		List<File> files = new ArrayList<File>();
 		for (Instance instance : series.instances) {
@@ -86,7 +86,7 @@ public class Dicom {
 		dataset.remove(Tags.ManufacturerModelName);
 		dataset.writeFile(to, null);
 	}
-	
+
 	private static final List<String> validCUIDs = Arrays.asList("1.2.840.10008.5.1.4.1.1.4", "1.2.840.10008.5.1.4.1.1.4.1", "1.2.840.10008.5.1.4.1.1.7");
 	public static boolean renderable(Series series) {
 		return validCUIDs.contains(series.instances.iterator().next().sop_cuid);

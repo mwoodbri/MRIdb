@@ -27,8 +27,8 @@ public class Person extends GenericModel {
 		RESEARCHER, PI, ADMIN
 	}
 
-//	public static enum Viewer {
-//		WEASIS, IMAGEJ
-//	}
+	//	public static enum Viewer {
+	//		WEASIS, IMAGEJ
+	//	}
 
 }
