@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import jobs.Exporter;
+import jobs.Exporter.Format;
 import models.Instance;
 import models.Patient;
 import models.Person;
@@ -143,11 +144,11 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	public static void download(long pk, String format, String echo) throws InterruptedException, IOException {
+	public static void download(long pk, Format format, String echo) throws InterruptedException, IOException {
 		PersistentLogger.log("Downloaded series %s", pk);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		renderBinary(await(new Exporter(pk, format, echo, tmpDir).now()));
+		renderBinary(await(new Exporter(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
 	}
 	
 	public static void export() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
