@@ -25,7 +25,7 @@ public class Dicom {
 	}
 
 	public static File file(Instance instance) {
-		return new File(Properties.getString("archive"), instance.files.iterator().next().filepath);
+		return new File(Properties.getArchive(), instance.files.iterator().next().filepath);
 	}
 	//
 	//	public static List<File> files(Series series) throws IOException {
@@ -44,7 +44,7 @@ public class Dicom {
 	}
 
 	public static File folder(Series series) {
-		File folder = new File(Properties.getString("archive"), series.instances.iterator().next().files.iterator().next().filepath).getParentFile();
+		File folder = new File(Properties.getArchive(), series.instances.iterator().next().files.iterator().next().filepath).getParentFile();
 		if (folder.list().length != series.instances.size()) {
 			throw new RuntimeException(String.format("Folder contains %s files but series only has %s!", folder.list().length, series.instances.size()));
 		}
