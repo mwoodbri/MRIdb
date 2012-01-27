@@ -2,9 +2,9 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +27,6 @@ import org.dcm4che.data.Dataset;
 
 import play.Play;
 import play.cache.Cache;
-import play.libs.Files;
 import play.libs.IO;
 import play.mvc.Before;
 import util.Clipboard;
@@ -142,15 +141,15 @@ public class Application extends SecureController {
 		renderBinary(await(new Downloader(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
 	}
 
-	public static void export() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	public static void export(String password) throws InterruptedException, IOException {
 		PersistentLogger.log("Export clipboard %s", getUser().clipboard);
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		await(new Exporter(clipboard, tmpDir).now());
-		File zipFile = new File(new File(Play.tmpDir, "downloads"), String.format("%s.zip", tmpDir.getName()));
-		Files.zip(tmpDir, zipFile);
-		renderBinary(zipFile);
+		File zipFile = new File(String.format("%s.7z", tmpDir.getPath()));
+		new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), tmpDir.getPath()).start().waitFor();
+		renderBinary(zipFile, String.format("%s.7z", new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date())));
 	}
 
 	public static void clipboard(String type, long pk, boolean remove) throws ClassNotFoundException {

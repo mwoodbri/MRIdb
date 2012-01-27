@@ -10,5 +10,6 @@
   </li>
   #{/list}
 </ul>
-#{a @export()}Export files#{/a}
+#{a @export(), class: 'export'}Export files#{/a}
 #{/if}
+<p>#{else}Use <img src="@{'/public/images/attach.png'}"> to add to clipboard#{/else}</p>

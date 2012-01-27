@@ -19,14 +19,14 @@ li a:hover {
 <h2>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h2>
 
 #{list patient.studies, as: 'study'}
-<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime.format()}</h3> [#{a @clipboard(study.class.simpleName, study.pk), class: 'clipboard'}+#{/a}]
+<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime.format()}</h3> #{a @clipboard(study.class.simpleName, study.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
 <ul class="media-grid">
-	#{list study.series.sort{it.series_no as int}, as: 'series'}
+	#{list study.series.findAll{util.Dicom.renderable(it)}.sort{it.series_no as int}, as: 'series'}
 	<li>
-		<a href="#{if util.Dicom.renderable(series)}@{series(series.pk)}#{/if}#{else}##{/else}">
-			<img class="thumbnail" width="128" height="128" src="#{if util.Dicom.renderable(series)}@{'/public/images/spinner.gif'}#{/if}#{else}@{'/public/images/128x128.gif'}#{/else}" alt="@{image(series.pk, 128)}">
+		#{a @series(series.pk)}
+			<img class="thumbnail" width="128" height="128" src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 128)}">
 			<div class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(20)}</div>
-		</a>
+		#{/a}
 	</li>
 	#{/list}
 </ul>

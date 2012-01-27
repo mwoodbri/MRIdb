@@ -12,6 +12,7 @@
 			<th>Date of Birth
 			<th>Study Description
 			<th>Date of Study
+			<th>
 		</tr>
 	</thead>
 	<tbody>
@@ -23,6 +24,7 @@
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
 			<td>${_.study_desc}
 			<td>${_.study_datetime.format()}
+			<td>#{a @clipboard(_.class.simpleName, _.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
 		</tr>
 		#{/list}
 	</tbody>

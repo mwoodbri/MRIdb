@@ -46,12 +46,13 @@
                 changeMonth: true,
                 changeYear: true
             });
-            var clipboard = function(event){
+            $(".container-fluid").on("click", "a.clipboard", function(event) {
                 $('#clipboard').load(this.href);
                 return false;
-            };
-            $("a.clipboard").on("click", clipboard);
-            $("#clipboard").on("click", "a.clipboard", clipboard);
+            });
+            $("#clipboard").on("click", "a.export", function(event) {
+                this.href += "?" + $.param({password: prompt("Encryption password")});
+            });
             $(".thumbnail").each(function() {
                 this.src = this.alt;
             });
