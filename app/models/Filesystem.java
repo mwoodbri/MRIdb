@@ -2,8 +2,6 @@ package models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import play.db.jpa.GenericModel;
 

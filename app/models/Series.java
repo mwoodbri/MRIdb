@@ -8,9 +8,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import ext.JavaExtensions;
-
 import play.db.jpa.GenericModel;
+import ext.JavaExtensions;
 
 @Entity
 public class Series extends GenericModel {

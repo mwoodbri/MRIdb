@@ -172,7 +172,7 @@ public class Application extends SecureController {
 		}
 		render();
 	}
-	
+
 	public static void imagej(long pk) {
 		Series series = Series.findById(pk);
 		renderBinary(Dicom.file(series.instances.iterator().next()));
