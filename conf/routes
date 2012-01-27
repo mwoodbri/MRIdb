@@ -14,5 +14,8 @@ GET     /public/                                staticDir:public
 # Import Secure routes
 *       /                                       module:secure
 
+# Ignore ImageJ applet requests
+GET     /application/StartupMacros.txt          404
+
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}

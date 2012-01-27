@@ -1,5 +1,12 @@
 #{extends 'main.html'/}
 #{set title:'Series'/}
+#{set 'moreScripts'}
+<script>
+    $('.media-grid a').on('click', function() {
+        $('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej(series.pk)}&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
+    });
+</script>
+#{/set}
 
 <h2 style="display: inline">${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime.format()} - ${series.series_custom1}(${series.series_no})</h2> #{a @clipboard(series.class.simpleName, series.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
 <p>#{stats series}%s files (%s)#{/stats} Download as #{if echoes.size() > 1 && series.instances.size() > 1}#{list echoes}#{a @download(series.pk, "dcm", _index)}dicom${_index}#{/a} #{/list}#{/if}#{else}#{a @download(series.pk)}dicom#{/a} #{/else}#{a @download(series.pk, 'nii')}nifti#{/a}<p>
@@ -54,7 +61,7 @@
 		<ul class="media-grid">
 			#{list echoes}
 			<li>
-				<a href="#">
+				<a href="#" data-pk="${series.pk}">
 					<img class="thumbnail" src="@{'/public/images/128x128.gif'}" alt="@{image(series.pk, 128, _index)}">
 				</a>
 			</li>
@@ -112,3 +119,5 @@
 		</tr>
 	</tbody>
 </table>
+
+<div id="imagej"></div>
