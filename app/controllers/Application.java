@@ -173,8 +173,29 @@ public class Application extends SecureController {
 		render();
 	}
 
-	public static void imagej(long pk) {
+	public static void imagej(long pk, String echo) throws InterruptedException, IOException {
 		Series series = Series.findById(pk);
-		renderBinary(Dicom.file(series.instances.iterator().next()));
+		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
+		tmpDir.mkdir();
+		File dcm;
+		if (series.instances.size() == 1) {
+			//TODO this doesn't handle multi-echo (neither does export)
+			dcm = await(new Downloader(pk, Format.dcm, echo, tmpDir).now());
+		} else {
+			//TODO this doesn't handle multi-echo either (but export does)
+			File nii = await(new Downloader(pk, Format.nii, echo, tmpDir).now());
+			dcm = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
+			ProcessBuilder pb = new ProcessBuilder(new File(Properties.getString("xmedcon"), "bin/medcon").getPath(),
+					"-c", "dicom",
+					"-noprefix",
+					"-anon",
+					"-fv",
+					"-o", dcm.getPath(),
+					"-f", nii.getPath()
+					);
+			pb.environment().put("LD_LIBRARY_PATH", new File(Properties.getString("xmedcon"), "lib").getPath());
+			pb.start().waitFor();
+		}
+		renderBinary(dcm);
 	}
 }
