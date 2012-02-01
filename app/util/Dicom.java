@@ -64,8 +64,8 @@ public class Dicom {
 			echoes.add(dataset.getString(Tags.EchoTime));
 		} else {
 			for (int i = 0; i < dataset.get(Tags.PerFrameFunctionalGroupsSeq).countItems(); i++) {
-				boolean seen = echoes.add(dataset.getItem(Tags.PerFrameFunctionalGroupsSeq, i).getItem(Tags.MREchoSeq).getString(Tags.EffectiveEchoTime));
-				if (seen) {
+				boolean unseen = echoes.add(dataset.getItem(Tags.PerFrameFunctionalGroupsSeq, i).getItem(Tags.MREchoSeq).getString(Tags.EffectiveEchoTime));
+				if (!unseen) {
 					break;
 				}
 			}
