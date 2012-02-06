@@ -46,12 +46,9 @@
 
     #{script 'jquery-1.7.1.min.js'/}
     #{script 'jquery-ui-1.8.17.custom.min.js'/}
-    *{#{script 'jquery.ui.datepicker-en-GB.js'/}}*
-    #{script 'jquery.tablesorter.min.js'/}
     #{script 'bootstrap-dropdown.js'/}
     <script>
         $(function() {
-            $("table.sortable").tablesorter();
             $.datepicker.setDefaults({
                 dateFormat: 'yy-mm-dd',
                 changeMonth: true,
@@ -68,14 +65,6 @@
                 this.src = this.alt;
             });
         });
-        function params(url) {
-            var e,
-                p = {},
-                r = /[?&](\w+)=?(\w*)/g;
-            while (e = r.exec(url))
-                p[e[1]] = e[2];
-            return p;
-        }
     </script>
     #{get 'moreScripts'/}
   </body>

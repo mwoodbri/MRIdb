@@ -1,24 +1,49 @@
 #{extends 'main.html'/}
 #{set title:'Studies'/}
 
-<h2>Search results (${studies.size()} matching subjects)</h2>
+#{set 'moreScripts'}
+<script>
+	function params(url) {
+		var e,
+			p = {},
+			r = /[?&](\w+)=?([a-zA-Z_0-9\-]*)/g;
+		while (e = r.exec(url))
+			p[e[1]] = e[2];
+		return p;
+	}
+	$(function() {
+		$('th.header').on('click', function() {
+			var search = $.extend(params(window.location.search), {
+				order: this.id,
+				sort: $(this).hasClass('headerSortDown') ? "desc" : "asc",
+				page: 0
+			});
+			window.location = window.location.pathname + "?" + $.param(search);
+		});
+	});
+</script>
+#{/set}
 
-<table id="studies" class="bordered-table zebra-striped sortable">
+<h2>Search results (${studyCount} matching subjects)</h2>
+
+<table id="studies" class="bordered-table zebra-striped">
 	<thead>
 		<tr>
+			#{if play.Play.mode.isDev()}
 			<th>pk
-			<th>Name
-			<th>Subject ID
-			<th>Date of Birth
-			<th>Study Description
-			<th>Date of Study
+			#{/if}
+			#{list items:['patient.pat_name':'Name', 'patient.pat_id':'Subject ID', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study']}
+			<th id="${_.key}" class="header#{if _.key == params.order} headerSort${params.sort == 'desc' ? 'Up' : 'Down'}#{/if}">${_.value}
+			#{/list}
 			<th>
 		</tr>
 	</thead>
 	<tbody>
 		#{list studies}
 		<tr>
+			#{if play.Play.mode.isDev()}
 			<td>#{a @patient(_.pk)}${_.patient.pk}#{/a}
+			#{/if}
 			<td>#{a @patient(_.pk)}${_.patient.pat_name?.formatAsName()}#{/a}
 			<td>${_.patient.pat_id}
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
@@ -29,3 +54,15 @@
 		#{/list}
 	</tbody>
 </table>
+
+#{if Math.ceil(studyCount / util.Properties.getInt("page.size")) > 1}
+<div class="pagination">
+  <ul>
+    <li class="prev#{if page == 0} disabled#{/if}"><a href="${request.url.replaceFirst("page=\\d+", "page=" + (page - 1))}">&larr; Previous</a></li>
+    #{list items:1..Math.ceil(studyCount / util.Properties.getInt("page.size"))}
+     <li#{if _ == page + 1} class="active"#{/if}><a href="${request.url.replaceFirst("page=\\d+", "page=" + (_ - 1))}">${_}</a></li>
+    #{/list}
+    <li class="next#{if page + 1 == Math.ceil(studyCount / util.Properties.getInt("page.size"))} disabled#{/if}"><a href="${request.url.replaceFirst("page=\\d+", "page=" + (page + 1))}">Next &rarr;</a></li>
+  </ul>
+</div>
+#{/if}

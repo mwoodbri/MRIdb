@@ -65,7 +65,7 @@ public class Application extends SecureController {
 		put("after", ">");
 		put("since", ">");
 	}};
-	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study) throws Exception {
+	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort) throws Exception {
 		List<String> from = new ArrayList<String>();
 		from.add("Study study");
 
@@ -108,8 +108,10 @@ public class Application extends SecureController {
 		if (!where.isEmpty()) {
 			query += " where " + StringUtils.join(where, " and ");
 		}
-		List<Study> studies = Study.find(query, args.toArray()).fetch();
-		render(studies);
+		query += " order by " + "study." + (order.isEmpty() ? "patient.pk" : order) + " " + ("desc".equals(sort) ? "desc" : "asc");
+		List<Study> studies = Study.find(query, args.toArray()).fetch(page + 1, Properties.getInt("page.size"));
+		int studyCount = Study.find(query, args.toArray()).fetch().size();
+		render(studies, studyCount, page);
 	}
 
 	public static void patient(long pk) throws Exception {
