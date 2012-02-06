@@ -45,7 +45,7 @@ public class Security extends Secure.Security {
 		}
 		PersistentLogger.log("Logged in");
 	}
-	
+
 	static boolean check(String profile) {
 		if ("admin".equals(profile)) {
 			return Person.<Person>findById(Security.connected()).role == Role.Administrator;

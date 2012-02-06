@@ -1,6 +1,5 @@
 package controllers.crud;
 
-import models.Person;
 import play.mvc.With;
 import controllers.CRUD;
 import controllers.Check;
