@@ -17,6 +17,16 @@
           <ul class="nav">
             <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @Application.index()}Search#{/a}
             <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @Application.help()}Help#{/a}
+            #{secure.check 'admin'}
+            <li class="dropdown" data-dropdown="dropdown">
+              <a href="#" class="dropdown-toggle">Admin</a>
+              <ul class="dropdown-menu">
+                <li#{if request.action == "Application.admin"} class="active"#{/if}>#{a @admin()}Recent imports#{/a}</li>
+                <li>#{a @crud.Persons.list()}Users#{/a}</li>
+                <li>#{a @crud.Logs.list(order: 'DESC')}Audit log#{/a}</li>
+              </ul>
+            </li>
+            #{/secure.check}
           </ul>
           <p class="pull-right">Logged in as ${session.username} <a href='@{Secure.logout()}'>Log out</a></p>
         </div>
@@ -38,6 +48,7 @@
     #{script 'jquery-ui-1.8.17.custom.min.js'/}
     *{#{script 'jquery.ui.datepicker-en-GB.js'/}}*
     #{script 'jquery.tablesorter.min.js'/}
+    #{script 'bootstrap-dropdown.js'/}
     <script>
         $(function() {
             $("table.sortable").tablesorter();

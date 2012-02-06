@@ -2,3 +2,6 @@
 # For example, for French create a messages.fr file
 #
 secure.disclaimer=Tigris is not certified for primary diagnosis and is for scientific use only.<br>The database contains confidential information which is for authorised users only.
+
+#CRUD
+Persons=People

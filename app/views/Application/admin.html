@@ -1,0 +1,31 @@
+#{extends 'main.html' /}
+#{set title:'Admin' /}
+
+<h1>Recent imports</h1>
+
+*{
+${play.configuration.getProperty("application.name")} has ${models.Person.count()} registered user${models.Person.findAll().pluralize()}
+}*
+
+<table id="studies" class="condensed-table bordered-table zebra-striped">
+	<thead>
+		<tr>
+			<th>Name
+			<th>Subject ID
+			<th>Study Description
+			<th>Date of Study
+			<th>Scanner
+		</tr>
+	</thead>
+	<tbody>
+		#{list models.Study.find("order by study_datetime desc").fetch(10)}
+		<tr>
+			<td>#{a @patient(_.pk)}${_.patient.pat_name?.formatAsName()}#{/a}
+			<td>${_.patient.pat_id}
+			<td>${_.study_desc}
+			<td>${_.study_datetime.format()}
+			<td>${_.series.iterator().next().station_name}
+		</tr>
+		#{/list}
+	</tbody>
+</table>

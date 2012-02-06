@@ -7,6 +7,7 @@ import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 
 import models.Person;
+import models.Person.Role;
 import play.Logger;
 import play.Play;
 import util.PersistentLogger;
@@ -43,5 +44,12 @@ public class Security extends Secure.Security {
 			person.validateAndCreate();
 		}
 		PersistentLogger.log("Logged in");
+	}
+	
+	static boolean check(String profile) {
+		if ("admin".equals(profile)) {
+			return Person.<Person>findById(Security.connected()).role == Role.Administrator;
+		}
+		return false;
 	}
 }

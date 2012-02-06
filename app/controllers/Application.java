@@ -21,6 +21,7 @@ import models.Patient;
 import models.Person;
 import models.Series;
 import models.Study;
+import notifiers.Mail;
 
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
@@ -29,6 +30,7 @@ import play.Play;
 import play.cache.Cache;
 import play.libs.IO;
 import play.mvc.Before;
+import play.mvc.Finally;
 import util.Clipboard;
 import util.Dicom;
 import util.PersistentLogger;
@@ -45,11 +47,15 @@ public class Application extends SecureController {
 		}
 	}
 
-	public static void index() throws Exception {
+	public static void index() {
 		render();
 	}
 
-	public static void help() throws Exception {
+	public static void admin() {
+		render();
+	}
+
+	public static void help() {
 		render();
 	}
 
@@ -197,5 +203,12 @@ public class Application extends SecureController {
 			pb.start().waitFor();
 		}
 		renderBinary(dcm);
+	}
+
+	@Finally
+	static void log(Throwable e) {
+		if( e != null ) {
+			Mail.exception(request, session, e);
+		}
 	}
 }

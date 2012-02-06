@@ -20,11 +20,11 @@ public class Person extends GenericModel {
 
 	@Override
 	public String toString() {
-		return String.format("%s %s %s", username, role, clipboard);
+		return username;
 	}
 
 	public static enum Role {
-		RESEARCHER, PI, ADMIN
+		Researcher, Administrator
 	}
 
 	//	public static enum Viewer {
