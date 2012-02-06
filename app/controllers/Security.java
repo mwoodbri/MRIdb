@@ -43,7 +43,7 @@ public class Security extends Secure.Security {
 			person = new Person(Security.connected());
 			person.validateAndCreate();
 		}
-		PersistentLogger.log("Logged in");
+		PersistentLogger.log("logged in");
 	}
 
 	static boolean check(String profile) {

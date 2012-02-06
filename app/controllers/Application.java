@@ -143,14 +143,14 @@ public class Application extends SecureController {
 	}
 
 	public static void download(long pk, Format format, String echo) throws InterruptedException, IOException {
-		PersistentLogger.log("Downloaded series %s", pk);
+		PersistentLogger.log("downloaded series %s", pk);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		renderBinary(await(new Downloader(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
 	}
 
 	public static void export(String password) throws InterruptedException, IOException {
-		PersistentLogger.log("Export clipboard %s", getUser().clipboard);
+		PersistentLogger.log("exported clipboard %s", getUser().clipboard);
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
