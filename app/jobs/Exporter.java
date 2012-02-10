@@ -20,6 +20,7 @@ import play.db.jpa.GenericModel;
 import play.jobs.Job;
 import play.mvc.Scope.Session;
 import util.Clipboard;
+import util.Properties;
 import controllers.Application;
 
 public class Exporter extends Job {
@@ -91,7 +92,7 @@ public class Exporter extends Job {
 			List<String> exportList = new ArrayList(Arrays.asList(exports.split(",")));
 			for (Iterator<String> i = exportList.iterator(); i.hasNext();) {
 				String export = i.next();
-				File tmpDir = new File(new File(Play.tmpDir, "downloads"), export.split(":")[0]);
+				File tmpDir = new File(Properties.getDownloads(), export.split(":")[0]);
 				if (tmpDir.exists()) {
 					archives.add(new File(tmpDir.getParentFile(), String.format("%s.7z", export.split(":")[1])));
 				} else {
@@ -112,7 +113,7 @@ public class Exporter extends Job {
 		if (exports != null) {
 			for (String export : Arrays.asList(exports.split(","))) {
 				if (name.equals(export.split(":")[1])) {
-					return new File(new File(Play.tmpDir, "downloads"), String.format("%s.7z", name));
+					return new File(Properties.getDownloads(), String.format("%s.7z", name));
 				}
 			}
 		}

@@ -9,11 +9,12 @@ import play.Play;
 import play.jobs.Every;
 import play.jobs.Job;
 import play.libs.Files;
+import util.Properties;
 
 @Every("1d")
 public class TmpWatch extends Job {
 
-	private static final List<String> watchedFolders = Arrays.asList("downloads");
+	private static final List<String> watchedFolders = Arrays.asList(Properties.getDownloads().getName());
 
 	@Override
 	public void doJob() {

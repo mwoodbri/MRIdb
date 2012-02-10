@@ -146,7 +146,7 @@ public class Application extends SecureController {
 
 	public static void download(long pk, Format format, String echo) throws InterruptedException, IOException {
 		PersistentLogger.log("downloaded series %s", pk);
-		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
+		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		renderBinary(await(new Downloader(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
 	}
@@ -154,7 +154,7 @@ public class Application extends SecureController {
 	public static void export(String password) throws InterruptedException, IOException {
 		PersistentLogger.log("exported clipboard %s", getUser().clipboard);
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
-		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
+		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		new Exporter(clipboard, tmpDir, password, session, Security.connected()).now();
 		redirect(request.headers.get("referer").value());
@@ -189,7 +189,7 @@ public class Application extends SecureController {
 
 	public static void imagej(long pk, String echo) throws InterruptedException, IOException {
 		Series series = Series.findById(pk);
-		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
+		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		File dcm;
 		if (series.instances.size() == 1) {
