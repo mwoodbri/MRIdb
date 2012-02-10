@@ -12,7 +12,7 @@ import util.Properties;
 
 public class Downloader extends Job<File> {
 
-	public static enum Format { dcm, nii };
+	public static enum Format { dcm, nii, img };
 
 	private long pk;
 	private Format format;
@@ -68,6 +68,19 @@ public class Downloader extends Job<File> {
 				tmpDir.listFiles()[0].renameTo(nii);
 				return nii;
 			}
+		} else if (format == Format.img) {
+			File dir = new File(tmpDir, series.toDownloadString());
+			dir.mkdir();
+			new ProcessBuilder(Properties.getString("dcm2nii"),
+					"-d", "n",//don't put date in filename
+					"-e", "n",//don't put series/acq in filename
+					"-i", "y",//use id in filename
+					"-n", "n",//.hdr/.img pair
+					"-s", "y",//analyze
+					"-o", dir.getPath(),//don't put destination file in same directory as source
+					"-p", "n",//don't put protocol in filename
+					Dicom.folder(series).getPath()).start().waitFor();
+			return dir;
 		} else {
 			if (series.instances.size() == 1) {
 				File anon = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
