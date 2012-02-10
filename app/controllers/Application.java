@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,12 +37,15 @@ import util.Properties;
 import controllers.Secure.Security;
 
 public class Application extends SecureController {
-	private static final String CLIPBOARD = "clipboard";
+	//session variables
+	public static final String CLIPBOARD = "clipboard";
+	public static final String EXPORTS = "exports";
 
 	@Before
 	static void before() {
 		if (Security.isConnected()) {
 			renderArgs.put(CLIPBOARD, new Clipboard(getUser().clipboard));
+			renderArgs.put(EXPORTS, Exporter.getExports(session));
 		}
 	}
 
@@ -100,7 +102,7 @@ public class Application extends SecureController {
 			args.add("%" + study.toLowerCase() + "%");
 		}
 		if (!acquisition.isEmpty()) {
-			where.add(String.format("cast(study_datetime as date) %s ?", comparators.get(acquisition)));
+			where.add(String.format("(study_datetime is null or cast(study_datetime as date) %s ?)", comparators.get(acquisition)));
 			args.add(params.get(acquisition, Date.class));
 		}
 
@@ -154,10 +156,14 @@ public class Application extends SecureController {
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(new File(Play.tmpDir, "downloads"), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		await(new Exporter(clipboard, tmpDir).now());
-		File zipFile = new File(String.format("%s.7z", tmpDir.getPath()));
-		new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), tmpDir.getPath()).start().waitFor();
-		renderBinary(zipFile, String.format("%s.7z", new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date())));
+		new Exporter(clipboard, tmpDir, password, session, Security.connected()).now();
+		redirect(request.headers.get("referer").value());
+	}
+
+	public static void retrieve(String filename) {
+		File download = Exporter.getExport(filename, session);
+		notFoundIfNull(download);
+		renderBinary(download);
 	}
 
 	public static void clipboard(String type, long pk, boolean remove) throws ClassNotFoundException {

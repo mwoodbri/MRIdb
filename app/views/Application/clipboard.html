@@ -13,3 +13,11 @@
 #{a @export(), class: 'export'}Export files#{/a}
 #{/if}
 <p>#{else}Use <img src="@{'/public/images/attach.png'}"> to add to clipboard#{/else}</p>
+#{if exports}
+<h5>Downloads</h5>
+<ul>
+  #{list exports}
+  <li>#{if _.exists()}#{a @retrieve(org.apache.commons.io.FilenameUtils.getBaseName(_.name))}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/a}#{/if}#{else}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/else}
+  #{/list}
+</ul>
+#{/if}
