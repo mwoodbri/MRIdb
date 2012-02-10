@@ -102,7 +102,8 @@ public class Application extends SecureController {
 			args.add("%" + study.toLowerCase() + "%");
 		}
 		if (!acquisition.isEmpty()) {
-			where.add(String.format("(study_datetime is null or cast(study_datetime as date) %s ?)", comparators.get(acquisition)));
+			//where.add(String.format("(study_datetime is null or cast(study_datetime as date) %s ?)", comparators.get(acquisition)));
+			where.add(String.format("cast(study_datetime as date) %s ?", comparators.get(acquisition)));
 			args.add(params.get(acquisition, Date.class));
 		}
 
