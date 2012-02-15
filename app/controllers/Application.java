@@ -18,6 +18,8 @@ import jobs.Exporter;
 import models.Instance;
 import models.Patient;
 import models.Person;
+import models.Project;
+import models.ProjectAssociation;
 import models.Series;
 import models.Study;
 import notifiers.Mail;
@@ -67,7 +69,7 @@ public class Application extends SecureController {
 		put("after", ">");
 		put("since", ">");
 	}};
-	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort) throws Exception {
+	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort, Long project) throws Exception {
 		List<String> from = new ArrayList<String>();
 		from.add("Study study");
 
@@ -106,6 +108,11 @@ public class Application extends SecureController {
 			where.add(String.format("cast(study_datetime as date) %s ?", comparators.get(acquisition)));
 			args.add(params.get(acquisition, Date.class));
 		}
+		if (project != null) {
+			from.add("in (study.projectAssociations) association");
+			where.add("association.project.id = ?");
+			args.add(project);
+		}
 
 		String query = "select study from " + StringUtils.join(from, ", ");
 		if (!where.isEmpty()) {
@@ -122,7 +129,7 @@ public class Application extends SecureController {
 		render(patient);
 	}
 
-	public static void series(long pk) throws Exception {
+	public static void series(long pk) throws IOException {
 		Series series = Series.findById(pk);
 		Dataset dataset = Dicom.dataset(Dicom.file(series.instances.iterator().next()));
 		Set<String> echoes = Dicom.echoes(dataset);
@@ -135,7 +142,7 @@ public class Application extends SecureController {
 		if (!Dicom.renderable(series)) {
 			renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 		}
-		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s", Properties.getString("dicom.host"), instance.sop_iuid);
+		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s", request.domain, instance.sop_iuid);
 		if (columns != null) {
 			url += String.format("&columns=%s", columns);
 		}
@@ -152,13 +159,16 @@ public class Application extends SecureController {
 		renderBinary(await(new Downloader(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
 	}
 
-	public static void export(String password) throws InterruptedException, IOException {
+	public static void export(String password) throws InterruptedException, IOException, ClassNotFoundException {
 		PersistentLogger.log("exported clipboard %s", getUser().clipboard);
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		new Exporter(clipboard, tmpDir, password, session, Security.connected()).now();
-		redirect(request.headers.get("referer").value());
+		new Exporter(clipboard, tmpDir, password, session, getUser().username).now();
+		//if (!request.isAjax()) {
+		//	redirect(request.headers.get("referer").value());
+		//}
+		clipboard(null, null, null);
 	}
 
 	public static void retrieve(String filename) {
@@ -167,24 +177,23 @@ public class Application extends SecureController {
 		renderBinary(download);
 	}
 
-	public static void clipboard(String type, long pk, boolean remove) throws ClassNotFoundException {
+	public enum ClipboardOp { ADD, REMOVE, CLEAR }
+	public static void clipboard(ClipboardOp op, String type, Long pk) throws ClassNotFoundException {
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
-		if (remove) {
-			if (type == null) {
-				clipboard.clear();
-			} else {
-				clipboard.remove(type, pk);
+		if (op != null) {
+			switch (op) {
+			case ADD: clipboard.add(type, pk); break;
+			case REMOVE: clipboard.remove(type, pk); break;
+			case CLEAR: clipboard.clear(); break;
 			}
-		} else {
-			clipboard.add(type, pk);
+			Person person = getUser();
+			person.clipboard = clipboard.toString();
+			person.merge();
+			Cache.set(person.username, person);
 		}
-		Person person = Person.findById(Security.connected());
-		person.clipboard = clipboard.toString();
-		person.save();
-		Cache.set(Security.connected(), person);
-		if (!request.isAjax()) {
-			redirect(request.headers.get("referer").value());
-		}
+		//		if (!request.isAjax()) {
+		//			redirect(request.headers.get("referer").value());
+		//		}
 		render();
 	}
 
@@ -212,6 +221,23 @@ public class Application extends SecureController {
 			pb.start().waitFor();
 		}
 		renderBinary(dcm);
+	}
+
+	public static void associate(Study study, Long projectID, String projectName) {
+		ProjectAssociation association = ProjectAssociation.find("from ProjectAssociation where study = ? and project.person = ?", study, getUser()).first();
+		if (association != null) {
+			association.delete();
+		}
+		Project project = null;
+		if (!projectName.isEmpty()) {
+			project = new Project(projectName, getUser()).save();
+		} else if (projectID != null) {
+			project = Project.findById(projectID);
+		}
+		if (project != null) {
+			new ProjectAssociation(project, study).save();
+		}
+		redirect(request.headers.get("referer").value());
 	}
 
 	@Finally

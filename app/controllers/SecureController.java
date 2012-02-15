@@ -13,7 +13,7 @@ public class SecureController extends Controller {
 
 	@Before
 	static void log() {
-		if (Security.isConnected()) {
+		if (Security.isConnected() && !request.isAjax()) {
 			Logger.info(Security.connected() + " " + request.action);
 		}
 	}

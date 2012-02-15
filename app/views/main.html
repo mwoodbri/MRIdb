@@ -47,6 +47,7 @@
     #{script 'jquery-1.7.1.min.js'/}
     #{script 'jquery-ui-1.8.17.custom.min.js'/}
     #{script 'bootstrap-dropdown.js'/}
+    #{script 'jquery.form.js'/}
     <script>
         $(function() {
             $.datepicker.setDefaults({
@@ -59,8 +60,16 @@
                 return false;
             });
             $("#clipboard").on("click", "a.export", function(event) {
-                this.href += "?" + $.param({password: prompt("Encryption password")});
+                var password = prompt("Encryption password");
+                if (password) {
+                    this.href += "?" + $.param({password: password});
+                    $('#clipboard').load(this.href);
+                }
+                return false;
             });
+            setInterval(function() {
+                $('#clipboard').load('@{clipboard()}');
+            }, 10000);
             $(".thumbnail").each(function() {
                 this.src = this.alt;
             });

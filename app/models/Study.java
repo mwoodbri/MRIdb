@@ -27,6 +27,12 @@ public class Study extends GenericModel {
 	public Patient patient;
 	@OneToMany(mappedBy = "study")
 	public Set<Series> series;
+	@OneToMany(mappedBy = "study")
+	public Set<ProjectAssociation> projectAssociations;
+
+	public Project getProject(String username) {
+		return Project.find("select project from Project project, in(project.projectAssociations) projectAssociation where project.person.username = ? and projectAssociation.study = ?", username, this).first();
+	}
 
 	public String toClipboardString() {
 		return String.format("%s on %s", patient.pat_name == null ? "" : JavaExtensions.formatAsName(patient.pat_name), study_datetime == null ? "" : JavaExtensions.format(study_datetime));

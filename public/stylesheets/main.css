@@ -12,3 +12,24 @@ body {
   margin-right: 240px;
   margin-left: 0;
 }
+
+.media-grid .caption {
+  font-size: 11px;
+  color: white;
+  background-color: #333;
+  text-align: center;
+}
+
+.media-grid a:hover {
+  text-decoration: none;
+}
+
+select {
+  background-color: white;
+}
+
+.loading {
+  background:url(../../public/images/spinner-small.gif) center right no-repeat;
+  padding: 0 20px 0 0;
+  white-space: nowrap;
+}

@@ -115,6 +115,17 @@
 					<input id="study" name="study" type="text">
 				</div>
 			</div>
+			<div class="clearfix">
+				<label for="project">Project</label>
+				<div class="input">
+					<select id="project" name="project">
+						<option></option>
+						#{list models.Project.find("person.username = ?", session.username).fetch()}
+						<option value="${_.id}">${_.name}</option>
+						#{/list}
+					</select>
+				</div>
+			</div>
 			<div class="actions">
 				<input type="submit" class="btn primary" value="Search">&nbsp;<button type="reset" class="btn">Cancel</button>
 			</div>

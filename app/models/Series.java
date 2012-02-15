@@ -27,7 +27,7 @@ public class Series extends GenericModel {
 	public Set<Instance> instances;
 
 	public String toDownloadString() {
-		return String.format("%s_%s-%s_%s", study.patient.pat_id, series_custom1, series_no, study.study_datetime == null ? "" : JavaExtensions.format(study.study_datetime));
+		return String.format(study.study_datetime == null ? "series" : JavaExtensions.format(study.study_datetime));
 	}
 
 	public String toClipboardString() {

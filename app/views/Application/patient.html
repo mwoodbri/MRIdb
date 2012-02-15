@@ -1,25 +1,43 @@
 #{extends 'main.html'/}
 #{set title:'Patient'/}
-#{set 'moreStyles'}
-<style>
-.caption {
-	font-size: 11px;
-	color: white;
-	background-color: #333;
-	text-align: center;
-}
-li a:hover {
-	text-decoration: none;
-}
-</style>
+#{set 'moreScripts'}
+<script>
+	$(function() {
+		$('select').on('change', function() {
+			if ($("option:selected", this).val() == -1) {
+				var projectName = prompt("Project name");
+				if (projectName) {
+					$(this).siblings('input[name=projectName]').val(projectName);
+					$(this).closest('form').submit();
+				} else {
+					return;
+				}
+			}
+			$(this).closest('form').ajaxSubmit();
+			return false;
+		});
+	});
+</script>
 #{/set}
-
-*{<h1>#{get 'title'/}</h1>}*
 
 <h2>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h2>
 
 #{list patient.studies, as: 'study'}
-<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3> #{a @clipboard(study.class.simpleName, study.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
+<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3> #{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
+<span style="position: relative; top:-0.25em; padding-left: 1em">
+#{form @associate(), style:'display: inline'}
+	Project:
+	<select name="projectID">
+		<option></option>
+		#{list models.Project.find("person.username = ?", session.username).fetch()}
+		<option value="${_.id}"#{if study.getProject(session.username).equals(_)} selected#{/if}>${_.name}</option>
+		#{/list}
+		<option value="-1">New project...</option>
+	</select>
+	<input type="hidden" name="study.pk" value="${study.pk}">
+	<input type="hidden" name="projectName">
+#{/form}
+</span>
 <ul class="media-grid">
 	#{list study.series.findAll{util.Dicom.renderable(it)}.sort{it.series_no as int}, as: 'series'}
 	<li>

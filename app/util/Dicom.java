@@ -27,11 +27,7 @@ public class Dicom {
 	public static File file(Instance instance) {
 		return new File(Properties.getArchive(), instance.files.iterator().next().filepath);
 	}
-	//
-	//	public static List<File> files(Series series) throws IOException {
-	//		return files(series, null);
-	//	}
-	//
+
 	public static List<File> files(Series series, String echo) throws IOException {
 		List<File> files = new ArrayList<File>();
 		for (Instance instance : series.instances) {
@@ -76,6 +72,7 @@ public class Dicom {
 	public static void anonymise(File from, File to) throws IOException {
 		Dataset dataset = DcmObjectFactory.getInstance().newDataset();
 		dataset.readFile(from, null, -1);
+		dataset.remove(Tags.PatientID);
 		dataset.remove(Tags.PatientName);
 		dataset.remove(Tags.PatientSex);
 		dataset.remove(Tags.PatientBirthDate);

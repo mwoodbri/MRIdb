@@ -1,12 +1,12 @@
 <h5 style="display: inline">Clipboard</h5>
 #{if clipboard.items}
-[#{a @clipboard(null, null, true), class: 'clipboard'}x#{/a}]
+[#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}x#{/a}]
 <ul>
   #{list clipboard.items}
   <li>
     #{if _.type == models.Study.class}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
     #{if _.type == models.Series.class}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
-    [#{a @clipboard(_.type.simpleName, _.pk, true), class: 'clipboard'}x#{/a}]
+    [#{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}x#{/a}]
   </li>
   #{/list}
 </ul>
@@ -17,7 +17,7 @@
 <h5>Downloads</h5>
 <ul>
   #{list exports}
-  <li>#{if _.exists()}#{a @retrieve(org.apache.commons.io.FilenameUtils.getBaseName(_.name))}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/a}#{/if}#{else}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/else}
+  <li>#{if _.exists()}#{a @retrieve(org.apache.commons.io.FilenameUtils.getBaseName(_.name))}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/a}#{/if}#{else}<span class="loading">${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}</span>#{/else}
   #{/list}
 </ul>
 #{/if}

@@ -15,7 +15,6 @@ import models.Study;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import play.Play;
 import play.db.jpa.GenericModel;
 import play.jobs.Job;
 import play.mvc.Scope.Session;

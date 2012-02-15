@@ -57,10 +57,8 @@ public class Downloader extends Job<File> {
 				return nii.exists() ? nii : dir;
 			} else {
 				new ProcessBuilder(Properties.getString("dcm2nii"),
-						"-d", "n",//don't put date in filename
 						"-e", "n",//don't put series/acq in filename
 						"-g", "n",//don't gzip
-						"-i", "y",//use id in filename
 						"-o", tmpDir.getPath(),//don't put destination file in same directory as source
 						"-p", "n",//don't put protocol in filename
 						Dicom.folder(series).getPath()).start().waitFor();
@@ -72,9 +70,7 @@ public class Downloader extends Job<File> {
 			File dir = new File(tmpDir, series.toDownloadString());
 			dir.mkdir();
 			new ProcessBuilder(Properties.getString("dcm2nii"),
-					"-d", "n",//don't put date in filename
 					"-e", "n",//don't put series/acq in filename
-					"-i", "y",//use id in filename
 					"-n", "n",//.hdr/.img pair
 					"-s", "y",//analyze
 					"-o", dir.getPath(),//don't put destination file in same directory as source
