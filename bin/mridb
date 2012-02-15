@@ -7,9 +7,9 @@ prog="mridb"
 
 . /etc/rc.d/init.d/functions
 
-export JAVA_HOME=/opt/jre1.6.0_30
+export JAVA_HOME=/opt/jre
 PLAY=/opt/play-1.2.4/play
-APP_PATH=/opt/MRIdb/
+APP_PATH=/opt/MRIdb
 
 run(){
     $PLAY $1 $APP_PATH --%prod --pid_file=/var/lock/subsys/$prog -Dprecompiled=true >/dev/null
