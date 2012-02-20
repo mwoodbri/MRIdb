@@ -136,18 +136,23 @@ public class Application extends SecureController {
 		render(series, dataset, echoes);
 	}
 
-	public static void image(long pk, Integer columns, Integer frameNumber) throws MalformedURLException, IOException {
+	public static void image(long pk, Integer columns, int echo) throws MalformedURLException, IOException {
 		Series series = Series.findById(pk);
-		Instance instance = series.instances.iterator().next();
 		if (!Dicom.renderable(series)) {
 			renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 		}
-		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s", request.domain, instance.sop_iuid);
+		int frameNumber;
+		String objectUID = null;
+		if (series.instances.size() == 1) {
+			frameNumber = Integer.parseInt(Dicom.attribute(series.instances.iterator().next().inst_attrs, "NumberOfFrames")) / 2 + echo + 1;
+			objectUID = series.instances.iterator().next().sop_iuid;
+		} else {
+			frameNumber = 1;
+			objectUID = Instance.find("bySeriesAndInst_no", series, String.valueOf(series.instances.size() / 2)).<Instance>first().sop_iuid;
+		}
+		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s", request.domain, objectUID, frameNumber);
 		if (columns != null) {
 			url += String.format("&columns=%s", columns);
-		}
-		if (frameNumber != null) {
-			url += String.format("&frameNumber=%s", frameNumber);
 		}
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}

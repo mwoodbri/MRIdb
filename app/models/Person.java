@@ -12,7 +12,6 @@ public class Person extends GenericModel {
 	public String username;
 	public Role role;
 	public String clipboard;
-	//public Viewer viewer;
 
 	public Person(String username) {
 		this.username = username;
@@ -26,9 +25,5 @@ public class Person extends GenericModel {
 	public static enum Role {
 		Researcher, Administrator
 	}
-
-	//	public static enum Viewer {
-	//		WEASIS, IMAGEJ
-	//	}
 
 }

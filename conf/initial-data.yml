@@ -1,0 +1,11 @@
+Person(doregan):
+    username: doregan
+    role: Administrator
+
+Person(gfagiolo):
+    username: gfagiolo
+    role: Administrator
+
+Person(mwoodbri):
+    username: mwoodbri
+    role: Administrator

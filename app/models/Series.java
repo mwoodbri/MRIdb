@@ -9,7 +9,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import play.db.jpa.GenericModel;
-import ext.JavaExtensions;
 
 @Entity
 public class Series extends GenericModel {
@@ -27,7 +26,7 @@ public class Series extends GenericModel {
 	public Set<Instance> instances;
 
 	public String toDownloadString() {
-		return String.format(study.study_datetime == null ? "series" : JavaExtensions.format(study.study_datetime));
+		return String.format("%s_%s", study.toDownloadString(), series_no);
 	}
 
 	public String toClipboardString() {

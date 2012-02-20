@@ -46,7 +46,7 @@ public class Exporter extends Job {
 				Downloader.export((Series) model, Format.dcm, tmpDir, null);
 			} else {
 				Study study = (Study) model;
-				File dir = new File(tmpDir, study.toClipboardString());
+				File dir = new File(tmpDir, study.toDownloadString());
 				dir.mkdir();
 				for (Series series : ((Study) model).series) {
 					Downloader.export(series, Format.dcm, dir, null);
@@ -54,7 +54,9 @@ public class Exporter extends Job {
 			}
 		}
 		File zipFile = new File(String.format("%s.7z", tmpDir.getPath()));
-		new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), tmpDir.getPath()).start().waitFor();
+		for (File folder : tmpDir.listFiles()) {
+			new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
+		}
 		zipFile.renameTo(getDest());
 	}
 

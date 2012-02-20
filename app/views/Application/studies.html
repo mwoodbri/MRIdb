@@ -29,9 +29,6 @@
 <table id="studies" class="bordered-table zebra-striped">
 	<thead>
 		<tr>
-			#{if play.Play.mode.isDev()}
-			<th>pk
-			#{/if}
 			#{list items:['patient.pat_name':'Name', 'patient.pat_id':'Subject ID', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study']}
 			<th id="${_.key}" class="header#{if _.key == params.order} headerSort${params.sort == 'desc' ? 'Up' : 'Down'}#{/if}">${_.value}
 			#{/list}
@@ -41,10 +38,7 @@
 	<tbody>
 		#{list studies}
 		<tr>
-			#{if play.Play.mode.isDev()}
-			<td>#{a @patient(_.patient.pk)}${_.patient.pk}#{/a}
-			#{/if}
-			<td>#{a @patient(_.patient.pk)}${_.patient.pat_name?.formatAsName()}#{/a}
+			<td>#{a @patient(_.patient.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'Unknown'}#{/a}
 			<td>${_.patient.pat_id}
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
 			<td>${_.study_desc}

@@ -34,6 +34,10 @@ public class Study extends GenericModel {
 		return Project.find("select project from Project project, in(project.projectAssociations) projectAssociation where project.person.username = ? and projectAssociation.study = ?", username, this).first();
 	}
 
+	public String toDownloadString() {
+		return study_id;
+	}
+
 	public String toClipboardString() {
 		return String.format("%s on %s", patient.pat_name == null ? "" : JavaExtensions.formatAsName(patient.pat_name), study_datetime == null ? "" : JavaExtensions.format(study_datetime));
 	}
