@@ -30,8 +30,8 @@ public class Study extends GenericModel {
 	@OneToMany(mappedBy = "study")
 	public Set<ProjectAssociation> projectAssociations;
 
-	public Project getProject(String username) {
-		return Project.find("select project from Project project, in(project.projectAssociations) projectAssociation where project.person.username = ? and projectAssociation.study = ?", username, this).first();
+	public ProjectAssociation getProjectAssociation(String username) {
+		return ProjectAssociation.find("select projectAssociation from Project project, in(project.projectAssociations) projectAssociation where project.person.username = ? and projectAssociation.study = ?", username, this).first();
 	}
 
 	public String toDownloadString() {

@@ -69,7 +69,7 @@ public class Application extends SecureController {
 		put("after", ">");
 		put("since", ">");
 	}};
-	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort, Long project) throws Exception {
+	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort, Long project, String participationID) throws Exception {
 		List<String> from = new ArrayList<String>();
 		from.add("Study study");
 
@@ -108,10 +108,16 @@ public class Application extends SecureController {
 			where.add(String.format("cast(study_datetime as date) %s ?", comparators.get(acquisition)));
 			args.add(params.get(acquisition, Date.class));
 		}
-		if (project != null) {
+		if (project != null || !participationID.isEmpty()) {
 			from.add("in (study.projectAssociations) association");
-			where.add("association.project.id = ?");
-			args.add(project);
+			if (project != null) {
+				where.add("association.project.id = ?");
+				args.add(project);
+			}
+			if (!participationID.isEmpty()) {
+				where.add("association.participationID = ?");
+				args.add(participationID);
+			}
 		}
 
 		String query = "select study from " + StringUtils.join(from, ", ");
@@ -170,9 +176,6 @@ public class Application extends SecureController {
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		new Exporter(clipboard, tmpDir, password, session, getUser().username).now();
-		//if (!request.isAjax()) {
-		//	redirect(request.headers.get("referer").value());
-		//}
 		clipboard(null, null, null);
 	}
 
@@ -193,12 +196,9 @@ public class Application extends SecureController {
 			}
 			Person person = getUser();
 			person.clipboard = clipboard.toString();
-			person.merge();
-			Cache.set(person.username, person);
+			person.merge()._save();
+			Cache.delete(Security.connected());
 		}
-		//		if (!request.isAjax()) {
-		//			redirect(request.headers.get("referer").value());
-		//		}
 		render();
 	}
 
@@ -228,9 +228,9 @@ public class Application extends SecureController {
 		renderBinary(dcm);
 	}
 
-	public static void associate(Study study, Long projectID, String projectName) {
+	public static void associate(Study study, Long projectID, String participationID, String projectName) {
 		ProjectAssociation association = ProjectAssociation.find("from ProjectAssociation where study = ? and project.person = ?", study, getUser()).first();
-		if (association != null) {
+		if (association != null && projectID == null) {
 			association.delete();
 		}
 		Project project = null;
@@ -240,7 +240,13 @@ public class Application extends SecureController {
 			project = Project.findById(projectID);
 		}
 		if (project != null) {
-			new ProjectAssociation(project, study).save();
+			if (association != null) {
+				association.project = project;
+			} else {
+				association = new ProjectAssociation(project, study);
+			}
+			association.participationID = participationID;
+			association.save();
 		}
 		redirect(request.headers.get("referer").value());
 	}
