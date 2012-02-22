@@ -16,7 +16,7 @@
 	<tbody>
 		#{list models.Study.find("order by study_datetime desc").fetch(util.Properties.getInt("page.size"))}
 		<tr>
-			<td>#{a @patient(_.patient.pk)}${_.patient.pat_name?.formatAsName()}#{/a}
+			<td>#{a @patient(_.patient.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/a}
 			<td>${_.patient.pat_id}
 			<td>${_.study_desc}
 			<td>${_.study_datetime?.format()}

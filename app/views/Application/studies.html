@@ -38,7 +38,7 @@
 	<tbody>
 		#{list studies}
 		<tr>
-			<td>#{a @patient(_.patient.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'Unknown'}#{/a}
+			<td>#{a @patient(_.patient.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/a}
 			<td>${_.patient.pat_id}
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
 			<td>${_.study_desc}
