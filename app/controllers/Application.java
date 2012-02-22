@@ -27,6 +27,7 @@ import notifiers.Mail;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
+import play.Invoker;
 import play.Play;
 import play.cache.Cache;
 import play.libs.IO;
@@ -253,7 +254,7 @@ public class Application extends SecureController {
 
 	@Finally
 	static void log(Throwable e) {
-		if (e != null && Properties.getString("mail.from") != null) {
+		if (e != null && !(e instanceof Invoker.Suspend) && Properties.getString("mail.from") != null) {
 			Mail.exception(request, session, e);
 		}
 	}
