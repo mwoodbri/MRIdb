@@ -15,6 +15,7 @@ import models.Study;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
+import play.Logger;
 import play.db.jpa.GenericModel;
 import play.jobs.Job;
 import play.mvc.Scope.Session;
@@ -57,7 +58,7 @@ public class Exporter extends Job {
 		for (File folder : tmpDir.listFiles()) {
 			new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
 		}
-		zipFile.renameTo(getDest());
+		Logger.info("%s %s %s", zipFile, getDest(), zipFile.renameTo(getDest()));
 	}
 
 	private void addExport() {
