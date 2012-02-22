@@ -17,6 +17,7 @@
 <h5>Downloads</h5>
 <ul>
   #{list exports}
+  <li>${_}
   <li>#{if _.exists()}#{a @retrieve(org.apache.commons.io.FilenameUtils.getBaseName(_.name))}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/a}#{/if}#{else}<span class="loading">${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}</span>#{/else}
   #{/list}
 </ul>
