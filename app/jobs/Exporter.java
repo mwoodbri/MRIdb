@@ -56,7 +56,8 @@ public class Exporter extends Job {
 		}
 		File zipFile = new File(String.format("%s.7z", tmpDir.getPath()));
 		for (File folder : tmpDir.listFiles()) {
-			new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
+			int result = new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
+			Logger.info("%s %s %s", zipFile, folder, result);
 		}
 		Logger.info("%s %s %s", zipFile, getDest(), zipFile.renameTo(getDest()));
 	}
