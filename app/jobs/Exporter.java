@@ -15,7 +15,6 @@ import models.Study;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import play.Logger;
 import play.db.jpa.GenericModel;
 import play.jobs.Job;
 import play.mvc.Scope.Session;
@@ -56,15 +55,7 @@ public class Exporter extends Job {
 		}
 		File zipFile = new File(String.format("%s.7z", tmpDir.getPath()));
 		for (File folder : tmpDir.listFiles()) {
-			Logger.info("%s %s", zipFile, folder);
-			int result = Integer.MIN_VALUE;
-			try {
-				//result = new ProcessBuilder("7za", "a", "-mhe=on", "-mx0", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
-				result = new ProcessBuilder("/tmp/a.sh").start().waitFor();
-			} finally {
-				Logger.info("%s %s %s", zipFile, folder, result);
-			}
-			Logger.info("complete");
+			new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
 		}
 		zipFile.renameTo(getDest());
 	}
