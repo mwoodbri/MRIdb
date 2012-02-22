@@ -10,8 +10,8 @@
 					return;
 				}
 				$(this).siblings('input[name=projectName]').val(projectName);
+				$(this).closest('form').submit();
 			}
-			$(this).closest('form').submit();
 		});
 	});
 </script>

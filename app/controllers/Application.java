@@ -253,7 +253,7 @@ public class Application extends SecureController {
 
 	@Finally
 	static void log(Throwable e) {
-		if (e != null && Properties.getString("mail.to") != null) {
+		if (e != null && Properties.getString("mail.from") != null) {
 			Mail.exception(request, session, e);
 		}
 	}

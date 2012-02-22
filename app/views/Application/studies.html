@@ -29,7 +29,7 @@
 <table id="studies" class="bordered-table zebra-striped">
 	<thead>
 		<tr>
-			#{list items:['patient.pat_name':'Name', 'patient.pat_id':'Subject ID', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study', project:'Project', participationID:'Identifier']}
+			#{list items:['patient.pat_name':'Name', 'patient.pat_id':'Subject ID', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study', project:'Project']}
 			<th id="${_.key}" class="header#{if _.key == params.order} headerSort${params.sort == 'desc' ? 'Up' : 'Down'}#{/if}">${_.value}
 			#{/list}
 			<th>
@@ -43,8 +43,7 @@
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
 			<td>${_.study_desc}
 			<td>${_.study_datetime?.format()}
-			<td>${_.getProjectAssociation(session.username)?.project}
-			<td>${_.getProjectAssociation(session.username)?.participationID}
+			<td>${_.getProjectAssociation(session.username)?.project}#{if _.getProjectAssociation(session.username)?.participationID} (${_.getProjectAssociation(session.username)?.participationID})#{/if}
 			<td>#{a @clipboard(controllers.Application.ClipboardOp.ADD, _.class.simpleName, _.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
 		</tr>
 		#{/list}
