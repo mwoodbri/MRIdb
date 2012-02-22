@@ -59,7 +59,8 @@ public class Exporter extends Job {
 			Logger.info("%s %s", zipFile, folder);
 			int result = Integer.MIN_VALUE;
 			try {
-				result = new ProcessBuilder("7za", "a", "-mhe=on", "-mx0", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
+				//result = new ProcessBuilder("7za", "a", "-mhe=on", "-mx0", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
+				result = new ProcessBuilder("/tmp/a.sh").start().waitFor();
 			} finally {
 				Logger.info("%s %s %s", zipFile, folder, result);
 			}
