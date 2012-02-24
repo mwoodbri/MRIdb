@@ -26,7 +26,7 @@ public class Series extends GenericModel {
 	public Set<Instance> instances;
 
 	public String toDownloadString() {
-		return String.format("%s_%s", study.toDownloadString(), series_no);
+		return String.format("%s_%s", series_no, series_custom1.replaceAll("\\W+", "_"));
 	}
 
 	public String toClipboardString() {

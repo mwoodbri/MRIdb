@@ -1,5 +1,6 @@
 package models;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
@@ -34,8 +35,16 @@ public class Study extends GenericModel {
 		return ProjectAssociation.find("select projectAssociation from Project project, in(project.projectAssociations) projectAssociation where project.person.username = ? and projectAssociation.study = ?", username, this).first();
 	}
 
-	public String toDownloadString() {
-		return study_id;
+	public String toDownloadString(String username) {
+		String string = String.format("%s_%s", new SimpleDateFormat("yyyyMMddHHmm").format(study_datetime), pk);
+		ProjectAssociation projectAssociation = getProjectAssociation(username);
+		if (projectAssociation != null) {
+			string = String.format("%s_%s", string, projectAssociation.project.name);
+			if (projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
+				string = String.format("%s_%s", string, projectAssociation.participationID);
+			}
+		}
+		return string;
 	}
 
 	public String toClipboardString() {

@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import jobs.Downloader;
-import jobs.Downloader.Format;
-import jobs.Exporter;
+import jobs.ClipboardExporter;
+import jobs.SeriesDownloader;
+import jobs.SeriesDownloader.Format;
 import models.Instance;
 import models.Patient;
 import models.Person;
@@ -30,6 +30,7 @@ import org.dcm4che.data.Dataset;
 import play.Invoker;
 import play.Play;
 import play.cache.Cache;
+import play.libs.Files;
 import play.libs.IO;
 import play.mvc.Before;
 import play.mvc.Finally;
@@ -48,7 +49,7 @@ public class Application extends SecureController {
 	static void before() {
 		if (Security.isConnected()) {
 			renderArgs.put(CLIPBOARD, new Clipboard(getUser().clipboard));
-			renderArgs.put(EXPORTS, Exporter.getExports(session));
+			renderArgs.put(EXPORTS, ClipboardExporter.getExports(session));
 		}
 	}
 
@@ -168,7 +169,10 @@ public class Application extends SecureController {
 		PersistentLogger.log("downloaded series %s", pk);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		renderBinary(await(new Downloader(pk, format == null ? Format.dcm : format, echo, tmpDir).now()));
+		await(new SeriesDownloader(pk, format == null ? Format.dcm : format, echo, tmpDir, getUser().username).now());
+		File zip = new File(tmpDir, String.format("%s.zip", tmpDir.listFiles()[0].getName()));
+		Files.zip(tmpDir.listFiles()[0], zip);
+		renderBinary(zip);
 	}
 
 	public static void export(String password) throws InterruptedException, IOException, ClassNotFoundException {
@@ -176,12 +180,12 @@ public class Application extends SecureController {
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		new Exporter(clipboard, tmpDir, password, session, getUser().username).now();
+		new ClipboardExporter(clipboard, tmpDir, password, session, getUser().username).now();
 		clipboard(null, null, null);
 	}
 
 	public static void retrieve(String filename) {
-		File download = Exporter.getExport(filename, session);
+		File download = ClipboardExporter.getExport(filename, session);
 		notFoundIfNull(download);
 		renderBinary(download);
 	}
@@ -205,17 +209,22 @@ public class Application extends SecureController {
 
 	public static void imagej(long pk, String echo) throws InterruptedException, IOException {
 		Series series = Series.findById(pk);
+
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
+
 		File dcm;
 		if (series.instances.size() == 1) {
 			//TODO this doesn't handle multi-echo (neither does export)
-			dcm = await(new Downloader(pk, Format.dcm, echo, tmpDir).now());
+			await(new SeriesDownloader(pk, Format.dcm, echo, tmpDir, getUser().username).now());
+			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
 			//TODO this doesn't handle multi-echo either (but export does)
-			File nii = await(new Downloader(pk, Format.nii, echo, tmpDir).now());
-			dcm = new File(tmpDir, String.format("%s.dcm", series.toDownloadString()));
-			ProcessBuilder pb = new ProcessBuilder(new File(Properties.getString("xmedcon"), "bin/medcon").getPath(),
+			await(new SeriesDownloader(pk, Format.nii, echo, tmpDir, getUser().username).now());
+			File nii = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
+			dcm = new File(tmpDir, String.format("%s.dcm", nii.getName()));
+			ProcessBuilder pb = new ProcessBuilder(
+					new File(Properties.getString("xmedcon"), "bin/medcon").getPath(),
 					"-c", "dicom",
 					"-noprefix",
 					"-anon",

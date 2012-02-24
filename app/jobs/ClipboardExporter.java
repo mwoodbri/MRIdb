@@ -8,54 +8,59 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import jobs.Downloader.Format;
 import models.Series;
 import models.Study;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
+import play.Logger;
 import play.db.jpa.GenericModel;
 import play.jobs.Job;
 import play.mvc.Scope.Session;
 import util.Clipboard;
+import util.Download;
 import util.Properties;
 import controllers.Application;
 
-public class Exporter extends Job {
+public class ClipboardExporter extends Job {
 
 	private Clipboard clipboard;
 	private File tmpDir;
 	private String password;
 	private Session session;
-	private String user;
+	private String username;
 
-	public Exporter(Clipboard clipboard, File tmpDir, String password, Session session, String user) {
+	public ClipboardExporter(Clipboard clipboard, File tmpDir, String password, Session session, String username) {
 		this.clipboard = clipboard;
 		this.tmpDir = tmpDir;
 		this.password = password;
 		this.session = session;
-		this.user = user;
+		this.username = username;
 		addExport();
 	}
 
 	@Override
 	public void doJob() throws Exception {
-		for (GenericModel model : clipboard.getObjects()) {
-			if (model instanceof Series) {
-				Downloader.export((Series) model, Format.dcm, tmpDir, null);
-			} else {
-				Study study = (Study) model;
-				File dir = new File(tmpDir, study.toDownloadString());
-				dir.mkdir();
-				for (Series series : ((Study) model).series) {
-					Downloader.export(series, Format.dcm, dir, null);
-				}
+		for (GenericModel object : clipboard.getObjects()) {
+			if (object instanceof Study) {
+				Study study = (Study) object;
+				Download.study(study, tmpDir, username);
+			} else if (object instanceof Series) {
+				Series series = (Series) object;
+				Download.series(series, tmpDir, username);
 			}
 		}
+
 		File zipFile = new File(String.format("%s.7z", tmpDir.getPath()));
 		for (File folder : tmpDir.listFiles()) {
-			new ProcessBuilder("7za", "a", "-mhe=on", String.format("-p%s", password), zipFile.getPath(), folder.getPath()).start().waitFor();
+			ProcessBuilder processBuilder = new ProcessBuilder("7za", "a", "-mhe=on", "-mx0", String.format("-p%s", password), zipFile.getPath(), folder.getPath());
+			processBuilder.redirectErrorStream(true);
+			Logger.info("%s %s", zipFile, folder);
+			Process process = processBuilder.start();
+			Logger.info(IOUtils.toString(process.getInputStream()));
+			Logger.info("" + process.waitFor());
 		}
 		zipFile.renameTo(getDest());
 	}
@@ -67,7 +72,7 @@ public class Exporter extends Job {
 		}
 		String name;
 		for (int i = 1; ; i++) {
-			name = String.format("%s-%s-%s", user, new SimpleDateFormat("yyyyMMdd").format(new Date()), i);
+			name = String.format("%s-%s-%s", username, new SimpleDateFormat("yyyyMMdd").format(new Date()), i);
 			if (!new File(tmpDir.getParentFile(), String.format("%s.7z", name)).exists()) {
 				break;
 			}
