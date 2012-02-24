@@ -44,7 +44,7 @@ public class Study extends GenericModel {
 				string = String.format("%s_%s", string, projectAssociation.participationID);
 			}
 		}
-		return string;
+		return string.replaceAll("\\W+", "");
 	}
 
 	public String toClipboardString() {
