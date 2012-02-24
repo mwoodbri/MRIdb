@@ -21,7 +21,7 @@
 
 #{list patient.studies, as: 'study'}
 <h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3> #{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
-#{form @associate()}
+#{form @associate(), method: 'post'}
 	Project:
 	<select name="projectID">
 		<option></option>
