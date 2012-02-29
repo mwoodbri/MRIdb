@@ -20,6 +20,10 @@ public class Properties {
 		return archive.isAbsolute() ? archive : new File(getString("dcm4chee"), String.format("server/default/%s", archive.getPath()));
 	}
 
+	public static int pageSize() {
+		return Integer.parseInt(Play.configuration.getProperty("page.size", String.valueOf(15)));
+	}
+
 	public static File getDownloads() {
 		File downloads = new File(Play.tmpDir, "downloads");
 		downloads.mkdir();

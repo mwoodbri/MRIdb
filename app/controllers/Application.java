@@ -127,7 +127,7 @@ public class Application extends SecureController {
 			query += " where " + StringUtils.join(where, " and ");
 		}
 		query += " order by " + "study." + (order.isEmpty() ? "patient.pk" : order) + " " + ("desc".equals(sort) ? "desc" : "asc");
-		List<Study> studies = Study.find(query, args.toArray()).fetch(page + 1, Properties.getInt("page.size"));
+		List<Study> studies = Study.find(query, args.toArray()).fetch(page + 1, Properties.pageSize());
 		int studyCount = Study.find(query, args.toArray()).fetch().size();
 		render(studies, studyCount, page);
 	}
@@ -156,7 +156,7 @@ public class Application extends SecureController {
 			objectUID = series.instances.iterator().next().sop_iuid;
 		} else {
 			frameNumber = 1;
-			objectUID = Instance.find("bySeriesAndInst_no", series, String.valueOf(series.instances.size() / 2)).<Instance>first().sop_iuid;
+			objectUID = series.instances.toArray(new Instance[0])[series.instances.size() / 2].sop_iuid;
 		}
 		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s", request.domain, objectUID, frameNumber);
 		if (columns != null) {

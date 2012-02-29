@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import play.db.jpa.GenericModel;
 
@@ -22,6 +23,7 @@ public class Series extends GenericModel {
 	@ManyToOne
 	@JoinColumn(name="study_fk")
 	public Study study;
+	@OrderBy("pk")
 	@OneToMany(mappedBy = "series")
 	public Set<Instance> instances;
 
