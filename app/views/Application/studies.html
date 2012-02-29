@@ -60,7 +60,7 @@
     <li class="prev disabled"><a href="#">&larr; Previous</a>
     #{/else}
     #{list items:util.Util.pages(studyCount, util.Properties.pageSize(), page + 1)}
-    #{if _}<li#{if _ == page + 1} class="active"#{/if}><a href="${request.url.replaceFirst("page=\\d+", "page=" + (_ - 1))}">${_}</a>#{/if}#{else}<li><a href="#">…</a>#{/else}
+    #{if _}<li#{if _ == page + 1} class="active"#{/if}><a href="${request.url.replaceFirst("page=\\d+", "page=" + (_ - 1))}">${_}</a>#{/if}#{else}<li class="disabled"><a href="#">…</a>#{/else}
     #{/list}
     #{if page < Math.ceil(studyCount / util.Properties.pageSize()) - 1}
     <li class="next"><a href="${request.url.replaceFirst("page=\\d+", "page=" + (page + 1))}">Next &rarr;</a>
