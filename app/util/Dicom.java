@@ -98,8 +98,13 @@ public class Dicom {
 	}
 
 	private static final List<String> validCUIDs = Arrays.asList("1.2.840.10008.5.1.4.1.1.4", "1.2.840.10008.5.1.4.1.1.4.1", "1.2.840.10008.5.1.4.1.1.7");
+	//UNUSED
 	public static boolean renderable(Series series) {
 		return validCUIDs.contains(series.instances.iterator().next().sop_cuid);
+	}
+	//TODO
+	public static boolean renderable(Instance instance) {
+		return validCUIDs.contains(instance.sop_cuid);
 	}
 
 	public static int numberOfFrames(Series series) throws IOException {

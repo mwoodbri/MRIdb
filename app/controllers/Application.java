@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,8 @@ import models.Series;
 import models.Study;
 import notifiers.Mail;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
@@ -146,17 +149,23 @@ public class Application extends SecureController {
 
 	public static void image(long pk, Integer columns, int echo) throws MalformedURLException, IOException {
 		Series series = Series.findById(pk);
-		if (!Dicom.renderable(series)) {
-			renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
-		}
 		int frameNumber;
 		String objectUID = null;
 		if (series.instances.size() == 1) {
+			if (!Dicom.renderable(series.instances.iterator().next())) {
+				renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
+			}
 			frameNumber = Dicom.numberOfFrames(series) / 2 + echo + 1;
 			objectUID = series.instances.iterator().next().sop_iuid;
 		} else {
+			Collection instances = CollectionUtils.select(series.instances, new Predicate() {
+				@Override
+				public boolean evaluate(Object arg0) {
+					return Dicom.renderable((Instance) arg0);
+				}
+			});
 			frameNumber = 1;
-			objectUID = series.instances.toArray(new Instance[0])[series.instances.size() / 2].sop_iuid;
+			objectUID = ((Instance) instances.toArray(new Instance[0])[instances.size() / 2]).sop_iuid;
 		}
 		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s", request.domain, objectUID, frameNumber);
 		if (columns != null) {
