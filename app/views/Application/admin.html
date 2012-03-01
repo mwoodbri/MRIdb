@@ -11,6 +11,7 @@
 			<th>Study Description
 			<th>Date of Study
 			<th>Scanner
+			<th>Imported
 		</tr>
 	</thead>
 	<tbody>
@@ -21,6 +22,7 @@
 			<td>${_.study_desc}
 			<td>${_.study_datetime?.format()}
 			<td>${_.series.iterator().next().station_name}
+			<td>${_.created_time.format()} ${_.created_time.time()}
 		</tr>
 		#{/list}
 	</tbody>

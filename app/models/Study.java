@@ -23,7 +23,7 @@ public class Study extends GenericModel {
 	public String study_desc;
 	public Date study_datetime;
 	public String study_custom1;
-	public Date created_at;
+	public Date created_time;
 	@ManyToOne
 	@JoinColumn(name="patient_fk")
 	public Patient patient;
