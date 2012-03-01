@@ -92,11 +92,7 @@ public class DicomTags extends FastTags {
 
 	public static void _NumberOfFrames(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
 		Series series = (Series) args.get("arg");
-		String numberOfFrames = Dicom.attribute(series.instances.iterator().next().inst_attrs, "NumberOfFrames");
-		if (numberOfFrames == null) {
-			numberOfFrames = String.valueOf(series.instances.size());
-		}
-		out.println(numberOfFrames);
+		out.println(String.valueOf(Dicom.numberOfFrames(series)));
 	}
 
 }

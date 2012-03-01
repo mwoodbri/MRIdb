@@ -152,7 +152,7 @@ public class Application extends SecureController {
 		int frameNumber;
 		String objectUID = null;
 		if (series.instances.size() == 1) {
-			frameNumber = Integer.parseInt(Dicom.attribute(series.instances.iterator().next().inst_attrs, "NumberOfFrames")) / 2 + echo + 1;
+			frameNumber = Dicom.numberOfFrames(series) / 2 + echo + 1;
 			objectUID = series.instances.iterator().next().sop_iuid;
 		} else {
 			frameNumber = 1;

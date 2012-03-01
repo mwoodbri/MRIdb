@@ -89,6 +89,13 @@ public class Dicom {
 		return validCUIDs.contains(series.instances.iterator().next().sop_cuid);
 	}
 
+	public static int numberOfFrames(Series series) throws IOException {
+		Dataset d = DcmObjectFactory.getInstance().newDataset();
+		d.readFile(new ByteArrayInputStream(series.instances.iterator().next().inst_attrs), null, -1);
+		Integer numberOfFrames = d.getInteger(Tags.forName("NumberOfFrames"));
+		return numberOfFrames != null ? numberOfFrames : series.instances.size();
+	}
+
 	//	public static Dataset privateDataset(Dataset dataset) throws IOException {
 	//		Dataset privateDataset;
 	//		Dataset perFrameFunctionalGroupsSeq = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
