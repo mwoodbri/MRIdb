@@ -8,7 +8,9 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+import models.Files;
 import models.Instance;
 import models.Series;
 
@@ -42,9 +44,20 @@ public class Dicom {
 	public static File folder(Series series) {
 		File folder = new File(Properties.getArchive(), series.instances.iterator().next().files.iterator().next().filepath).getParentFile();
 		if (folder.list().length != series.instances.size()) {
-			throw new RuntimeException(String.format("Folder contains %s files but series only has %s!", folder.list().length, series.instances.size()));
+			throw new RuntimeException(String.format("Folder %s contains %s files but series has length %s!", folder, folder.list().length, series.instances.size()));
 		}
 		return folder;
+	}
+
+	public static File collate(Series series) {
+		File collated = new File(Properties.getCollations(), UUID.randomUUID().toString());
+		collated.mkdir();
+		for (Instance instance : series.instances) {
+			for (Files files : instance.files) {
+				play.libs.Files.copy(new File(Properties.getArchive(), files.filepath), new File(collated, String.valueOf(files.pk)));
+			}
+		}
+		return collated;
 	}
 
 	//retrieve attributes that aren't in the table or blob by looking in the file

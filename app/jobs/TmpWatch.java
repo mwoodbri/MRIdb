@@ -14,7 +14,7 @@ import util.Properties;
 @Every("1d")
 public class TmpWatch extends Job {
 
-	private static final List<String> watchedFolders = Arrays.asList(Properties.getDownloads().getName());
+	private static final List<String> watchedFolders = Arrays.asList(Properties.getDownloads().getName(), Properties.getCollations().getName());
 
 	@Override
 	public void doJob() {

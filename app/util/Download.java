@@ -21,29 +21,32 @@ public class Download {
 	}
 
 	public static void series(Series series, File tmpDir, String username, Format format, String echo) throws IOException, InterruptedException {
-		tmpDir = new File(tmpDir, series.study.toDownloadString(username));
-		tmpDir.mkdir();
+		File studyDir = new File(tmpDir, series.study.toDownloadString(username));
+		studyDir.mkdir();
 
 		if (format == Format.nii) {
-			File dir = new File(tmpDir, series.toDownloadString());
+			File dir = new File(studyDir, series.toDownloadString());
 			dir.mkdir();
 			if (series.instances.size() == 1) {
 				File dcm = Dicom.file(series.instances.iterator().next());
 				File nii = new File(dir, String.format("%s.nii", dcm.getName()));
 				new ProcessBuilder(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), nii.getPath()).start().waitFor();
 			} else {
+				File collated = Dicom.collate(series);
 				new ProcessBuilder(
 						Properties.getString("dcm2nii"),
 						"-d", "n",//don't put date in filename
 						"-p", "n",//don't put protocol in filename
 						"-g", "n",//don't gzip
 						"-o", dir.getPath(),//don't put destination file in same directory as source
-						Dicom.folder(series).getPath()
+						collated.getPath()
 						).start().waitFor();
 			}
 		} else if (format == Format.img) {
-			File dir = new File(tmpDir, series.toDownloadString());
+			File dir = new File(studyDir, series.toDownloadString());
 			dir.mkdir();
+			File collatedDir = new File(tmpDir, "collated");
+			File collated = Dicom.collate(series);
 			new ProcessBuilder(
 					Properties.getString("dcm2nii"),
 					"-d", "n",//don't put date in filename
@@ -51,10 +54,10 @@ public class Download {
 					"-n", "n",//.hdr/.img pair
 					"-s", "y",//analyze
 					"-o", dir.getPath(),//don't put destination file in same directory as source
-					Dicom.folder(series).getPath()
+					collated.getPath()
 					).start().waitFor();
 		} else {
-			File dir = new File(tmpDir, series.toDownloadString());
+			File dir = new File(studyDir, series.toDownloadString());
 			dir.mkdir();
 			for (File dcm : Dicom.files(series, echo)) {
 				Dicom.anonymise(dcm, new File(dir, String.format("%s.dcm", dcm.getName())));

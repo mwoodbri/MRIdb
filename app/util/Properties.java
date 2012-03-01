@@ -29,4 +29,10 @@ public class Properties {
 		downloads.mkdir();
 		return downloads;
 	}
+
+	public static File getCollations() {
+		File downloads = new File(Play.tmpDir, "collations");
+		downloads.mkdir();
+		return downloads;
+	}
 }
