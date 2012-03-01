@@ -164,6 +164,9 @@ public class Application extends SecureController {
 					return Dicom.renderable((Instance) arg0);
 				}
 			});
+			if (instances.size() == 0) {
+				renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
+			}
 			frameNumber = 1;
 			objectUID = ((Instance) instances.toArray(new Instance[0])[instances.size() / 2]).sop_iuid;
 		}
