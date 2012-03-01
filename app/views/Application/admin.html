@@ -14,7 +14,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		#{list models.Study.find("order by created_at desc").fetch(util.Properties.pageSize())}
+		#{list models.Study.find("order by created_time desc").fetch(util.Properties.pageSize())}
 		<tr>
 			<td>#{a @patient(_.patient.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/a}
 			<td>${_.patient.pat_id}
