@@ -2,6 +2,7 @@ package tags;
 
 import groovy.lang.Closure;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 import models.Series;
 
 import org.dcm4che.data.Dataset;
+import org.dcm4che.data.DcmObjectFactory;
 import org.dcm4che.dict.Tags;
 
 import play.templates.FastTags;
@@ -27,10 +29,17 @@ public class DicomTags extends FastTags {
 		out.println(pixelSpacing["X".equals(axis) ? 0 : 1]);
 	}
 
-	public static void _SliceThickness(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
+	public static void _SliceThickness(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
 		Dataset dataset = (Dataset) args.get("arg");
 		if (!dataset.contains(Tags.SliceThickness)) {
-			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.valueOf("(2005,140F)"));
+			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
+			if (dataset.get(Tags.valueOf("(2005,140F)")).hasItems()) {
+				dataset = dataset.getItem(Tags.valueOf("(2005,140F)"));
+			} else {
+				byte[] buf = dataset.get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
+				dataset = DcmObjectFactory.getInstance().newDataset();
+				dataset.readFile(new ByteArrayInputStream(buf), null, -1);
+			}
 		}
 		out.println(dataset.getFloat(Tags.SliceThickness));
 	}
@@ -81,11 +90,18 @@ public class DicomTags extends FastTags {
 		out.println(dataset.getFloat(Tags.RepetitionTime));
 	}
 
-	public static void _attr(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
+	public static void _attr(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
 		Dataset dataset = (Dataset) args.get("arg");
 		int tag = Tags.forName((String) args.get("tag"));
 		if (!dataset.contains(tag)) {
-			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.valueOf("(2005,140F)"));
+			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
+			if (dataset.get(Tags.valueOf("(2005,140F)")).hasItems()) {
+				dataset = dataset.getItem(Tags.valueOf("(2005,140F)"));
+			} else {
+				byte[] buf = dataset.get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
+				dataset = DcmObjectFactory.getInstance().newDataset();
+				dataset.readFile(new ByteArrayInputStream(buf), null, -1);
+			}
 		}
 		out.println(Boolean.TRUE.equals(args.get("float")) ? dataset.getFloat(tag) : dataset.getString(tag));
 	}
