@@ -13,7 +13,7 @@
     <div class="topbar">
       <div class="topbar-inner">
         <div class="container-fluid">
-          <a class="brand" href="@{Application.index}">${play.configuration.getProperty("application.name")}</a>
+          <a class="brand" href="@{Application.index}"><img src="@{'/public/images/title.png'}"></a>
           <ul class="nav">
             <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @Application.index()}Search#{/a}
             <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @Application.help()}Help#{/a}
