@@ -14,7 +14,7 @@
 #{if echoes.size() > 1 && series.instances.size() > 1}#{list echoes}#{a @download(series.pk, "dcm", _index)}DICOM${_index}#{/a}#{/list}#{/if}#{else}#{a @download(series.pk)}<img src="@{'/public/images/dicom.png'}" alt="DICOM">#{/a}#{/else}#{a @download(series.pk, 'nii')}<img src="@{'/public/images/nifti.png'}" alt="NIfTI">#{/a}#{a @download(series.pk, 'img')}<img src="@{'/public/images/analyze.png'}" alt="Analyze">#{/a}&nbsp;<a href="#" class="imagej"><img src="@{'/public/images/imagej.png'}" alt="ImageJ"></a> <a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}"><img src="@{'/public/images/weasis.png'}" alt="Weasis"></a>
 <hr>
 <div class="row">
-	<div class="span8">
+	<div class="span7">
 		<h3>Subject details</h3>
 		<table class="table table-bordered">
 			<thead>
@@ -58,11 +58,11 @@
 			</tbody>
 		</table>
 	</div>
-	<div class="span2 offset1">
+	<div class="span4 offset1">
 		<ul class="thumbnails">
 			#{list echoes}
-			<li>
-				<a href="#" class="imagej thumbnail">
+			<li class="span2">
+				<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="thumbnail">
 					<img src="@{'/public/images/128x128.gif'}" alt="@{image(series.pk, 128, _index - 1)}">
 				</a>
 			</li>

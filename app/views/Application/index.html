@@ -12,7 +12,7 @@
 		$('#before,#on,#after').datepicker('option', 'maxDate', 0).click(function() {
 			$('input:radio[value=' + this.id + ']').attr('checked', true);
 		});
-		$('#relative').change(function() {
+		$('#relative').on("change", function() {
 			$('input:radio[value=since]').attr('checked', true);
 			$('#since').datepicker('setDate', $(this).val());
 		});
@@ -71,31 +71,31 @@
 				<label class="radio">
 					<input type="radio" name="acquisition" value="before" checked>
 					Before
-					&nbsp;<input id="before" name="before" class="input-small" type="text">
 				</label>
+				<input id="before" name="before" class="input-small" type="text">
 				<label class="radio">
 					<input type="radio" name="acquisition" value="on">
 					On
-					&nbsp;<input id="on" name="on" class="input-small" type="text">
 				</label>
+				<input id="on" name="on" class="input-small" type="text">
 				<label class="radio">
 					<input type="radio" name="acquisition" value="after">
 					After
-					&nbsp;<input id="after" name="after" class="input-small" type="text">
 				</label>
+				<input id="after" name="after" class="input-small" type="text">
 				<label class="radio">
 					<input type="radio" name="acquisition" value="since">
 					In the last
-					&nbsp;<select id="relative" class="input-small" style="display: inline">
-						<option value="-1d">1 Day</option>
-						<option value="-2d">2 Days</option>
-						<option value="-3d">3 Days</option>
-						<option value="-1w">Week</option>
-						<option value="-2w">2 Weeks</option>
-						<option value="-1m">Month</option>
-					</select>
-					<input id="since" name="since" type="hidden">
 				</label>
+				<select id="relative" class="input-small" style="display: inline">
+					<option value="-1d">1 Day</option>
+					<option value="-2d">2 Days</option>
+					<option value="-3d">3 Days</option>
+					<option value="-1w">Week</option>
+					<option value="-2w">2 Weeks</option>
+					<option value="-1m">Month</option>
+				</select>
+				<input id="since" name="since" type="hidden">
 			</div>
 		</div>
 		<div class="control-group">
