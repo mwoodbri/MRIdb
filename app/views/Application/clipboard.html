@@ -1,23 +1,25 @@
-<h5 style="display: inline">Clipboard</h5>
-#{if clipboard.items}
-[#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}x#{/a}]
-<ul>
+<ul class="nav nav-list">
+  <li class="nav-header">Clipboard</li>
+  #{if clipboard.items}
   #{list clipboard.items}
   <li>
-    #{if _.type == models.Study.class}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
-    #{if _.type == models.Series.class}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
-    [#{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}x#{/a}]
+    <span>
+      #{if _.type == models.Study.class}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
+      #{if _.type == models.Series.class}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
+      [#{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}x#{/a}]
+    </span>
   </li>
   #{/list}
-</ul>
-#{a @export(), class: 'export'}Export files#{/a}
-#{/if}
-<p>#{else}Use <img src="@{'/public/images/attach.png'}"> to add to clipboard#{/else}</p>
-#{if exports}
-<h5>Downloads</h5>
-<ul>
+  <li>&nbsp;</li>
+  <li>#{a @export(), class: 'export'}Export files#{/a}</li>
+  <li>#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}Remove all#{/a}</li>
+  #{/if}
+  #{else}Use <img src="@{'/public/images/attach.png'}"> to add to clipboard#{/else}
+  #{if exports}
+  <li>&nbsp;</li>
+  <li class="nav-header">Downloads</li>
   #{list exports}
   <li>#{if _.exists()}#{a @retrieve(org.apache.commons.io.FilenameUtils.getBaseName(_.name))}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/a}#{/if}#{else}<span class="loading">${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}</span>#{/else}
   #{/list}
+  #{/if}
 </ul>
-#{/if}

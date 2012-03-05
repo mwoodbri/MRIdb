@@ -2,24 +2,23 @@
 <html>
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
-    <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-    #{stylesheet 'flick/jquery-ui-1.8.17.custom.css'/}
+    #{stylesheet 'flick/jquery-ui-1.8.18.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
     #{stylesheet 'main.css'/}
     #{get 'moreStyles'/}
   </head>
   <body>
 
-    <div class="topbar">
-      <div class="topbar-inner">
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
         <div class="container-fluid">
           <a class="brand" href="@{Application.index}"><img src="@{'/public/images/title.png'}"></a>
           <ul class="nav">
             <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @Application.index()}Search#{/a}
             <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @Application.help()}Help#{/a}
             #{secure.check 'admin'}
-            <li class="dropdown" data-dropdown="dropdown">
-              <a href="#" class="dropdown-toggle">Admin</a>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li#{if request.action == "Application.admin"} class="active"#{/if}>#{a @admin()}Recent imports#{/a}</li>
                 <li>#{a @crud.Persons.list()}Users#{/a}</li>
@@ -28,25 +27,27 @@
             </li>
             #{/secure.check}
           </ul>
-          <p class="pull-right">Logged in as ${session.username} <a href='@{Secure.logout()}'>Log out</a></p>
+          <p class="navbar-text pull-right">Logged in as ${session.username} <a href='@{Secure.logout()}'>Log out</a></p>
         </div>
       </div>
     </div>
 
     <div class="container-fluid">
-      <div class="sidebar">
-        <div class="well" id="clipboard">
-          #{include 'Application/clipboard.html'/}
+      <div class="row-fluid">
+        <div class="span9">
+          #{doLayout/}
         </div>
-      </div>
-      <div class="content">
-        #{doLayout/}
+        <div class="span3">
+          <div class="well" id="clipboard">
+          #{include 'Application/clipboard.html'/}
+          </div>
+        </div>
       </div>
     </div>
 
     #{script 'jquery-1.7.1.min.js'/}
-    #{script 'jquery-ui-1.8.17.custom.min.js'/}
-    #{script 'bootstrap-dropdown.js'/}
+    #{script 'jquery-ui-1.8.18.custom.min.js'/}
+    #{script 'bootstrap.min.js'/}
     #{script 'jquery.form.js'/}
     <script>
         $(function() {
@@ -70,7 +71,7 @@
             setInterval(function() {
                 $('#clipboard').load('@{clipboard()}');
             }, 10000);
-            $(".thumbnail").each(function() {
+            $(".thumbnail img").each(function() {
                 this.src = this.alt;
             });
         });

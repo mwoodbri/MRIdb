@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,8 @@ import models.Files;
 import models.Instance;
 import models.Series;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.dcm4che.data.Dataset;
 import org.dcm4che.data.DcmObjectFactory;
 import org.dcm4che.dict.Tags;
@@ -97,10 +100,26 @@ public class Dicom {
 		dataset.writeFile(to, null);
 	}
 
-	private static final List<String> validCUIDs = Arrays.asList("1.2.840.10008.5.1.4.1.1.4", "1.2.840.10008.5.1.4.1.1.4.1", "1.2.840.10008.5.1.4.1.1.7");
-	//UNUSED
+	private static final List<String> validCUIDs = Arrays.asList(
+			"1.2.840.10008.5.1.4.1.1.4",//MR Image Storage
+			"1.2.840.10008.5.1.4.1.1.4.1",//Enhanced MR Image Storage
+			"1.2.840.10008.5.1.4.1.1.7"//Secondary Capture Image Storage
+			);
 	public static boolean renderable(Series series) {
-		return validCUIDs.contains(series.instances.iterator().next().sop_cuid);
+		return CollectionUtils.exists(series.instances, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return validCUIDs.contains(((Instance) arg0).sop_cuid);
+			}
+		});
+	}
+	public static Collection renderables(Series series) {
+		return CollectionUtils.select(series.instances, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return Dicom.renderable((Instance) arg0);
+			}
+		});
 	}
 	//TODO
 	public static boolean renderable(Instance instance) {

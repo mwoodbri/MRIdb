@@ -2,30 +2,17 @@ body {
   padding-top: 60px;
 }
 
-.container-fluid > .sidebar {
-  position: absolute;
-  right: 20px;
-  left: auto;
-}
-
-.container-fluid > .content {
-  margin-right: 240px;
-  margin-left: 0;
-}
-
-.media-grid .caption {
+.thumbnail .caption {
   font-size: 11px;
   color: white;
   background-color: #333;
   text-align: center;
+  padding: 0.4em;
+
 }
 
-.media-grid a:hover {
+a.thumbnail:hover {
   text-decoration: none;
-}
-
-select {
-  background-color: white;
 }
 
 .loading {
@@ -34,7 +21,22 @@ select {
   white-space: nowrap;
 }
 
-.topbar .brand {
+.navbar .brand {
   padding: 0;
   line-height: 0;
+}
+
+th.header {
+  background-image: url(../../public/images/bg.gif);
+  background-repeat: no-repeat;
+  background-position: center right;
+  cursor: pointer;
+}
+
+th.headerSortDown {
+  background-image: url(../../public/images/desc.gif);
+}
+
+th.headerSortUp {
+  background-image: url(../../public/images/asc.gif);
 }

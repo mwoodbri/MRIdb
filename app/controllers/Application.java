@@ -158,12 +158,7 @@ public class Application extends SecureController {
 			frameNumber = Dicom.numberOfFrames(series) / 2 + echo + 1;
 			objectUID = series.instances.iterator().next().sop_iuid;
 		} else {
-			Collection instances = CollectionUtils.select(series.instances, new Predicate() {
-				@Override
-				public boolean evaluate(Object arg0) {
-					return Dicom.renderable((Instance) arg0);
-				}
-			});
+			Collection instances = Dicom.renderables(series);
 			if (instances.size() == 0) {
 				renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 			}

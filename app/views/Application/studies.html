@@ -24,14 +24,15 @@
 </script>
 #{/set}
 
-<h2>Search results (${studyCount} matching subjects)</h2>
+<h1>Results <small>${studyCount} matching subjects</small></h1>
 
-<table id="studies" class="bordered-table zebra-striped">
+<table id="studies" class="table table-striped table-bordered">
 	<thead>
 		<tr>
-			#{list items:['patient.pat_name':'Name', 'patient.pat_id':'Subject ID', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study', project:'Project']}
+			#{list items:['patient.pat_name':'Name', 'patient.pat_id':'Subject ID', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study']}
 			<th id="${_.key}" class="header#{if _.key == params.order} headerSort${params.sort == 'desc' ? 'Up' : 'Down'}#{/if}">${_.value}
 			#{/list}
+			<th>Project
 			<th>
 		</tr>
 	</thead>
@@ -54,10 +55,10 @@
 <div class="pagination">
   <ul>
     #{if page}
-    <li class="prev"><a href="${request.url.replaceFirst("page=\\d+", "page=" + (page - 1))}">&larr; Previous</a>
+    <li class="prev"><a href="${request.url.replaceFirst("page=\\d+", "page=" + (page - 1))}">&larr; Prev</a>
     #{/if}
     #{else}
-    <li class="prev disabled"><a href="#">&larr; Previous</a>
+    <li class="prev disabled"><a href="#">&larr; Prev</a>
     #{/else}
     #{list items:util.Util.pages(studyCount, util.Properties.pageSize(), page + 1)}
     #{if _}<li#{if _ == page + 1} class="active"#{/if}><a href="${request.url.replaceFirst("page=\\d+", "page=" + (_ - 1))}">${_}</a>#{/if}#{else}<li class="disabled"><a href="#">…</a>#{/else}

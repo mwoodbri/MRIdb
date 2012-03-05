@@ -73,9 +73,9 @@ public class DicomTags extends FastTags {
 	public static void _ReceiveCoilName(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
 		if (!dataset.contains(Tags.ReceiveCoilName)) {
-			if (dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRReceiveCoilSeq)) {
+			if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRReceiveCoilSeq)) {
 				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
-			} else {
+			} else if (dataset.contains(Tags.SharedFunctionalGroupsSeq)) {
 				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
 			}
 		}
@@ -93,7 +93,7 @@ public class DicomTags extends FastTags {
 	public static void _attr(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
 		Dataset dataset = (Dataset) args.get("arg");
 		int tag = Tags.forName((String) args.get("tag"));
-		if (!dataset.contains(tag)) {
+		if (!dataset.contains(tag) && dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
 			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
 			if (dataset.get(Tags.valueOf("(2005,140F)")).hasItems()) {
 				dataset = dataset.getItem(Tags.valueOf("(2005,140F)"));
