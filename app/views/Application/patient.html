@@ -17,9 +17,8 @@
 </script>
 #{/set}
 
-<div class="page-header">
-	<h1>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h1>
-</div>
+<h1>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h1>
+<hr>
 
 #{list patient.studies, as: 'study'}
 <h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3> #{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
