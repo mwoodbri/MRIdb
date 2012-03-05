@@ -75,7 +75,7 @@ public class DicomTags extends FastTags {
 		if (!dataset.contains(Tags.ReceiveCoilName)) {
 			if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRReceiveCoilSeq)) {
 				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
-			} else if (dataset.contains(Tags.SharedFunctionalGroupsSeq)) {
+			} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
 				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
 			}
 		}
