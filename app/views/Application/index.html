@@ -109,7 +109,7 @@
 			<div class="controls">
 				<select id="project" name="project">
 					<option></option>
-					#{list models.Project.findAll()}
+					#{list models.Project.find("order by name").fetch()}
 					<option value="${_.id}">${_.name}</option>
 					#{/list}
 				</select>

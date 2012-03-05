@@ -29,7 +29,7 @@
 	Project:
 	<select name="projectID">
 		<option></option>
-		#{list models.Project.findAll()}
+		#{list models.Project.find("order by name").fetch()}
 		<option value="${_.id}"#{if _.equals(study.getProjectAssociation()?.project)} selected#{/if}>${_.name}</option>
 		#{/list}
 		<option value="-1">New project...</option>
