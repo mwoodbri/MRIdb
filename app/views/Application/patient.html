@@ -10,7 +10,10 @@
 					return;
 				}
 				$(this).siblings('input[name=projectName]').val(projectName);
+				$(this).siblings('input[name=participationID]').val('');
 				$(this).closest('form').submit();
+			} else {
+				$(this).siblings('input[name=participationID]').attr("disabled", !$("option:selected", this).val());
 			}
 		});
 	});
@@ -26,14 +29,14 @@
 	Project:
 	<select name="projectID">
 		<option></option>
-		#{list models.Project.find("person.username = ?", session.username).fetch()}
-		<option value="${_.id}"#{if _.equals(study.getProjectAssociation(session.username)?.project)} selected#{/if}>${_.name}</option>
+		#{list models.Project.findAll()}
+		<option value="${_.id}"#{if _.equals(study.getProjectAssociation()?.project)} selected#{/if}>${_.name}</option>
 		#{/list}
 		<option value="-1">New project...</option>
 	</select>
 	&nbsp;
 	Identifier:
-	<input type="text" name="participationID" value="${study.getProjectAssociation(session.username)?.participationID}"#{ifnot study.getProjectAssociation(session.username)} disabled#{/ifnot}>
+	<input type="text" name="participationID" value="${study.getProjectAssociation()?.participationID}"#{ifnot study.getProjectAssociation()} disabled#{/ifnot}>
 	&nbsp;
 	<input type="hidden" name="study.pk" value="${study.pk}">
 	<input type="hidden" name="projectName">

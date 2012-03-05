@@ -3,7 +3,6 @@ package models;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import play.db.jpa.Model;
@@ -12,14 +11,11 @@ import play.db.jpa.Model;
 public class Project extends Model {
 
 	public String name;
-	@ManyToOne
-	public Person person;
 	@OneToMany(mappedBy = "project")
 	public Set<ProjectAssociation> projectAssociations;
 
-	public Project(String name, Person person) {
+	public Project(String name) {
 		this.name = name;
-		this.person = person;
 	}
 
 	@Override

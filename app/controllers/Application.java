@@ -25,8 +25,6 @@ import models.Series;
 import models.Study;
 import notifiers.Mail;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
@@ -246,13 +244,13 @@ public class Application extends SecureController {
 	}
 
 	public static void associate(Study study, Long projectID, String participationID, String projectName) {
-		ProjectAssociation association = ProjectAssociation.find("from ProjectAssociation where study = ? and project.person = ?", study, getUser()).first();
+		ProjectAssociation association = ProjectAssociation.find("byStudy", study).first();
 		if (association != null && projectID == null) {
 			association.delete();
 		}
 		Project project = null;
 		if (!projectName.isEmpty()) {
-			project = new Project(projectName, getUser()).save();
+			project = new Project(projectName).save();
 		} else if (projectID != null) {
 			project = Project.findById(projectID);
 		}

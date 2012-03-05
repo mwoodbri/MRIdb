@@ -32,13 +32,13 @@ public class Study extends GenericModel {
 	@OneToMany(mappedBy = "study")
 	public Set<ProjectAssociation> projectAssociations;
 
-	public ProjectAssociation getProjectAssociation(String username) {
-		return ProjectAssociation.find("select projectAssociation from Project project, in(project.projectAssociations) projectAssociation where project.person.username = ? and projectAssociation.study = ?", username, this).first();
+	public ProjectAssociation getProjectAssociation() {
+		return ProjectAssociation.find("select projectAssociation from Project project, in(project.projectAssociations) projectAssociation where projectAssociation.study = ?", this).first();
 	}
 
 	public String toDownloadString(String username) {
 		String string = String.format("%s_%s", new SimpleDateFormat("yyyyMMddHHmm").format(study_datetime), pk);
-		ProjectAssociation projectAssociation = getProjectAssociation(username);
+		ProjectAssociation projectAssociation = getProjectAssociation();
 		if (projectAssociation != null) {
 			string = String.format("%s_%s", string, projectAssociation.project.name);
 			if (projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {

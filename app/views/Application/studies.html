@@ -44,7 +44,7 @@
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
 			<td>${_.study_desc}
 			<td>${_.study_datetime?.format()}
-			<td>${_.getProjectAssociation(session.username)?.project}#{if _.getProjectAssociation(session.username)?.participationID} (${_.getProjectAssociation(session.username)?.participationID})#{/if}
+			<td>${_.getProjectAssociation()?.project}#{if _.getProjectAssociation()?.participationID} (${_.getProjectAssociation()?.participationID})#{/if}
 			<td>#{a @clipboard(controllers.Application.ClipboardOp.ADD, _.class.simpleName, _.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
 		</tr>
 		#{/list}

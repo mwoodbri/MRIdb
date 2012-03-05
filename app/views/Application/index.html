@@ -109,7 +109,7 @@
 			<div class="controls">
 				<select id="project" name="project">
 					<option></option>
-					#{list models.Project.find("person.username = ?", session.username).fetch()}
+					#{list models.Project.findAll()}
 					<option value="${_.id}">${_.name}</option>
 					#{/list}
 				</select>
