@@ -140,23 +140,25 @@ public class Application extends SecureController {
 
 	public static void series(long pk) throws IOException {
 		Series series = Series.findById(pk);
-		Dataset dataset = Dicom.dataset(Dicom.file(series.instances.iterator().next()));
+		Instance instance = Dicom.multiFrame(series);
+		if (instance == null) {
+			instance = (Instance) Dicom.singleFrames(series).iterator().next();
+		}
+		Dataset dataset = Dicom.dataset(Dicom.file(instance));
 		Set<String> echoes = Dicom.echoes(dataset);
 		render(series, dataset, echoes);
 	}
 
-	public static void image(long pk, Integer columns, int echo) throws MalformedURLException, IOException {
+	public static void image(long pk, Integer columns) throws MalformedURLException, IOException {
 		Series series = Series.findById(pk);
 		int frameNumber;
 		String objectUID = null;
-		if (series.instances.size() == 1) {
-			if (!Dicom.renderable(series.instances.iterator().next())) {
-				renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
-			}
-			frameNumber = Dicom.numberOfFrames(series) / 2 + echo + 1;
-			objectUID = series.instances.iterator().next().sop_iuid;
+		Instance instance = Dicom.multiFrame(series);
+		if (instance != null) {
+			frameNumber = Dicom.numberOfFrames(series) / 2 + 1;
+			objectUID = instance.sop_iuid;
 		} else {
-			Collection instances = Dicom.renderables(series);
+			Collection instances = Dicom.singleFrames(series);
 			if (instances.size() == 0) {
 				renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 			}
@@ -170,11 +172,11 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	public static void download(long pk, Format format, String echo) throws InterruptedException, IOException {
+	public static void download(long pk, Format format) throws InterruptedException, IOException {
 		PersistentLogger.log("downloaded series %s", pk);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		await(new SeriesDownloader(pk, format == null ? Format.dcm : format, echo, tmpDir, getUser().username).now());
+		await(new SeriesDownloader(pk, format == null ? Format.dcm : format, tmpDir, getUser().username).now());
 		File zip = new File(tmpDir, String.format("%s.zip", tmpDir.listFiles()[0].getName()));
 		Files.zip(tmpDir.listFiles()[0], zip);
 		renderBinary(zip);
@@ -212,20 +214,19 @@ public class Application extends SecureController {
 		render();
 	}
 
-	public static void imagej(long pk, String echo) throws InterruptedException, IOException {
+	public static void imagej(long pk) throws InterruptedException, IOException {
 		Series series = Series.findById(pk);
 
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 
 		File dcm;
-		if (series.instances.size() == 1) {
-			//TODO this doesn't handle multi-echo (neither does export)
-			await(new SeriesDownloader(pk, Format.dcm, echo, tmpDir, getUser().username).now());
+		Instance instance = Dicom.multiFrame(series);
+		if (instance != null) {
+			await(new SeriesDownloader(pk, Format.dcm, tmpDir, getUser().username).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
-			//TODO this doesn't handle multi-echo either (but export does)
-			await(new SeriesDownloader(pk, Format.nii, echo, tmpDir, getUser().username).now());
+			await(new SeriesDownloader(pk, Format.nii, tmpDir, getUser().username).now());
 			File nii = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 			dcm = new File(tmpDir, String.format("%s.dcm", nii.getName()));
 			ProcessBuilder pb = new ProcessBuilder(

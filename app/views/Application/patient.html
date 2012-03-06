@@ -21,7 +21,6 @@
 #{/set}
 
 <h1>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h1>
-<hr>
 
 #{list patient.studies, as: 'study'}
 <h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3> #{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
@@ -43,12 +42,11 @@
 	<input type="submit" class="btn" value="Update">
 #{/form}
 <ul class="thumbnails">
-	*{ #{list study.series.findAll{util.Dicom.renderable(it)}.sort{it.series_no as int}, as: 'series'} }*
-	#{list study.series.sort{it.series_no as int}, as: 'series'}
+	#{list study.series.findAll{it.modality.equals('MR')}.sort{it.series_no as int}, as: 'series'}
 	<li>
-		<a href="#{if util.Dicom.renderable(series)}@{series(series.pk)}#{/if}#{else}##{/else}" class="thumbnail">
+		<a href="@{series(series.pk)}" class="thumbnail">
 			<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 128)}">
-			<div class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(20)}</div>
+			<div class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(18)}</div>
 		</a>
 	</li>
 	#{/list}

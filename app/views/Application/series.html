@@ -2,19 +2,19 @@
 #{set title:'Series'/}
 #{set 'moreScripts'}
 <script>
-    $('a.imagej').on('click', function() {
-        $('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej(series.pk)}&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
-    });
+	$('a.imagej').on('click', function() {
+		$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej(series.pk)}&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
+	});
 </script>
 #{/set}
 
-<h2 style="display: inline">${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime?.format()} - ${series.series_custom1}(${series.series_no})</h2>
+<h3 style="display: inline">${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime?.format()} - ${series.series_custom1}(${series.series_no})</h3>
 #{a @clipboard(controllers.Application.ClipboardOp.ADD, series.class.simpleName, series.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a} #{stats series}%s files (%s)#{/stats}
 <br>
-#{if echoes.size() > 1 && series.instances.size() > 1}#{list echoes}#{a @download(series.pk, "dcm", _index)}DICOM${_index}#{/a}#{/list}#{/if}#{else}#{a @download(series.pk)}<img src="@{'/public/images/dicom.png'}" alt="DICOM">#{/a}#{/else}#{a @download(series.pk, 'nii')}<img src="@{'/public/images/nifti.png'}" alt="NIfTI">#{/a}#{a @download(series.pk, 'img')}<img src="@{'/public/images/analyze.png'}" alt="Analyze">#{/a}&nbsp;<a href="#" class="imagej"><img src="@{'/public/images/imagej.png'}" alt="ImageJ"></a> <a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}"><img src="@{'/public/images/weasis.png'}" alt="Weasis"></a>
+#{a @download(series.pk)}<img src="@{'/public/images/dicom.png'}" alt="DICOM">#{/a}#{a @download(series.pk, 'nii')}<img src="@{'/public/images/nifti.png'}" alt="NIfTI">#{/a}#{a @download(series.pk, 'img')}<img src="@{'/public/images/analyze.png'}" alt="Analyze">#{/a}&nbsp;<a href="#" class="imagej"><img src="@{'/public/images/imagej.png'}" alt="ImageJ"></a> <a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}"><img src="@{'/public/images/weasis.png'}" alt="Weasis"></a>
 <hr>
 <div class="row">
-	<div class="span7">
+	<div class="span10">
 		<h3>Subject details</h3>
 		<table class="table table-bordered">
 			<thead>
@@ -58,15 +58,13 @@
 			</tbody>
 		</table>
 	</div>
-	<div class="span4 offset1">
+	<div class="span2">
 		<ul class="thumbnails">
-			#{list echoes}
-			<li class="span2">
+			<li>
 				<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="thumbnail">
-					<img src="@{'/public/images/128x128.gif'}" alt="@{image(series.pk, 128, _index - 1)}">
+					<img width="128" height="128" src="@{'/public/images/128x128.gif'}" alt="@{image(series.pk, 128)}">
 				</a>
 			</li>
-			#{/list}
 		</ul>
 	</div>
 </div>
@@ -83,7 +81,7 @@
 	</thead>
 	<tbody>
 		<tr>
-			<td>${series.instances.iterator().next().inst_attrs.get('Columns')} / ${series.instances.iterator().next().inst_attrs.get('Rows')} / #{NumberOfFrames series/}</td>
+			<td>#{attr dataset, tag:'Columns'/} / #{attr dataset, tag:'Rows'/} / #{NumberOfFrames series/}</td>
 			<td>#{PixelSpacing dataset, axis: 'X'/} / #{PixelSpacing dataset, axis: 'Y'/} / #{SliceThickness dataset/}</td>
 			<td>#{InPlanePhaseEncodingDirection dataset/}</td>
 			<td>#{MRAcquisitionPhaseEncodingStepsInPlane dataset/}</td>

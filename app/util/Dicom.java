@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,34 +32,26 @@ public class Dicom {
 		return new File(Properties.getArchive(), instance.files.iterator().next().filepath);
 	}
 
-	public static List<File> files(Series series, String echo) throws IOException {
-		List<File> files = new ArrayList<File>();
-		for (Instance instance : series.instances) {
-			File dicom = file(instance);
-			if (echo == null || dataset(dicom).getString(Tags.EchoTime).equals(echo)) {
-				files.add(dicom);
-			}
-		}
-		return files;
-	}
-
-	public static File folder(Series series) {
-		File folder = new File(Properties.getArchive(), series.instances.iterator().next().files.iterator().next().filepath).getParentFile();
-		if (folder.list().length != series.instances.size()) {
-			throw new RuntimeException(String.format("Folder %s contains %s files but series has length %s!", folder, folder.list().length, series.instances.size()));
-		}
-		return folder;
-	}
-
 	public static File collate(Series series) {
 		File collated = new File(Properties.getCollations(), UUID.randomUUID().toString());
 		collated.mkdir();
-		for (Instance instance : series.instances) {
-			for (Files files : instance.files) {
-				play.libs.Files.copy(new File(Properties.getArchive(), files.filepath), new File(collated, String.valueOf(files.pk)));
-			}
+		for (Files files : Dicom.getFiles(series)) {
+			play.libs.Files.copy(new File(Properties.getArchive(), files.filepath), new File(collated, String.valueOf(files.pk)));
 		}
 		return collated;
+	}
+
+	public static Collection<Files> getFiles(Series series) {
+		List<Files> filesList = new ArrayList<Files>();
+		Collection singleFrames = Dicom.singleFrames(series);
+		if (singleFrames.size() > 0) {
+			for (Object instance : Dicom.singleFrames(series)) {
+				filesList.add(((Instance) instance).files.iterator().next());
+			}
+		} else {
+			filesList.add(Dicom.multiFrame(series).files.iterator().next());
+		}
+		return filesList;
 	}
 
 	//retrieve attributes that aren't in the table or blob by looking in the file
@@ -100,37 +91,38 @@ public class Dicom {
 		dataset.writeFile(to, null);
 	}
 
-	private static final List<String> validCUIDs = Arrays.asList(
-			"1.2.840.10008.5.1.4.1.1.4",//MR Image Storage
-			"1.2.840.10008.5.1.4.1.1.4.1",//Enhanced MR Image Storage
-			"1.2.840.10008.5.1.4.1.1.7"//Secondary Capture Image Storage
-			);
-	public static boolean renderable(Series series) {
-		return CollectionUtils.exists(series.instances, new Predicate() {
+	//	private static final List<String> validCUIDs = Arrays.asList(
+	//			"1.2.840.10008.5.1.4.1.1.4",//MR Image Storage
+	//			"1.2.840.10008.5.1.4.1.1.4.1",//Enhanced MR Image Storage
+	//			"1.2.840.10008.5.1.4.1.1.7"//Secondary Capture Image Storage
+	//			);
+
+	public static int numberOfFrames(Series series) throws IOException {
+		Instance instance = multiFrame(series);
+		if (instance != null) {
+			Dataset d = DcmObjectFactory.getInstance().newDataset();
+			d.readFile(new ByteArrayInputStream(instance.inst_attrs), null, -1);
+			return d.getInteger(Tags.forName("NumberOfFrames"));
+		}
+		return singleFrames(series).size();
+	}
+
+	public static Instance multiFrame(Series series) {
+		return (Instance) CollectionUtils.find(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
-				return validCUIDs.contains(((Instance) arg0).sop_cuid);
+				return "1.2.840.10008.5.1.4.1.1.4.1".equals(((Instance) arg0).sop_cuid);
 			}
 		});
 	}
-	public static Collection renderables(Series series) {
+
+	public static Collection singleFrames(Series series) {
 		return CollectionUtils.select(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
-				return Dicom.renderable((Instance) arg0);
+				return "1.2.840.10008.5.1.4.1.1.4".equals(((Instance) arg0).sop_cuid);
 			}
 		});
-	}
-	//TODO
-	public static boolean renderable(Instance instance) {
-		return validCUIDs.contains(instance.sop_cuid);
-	}
-
-	public static int numberOfFrames(Series series) throws IOException {
-		Dataset d = DcmObjectFactory.getInstance().newDataset();
-		d.readFile(new ByteArrayInputStream(series.instances.iterator().next().inst_attrs), null, -1);
-		Integer numberOfFrames = d.getInteger(Tags.forName("NumberOfFrames"));
-		return numberOfFrames != null ? numberOfFrames : series.instances.size();
 	}
 
 	//	public static Dataset privateDataset(Dataset dataset) throws IOException {

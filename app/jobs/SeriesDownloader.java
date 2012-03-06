@@ -17,14 +17,12 @@ public class SeriesDownloader extends Job<File> {
 
 	private long pk;
 	private Format format;
-	private String echo;
 	private File tmpDir;
 	private String username;
 
-	public SeriesDownloader(long pk, Format format, String echo, File tmpDir, String username) {
+	public SeriesDownloader(long pk, Format format, File tmpDir, String username) {
 		this.pk = pk;
 		this.format = format;
-		this.echo = echo;
 		this.tmpDir = tmpDir;
 		this.username = username;
 	}
@@ -32,7 +30,7 @@ public class SeriesDownloader extends Job<File> {
 	@Override
 	public void doJob() {
 		try {
-			Download.series(Series.<Series>findById(pk), tmpDir, username, format, echo);
+			Download.series(Series.<Series>findById(pk), tmpDir, username, format);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (InterruptedException e) {
