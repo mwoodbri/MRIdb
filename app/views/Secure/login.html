@@ -6,7 +6,7 @@
 
 	#{form @authenticate()}
 		
-		<img style="display: block; margin: 0 auto 10px auto" width="460" src="@{'/public/images/tigris.jpg'}">
+		<img style="display: block; margin: 0 auto 10px auto" width="460" src="@{'/public/images/tigris.png'}">
 		
 		<p style="text-align: center; font-size: 75%">&{'secure.disclaimer'}</p>
 		
@@ -27,7 +27,7 @@
 		</p>
 		<p id="password-field">
 			<label for="password">&{'secure.password'}</label>
-			<input type="password" name="password" id="password" value="" />
+			<input type="password" name="password" id="password" value="" style="width: 200px"/>
 		</p>
 		<p id="remember-field">
 			<input type="checkbox" name="remember" id="remember" value="true" ${flash.remember ? 'checked="true"' : ''} />

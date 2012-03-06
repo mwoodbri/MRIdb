@@ -61,7 +61,7 @@
                 return false;
             });
             $("#clipboard").on("click", "a.export", function(event) {
-                var password = prompt("Encryption password");
+                var password = prompt("Encryption password", "");
                 if (password) {
                     this.href += "?" + $.param({password: password});
                     $('#clipboard').load(this.href);
@@ -72,7 +72,10 @@
                 $('#clipboard').load('@{clipboard()}');
             }, 10000);
             $(".thumbnail img").each(function() {
-                this.src = this.alt;
+            	var img = this;
+                $("<img />").attr('src', this.alt).load(function() {
+                    $(img).before(this).remove();
+                });
             });
         });
     </script>
