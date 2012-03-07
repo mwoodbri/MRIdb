@@ -23,9 +23,10 @@
 <h1>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h1>
 
 #{list patient.studies, as: 'study'}
-<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3>&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
+<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3>&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
+<br><br>
 #{form @associate(), method: 'post', class: 'form-inline'}
-	Project:
+	Project:&nbsp;
 	<select name="projectID">
 		<option></option>
 		#{list models.Project.find("order by name").fetch()}
@@ -34,7 +35,7 @@
 		<option value="-1">New project...</option>
 	</select>
 	&nbsp;
-	Identifier:
+	Identifier:&nbsp;
 	<input type="text" name="participationID" value="${study.getProjectAssociation()?.participationID}"#{ifnot study.getProjectAssociation()} disabled#{/ifnot}>
 	&nbsp;
 	<input type="hidden" name="study.pk" value="${study.pk}">

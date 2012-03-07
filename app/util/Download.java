@@ -15,7 +15,9 @@ public class Download {
 
 	public static void study(Study study, File tmpDir, String username) throws IOException, InterruptedException {
 		for (Series series : study.series) {
-			series(series, tmpDir, username);
+			if ("MR".equals(series.modality)) {
+				series(series, tmpDir, username);
+			}
 		}
 	}
 

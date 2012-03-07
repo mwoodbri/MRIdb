@@ -2,8 +2,9 @@
 <html>
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
-    #{stylesheet 'flick/jquery-ui-1.8.18.custom.css'/}
+    #{stylesheet 'vader/jquery-ui-1.8.18.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
+    #{stylesheet 'font-awesome.css'/}
     #{stylesheet 'main.css'/}
     #{get 'moreStyles'/}
   </head>
@@ -22,6 +23,7 @@
               <ul class="dropdown-menu">
                 <li#{if request.action == "Application.admin"} class="active"#{/if}>#{a @admin()}Recent imports#{/a}</li>
                 <li>#{a @crud.Persons.list()}Users#{/a}</li>
+                <li>#{a @crud.Projects.list()}Projects#{/a}</li>
                 <li>#{a @crud.Logs.list(order: 'DESC')}Audit log#{/a}</li>
               </ul>
             </li>

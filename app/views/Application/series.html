@@ -9,10 +9,15 @@
 #{/set}
 
 <h3 style="display: inline">${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime?.format()} - ${series.series_custom1}(${series.series_no})</h3>
-#{a @clipboard(controllers.Application.ClipboardOp.ADD, series.class.simpleName, series.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a} #{stats series}%s files (%s)#{/stats}
-<br>
-#{a @download(series.pk)}<img src="@{'/public/images/dicom.png'}" alt="DICOM">#{/a}#{a @download(series.pk, 'nii')}<img src="@{'/public/images/nifti.png'}" alt="NIfTI">#{/a}#{a @download(series.pk, 'img')}<img src="@{'/public/images/analyze.png'}" alt="Analyze">#{/a}&nbsp;<a href="#" class="imagej"><img src="@{'/public/images/imagej.png'}" alt="ImageJ"></a> <a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}"><img src="@{'/public/images/weasis.png'}" alt="Weasis"></a>
-<hr>
+&nbsp;&nbsp;#{stats series}%s files (%s)#{/stats}
+&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, series.class.simpleName, series.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
+<br><br>
+#{a @download(series.pk), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
+#{a @download(series.pk, 'nii'), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
+#{a @download(series.pk, 'img'), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
+<a href="#" class="btn btn-info imagej"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
+<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="btn btn-info"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
+<br><br>
 <div class="row">
 	<div class="span10">
 		<h3>Subject details</h3>

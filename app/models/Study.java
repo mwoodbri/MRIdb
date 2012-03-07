@@ -49,6 +49,6 @@ public class Study extends GenericModel {
 	}
 
 	public String toClipboardString() {
-		return String.format("%s on %s", patient.pat_name == null ? "" : JavaExtensions.formatAsName(patient.pat_name), study_datetime == null ? "" : JavaExtensions.format(study_datetime));
+		return String.format("%s on %s", patient.pat_name == null ? "UNKNOWN" : JavaExtensions.formatAsName(patient.pat_name), study_datetime == null ? "" : JavaExtensions.format(study_datetime));
 	}
 }

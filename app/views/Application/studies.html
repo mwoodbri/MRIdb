@@ -24,7 +24,7 @@
 </script>
 #{/set}
 
-<h1>Results <small>${studyCount} matching subjects</small></h1>
+<h1>Search results&nbsp<small>${studyCount} matching subjects</small></h1>
 
 <table id="studies" class="table table-striped table-bordered">
 	<thead>
@@ -45,7 +45,7 @@
 			<td>${_.study_desc}
 			<td>${_.study_datetime?.format()}
 			<td>${_.getProjectAssociation()?.project}#{if _.getProjectAssociation()?.participationID} (${_.getProjectAssociation()?.participationID})#{/if}
-			<td>#{a @clipboard(controllers.Application.ClipboardOp.ADD, _.class.simpleName, _.pk), class: 'clipboard'}<img src="@{'/public/images/attach.png'}">#{/a}
+			<td>#{a @clipboard(controllers.Application.ClipboardOp.ADD, _.class.simpleName, _.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
 		</tr>
 		#{/list}
 	</tbody>

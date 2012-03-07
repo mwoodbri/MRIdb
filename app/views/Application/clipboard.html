@@ -6,7 +6,7 @@
     <span>
       #{if _.type == models.Study.class}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
       #{if _.type == models.Series.class}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
-      [#{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}x#{/a}]
+      #{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}<i class="icon-remove-sign icon-large"></i>#{/a}
     </span>
   </li>
   #{/list}
@@ -14,7 +14,7 @@
   <li>#{a @export(), class: 'export'}Export files#{/a}</li>
   <li>#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}Remove all#{/a}</li>
   #{/if}
-  #{else}Use <img src="@{'/public/images/attach.png'}"> to add to clipboard#{/else}
+  #{else}Use&nbsp;&nbsp;<i class="icon-download-alt icon-large"></i>&nbsp;&nbsp;to add to clipboard#{/else}
   #{if exports}
   <li>&nbsp;</li>
   <li class="nav-header">Downloads</li>
