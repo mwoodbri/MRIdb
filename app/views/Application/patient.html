@@ -43,7 +43,7 @@
 	<input type="submit" class="btn" value="Update">
 #{/form}
 <ul class="thumbnails">
-	#{list study.series.findAll{it.modality.equals('MR')}.sort{it.series_no as int}, as: 'series'}
+	#{list study.series.findAll{util.Dicom.renderable(it)}.sort{it.series_no as int}, as: 'series'}
 	<li class="span2">
 		<a href="@{series(series.pk)}" class="thumbnail">
 			<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 128)}">

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -121,6 +122,16 @@ public class Dicom {
 			@Override
 			public boolean evaluate(Object arg0) {
 				return "1.2.840.10008.5.1.4.1.1.4".equals(((Instance) arg0).sop_cuid);
+			}
+		});
+	}
+	
+	private static List<String> renderable = Arrays.asList("1.2.840.10008.5.1.4.1.1.4", "1.2.840.10008.5.1.4.1.1.4.1");
+	public static boolean renderable(Series series) {
+		return CollectionUtils.exists(series.instances, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return renderable.contains(((Instance) arg0).sop_cuid);
 			}
 		});
 	}
