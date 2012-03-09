@@ -8,7 +8,7 @@
 </script>
 #{/set}
 
-<h3 style="display: inline">${series.study.patient.pat_id} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime?.format()} - ${series.series_custom1}(${series.series_no})</h3>
+<h3 style="display: inline">#{a @patient(series.study.patient.pk)}${series.study.patient.pat_id}#{/a} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime?.format()} - ${series.series_custom1}(${series.series_no})</h3>
 &nbsp;&nbsp;#{stats series}%s files (%s)#{/stats}
 &nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, series.class.simpleName, series.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
 <br><br>
@@ -18,9 +18,9 @@
 <a href="#" class="btn btn-info imagej"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
 <a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="btn btn-info"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
 <br><br>
+<h3>Subject details</h3>
 <div class="row">
 	<div class="span9">
-		<h3>Subject details</h3>
 		<table class="table table-bordered">
 			<thead>
 				<tr>

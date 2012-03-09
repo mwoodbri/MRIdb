@@ -170,9 +170,7 @@ public class Application extends SecureController {
 					return Integer.valueOf(((Instance) o1).inst_no).compareTo(Integer.valueOf(((Instance) o2).inst_no));
 				}
 			});
-			System.out.println(Arrays.toString(instances));
 			objectUID = ((Instance) instances[instances.length / 2]).sop_iuid;
-			System.out.println(objectUID);
 		}
 		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s", request.domain, objectUID, frameNumber);
 		if (columns != null) {
