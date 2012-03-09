@@ -4,7 +4,7 @@
   #{list clipboard.items}
   <li>
     <span>
-      #{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}<i class="icon-remove-sign icon-large" style="margin-right: 0"></i>#{/a}
+      #{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}<i class="icon-remove-sign icon-large"></i>#{/a}
       #{if _.type == models.Study.class}<a href="@{patient(models.Study.findById(_.pk).patient.pk)}#${_.pk}">${models.Study.findById(_.pk).toClipboardString()}</a>#{/if}
       #{if _.type == models.Series.class}#{a @series(_.pk)}${models.Series.findById(_.pk).toClipboardString()}#{/a}#{/if}
     </span>
