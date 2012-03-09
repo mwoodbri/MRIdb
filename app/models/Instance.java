@@ -18,6 +18,7 @@ public class Instance extends GenericModel {
 	public String sop_iuid;
 	public String sop_cuid;
 	public byte[] inst_attrs;
+	public String inst_no;
 	@ManyToOne
 	@JoinColumn(name="series_fk")
 	public Series series;

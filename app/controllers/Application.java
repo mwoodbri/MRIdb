@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -158,12 +159,20 @@ public class Application extends SecureController {
 			frameNumber = Dicom.numberOfFrames(series) / 2 + 1;
 			objectUID = instance.sop_iuid;
 		} else {
-			Collection instances = Dicom.singleFrames(series);
-			if (instances.size() == 0) {
+			Object[] instances = Dicom.singleFrames(series).toArray(new Instance[0]);
+			if (instances.length == 0) {
 				renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 			}
 			frameNumber = 1;
-			objectUID = ((Instance) instances.toArray(new Instance[0])[instances.size() / 2]).sop_iuid;
+			Arrays.sort(instances, new Comparator() {
+				@Override
+				public int compare(Object o1, Object o2) {
+					return Integer.valueOf(((Instance) o1).inst_no).compareTo(Integer.valueOf(((Instance) o2).inst_no));
+				}
+			});
+			System.out.println(Arrays.toString(instances));
+			objectUID = ((Instance) instances[instances.length / 2]).sop_iuid;
+			System.out.println(objectUID);
 		}
 		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s", request.domain, objectUID, frameNumber);
 		if (columns != null) {

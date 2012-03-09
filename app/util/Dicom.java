@@ -125,7 +125,7 @@ public class Dicom {
 			}
 		});
 	}
-	
+
 	private static List<String> renderable = Arrays.asList("1.2.840.10008.5.1.4.1.1.4", "1.2.840.10008.5.1.4.1.1.4.1");
 	public static boolean renderable(Series series) {
 		return CollectionUtils.exists(series.instances, new Predicate() {
