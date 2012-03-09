@@ -27,6 +27,7 @@ th.header {
   background-image: url(../../public/images/bg.gif);
   background-repeat: no-repeat;
   background-position: center right;
+  padding-right: 16px;
   cursor: pointer;
 }
 
