@@ -23,7 +23,7 @@
 <h1>${patient.pat_id} - ${patient.pat_name?.formatAsName()} - ${patient.pat_birthdate?.formatAsDate()}</h1>
 
 #{list patient.studies, as: 'study'}
-<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3>&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
+<h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3>#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard', style: 'padding-left: 0.5em'}<i class="icon-download-alt icon-large"></i>#{/a}
 <br><br>
 #{form @associate(), method: 'post', class: 'form-inline'}
 	Project:&nbsp;

@@ -7,7 +7,7 @@ import models.Series;
 import play.jobs.Job;
 import util.Download;
 
-public class SeriesDownloader extends Job<File> {
+public class SeriesDownloader extends Job<Void> {
 
 	public static enum Format {
 		dcm, //DICOM

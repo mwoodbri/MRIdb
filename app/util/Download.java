@@ -34,34 +34,17 @@ public class Download {
 			dir.mkdir();
 			Collection singleFrames = Dicom.singleFrames(series);
 			if (singleFrames.size() > 0) {
-				File collated = Dicom.collate(series);
-				new ProcessBuilder(
-						Properties.getString("dcm2nii"),
-						"-d", "n",//don't put date in filename
-						"-p", "n",//don't put protocol in filename
-						"-g", "n",//don't gzip
-						"-o", dir.getPath(),//don't put destination file in same directory as source
-						collated.getPath()
-						).start().waitFor();
+				Medcon.convert(Dicom.collate(series), format, dir);
 			} else {
 				Instance instance = Dicom.multiFrame(series);
 				File dcm = Dicom.file(instance);
 				File nii = new File(dir, String.format("%s.nii", dcm.getName()));
-				new ProcessBuilder(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), nii.getPath()).start().waitFor();
+				Util.exec(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), nii.getPath());
 			}
 		} else if (format == Format.img) {
 			File dir = new File(studyDir, series.toDownloadString());
 			dir.mkdir();
-			File collated = Dicom.collate(series);
-			new ProcessBuilder(
-					Properties.getString("dcm2nii"),
-					"-d", "n",//don't put date in filename
-					"-p", "n",//don't put protocol in filename
-					"-n", "n",//.hdr/.img pair
-					"-s", "y",//analyze
-					"-o", dir.getPath(),//don't put destination file in same directory as source
-					collated.getPath()
-					).start().waitFor();
+			Medcon.convert(Dicom.collate(series), format, dir);
 		} else {
 			File dir = new File(studyDir, series.toDownloadString());
 			dir.mkdir();

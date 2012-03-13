@@ -38,6 +38,7 @@ import play.mvc.Before;
 import play.mvc.Finally;
 import util.Clipboard;
 import util.Dicom;
+import util.Medcon;
 import util.PersistentLogger;
 import util.Properties;
 import controllers.Secure.Security;
@@ -233,20 +234,8 @@ public class Application extends SecureController {
 			await(new SeriesDownloader(pk, Format.dcm, tmpDir, getUser().username).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
-			await(new SeriesDownloader(pk, Format.nii, tmpDir, getUser().username).now());
-			File nii = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
-			dcm = new File(tmpDir, String.format("%s.dcm", nii.getName()));
-			ProcessBuilder pb = new ProcessBuilder(
-					new File(Properties.getString("xmedcon"), "bin/medcon").getPath(),
-					"-c", "dicom",
-					"-noprefix",
-					"-anon",
-					"-fv",
-					"-o", dcm.getPath(),
-					"-f", nii.getPath()
-					);
-			pb.environment().put("LD_LIBRARY_PATH", new File(Properties.getString("xmedcon"), "lib").getPath());
-			pb.start().waitFor();
+			dcm = new File(tmpDir, String.format("%s.dcm", series.pk));
+			Medcon.convert(Dicom.collate(series), Format.dcm, dcm);
 		}
 		renderBinary(dcm);
 	}
