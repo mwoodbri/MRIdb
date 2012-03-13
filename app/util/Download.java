@@ -39,7 +39,8 @@ public class Download {
 				Instance instance = Dicom.multiFrame(series);
 				File dcm = Dicom.file(instance);
 				File nii = new File(dir, String.format("%s.nii", dcm.getName()));
-				Util.exec(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), nii.getPath());
+				//Util.exec(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), nii.getPath());
+				Medcon.convert(dcm, format, nii);
 			}
 		} else if (format == Format.img) {
 			File dir = new File(studyDir, series.toDownloadString());

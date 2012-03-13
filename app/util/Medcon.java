@@ -25,7 +25,7 @@ public class Medcon {
 				"-noprefix",
 				"-c", formats.get(format)
 				));
-		if (!to.isDirectory()) {
+		if (from.isDirectory() && !to.isDirectory()) {
 			prefix.addAll(Arrays.asList(
 					"-stack3d",
 					"-o", to.getName()
