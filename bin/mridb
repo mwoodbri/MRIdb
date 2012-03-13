@@ -9,7 +9,6 @@ prog="mridb"
 
 PLAY=/opt/play-1.2.4/play
 APP_PATH=/opt/$prog
-export JAVA_HOME=/opt/jre1.6.0_31
 
 PLAY_OPTS=""
 
