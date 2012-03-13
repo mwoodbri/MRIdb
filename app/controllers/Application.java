@@ -69,7 +69,7 @@ public class Application extends SecureController {
 	}
 
 	private static Map<String, String> comparators = new HashMap<String, String>() {{
-		put("before", "<");
+		put("before", "<=");
 		put("on", "=");
 		put("after", ">");
 		put("since", ">");
