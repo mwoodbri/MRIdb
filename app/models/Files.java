@@ -5,6 +5,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.apache.commons.lang.StringUtils;
+
 import play.db.jpa.GenericModel;
 
 @Entity
@@ -19,7 +21,7 @@ public class Files extends GenericModel {
 	public Instance instance;
 
 	public String toDownloadString() {
-		return String.format("%s_%s", instance.series.toDownloadString(), instance.inst_no);
+		return String.format("%s_%s", instance.series.toDownloadString(), StringUtils.leftPad(instance.inst_no, 3, '0'));
 	}
 
 	@Override
