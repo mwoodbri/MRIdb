@@ -47,9 +47,9 @@ public class DicomTags extends FastTags {
 	public static void _InPlanePhaseEncodingDirection(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
 		if (!dataset.contains(Tags.InPlanePhaseEncodingDirection)) {
-			if (dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
+			if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
 				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
-			} else {
+			} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
 				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
 			}
 		}
@@ -60,9 +60,9 @@ public class DicomTags extends FastTags {
 		Dataset dataset = (Dataset) args.get("arg");
 		Integer numberOfPhaseEncodingSteps = dataset.getInteger(Tags.NumberOfPhaseEncodingSteps);
 		if (numberOfPhaseEncodingSteps == null) {
-			if (dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
+			if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
 				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
-			} else {
+			} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
 				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
 			}
 			numberOfPhaseEncodingSteps = dataset.getInteger(Tags.MRAcquisitionPhaseEncodingStepsInPlane);
