@@ -46,10 +46,10 @@ public class ClipboardExporter extends Job {
 		for (GenericModel object : clipboard.getObjects()) {
 			if (object instanceof Study) {
 				Study study = (Study) object;
-				Download.study(study, tmpDir, username);
+				Download.study(study, tmpDir);
 			} else if (object instanceof Series) {
 				Series series = (Series) object;
-				Download.series(series, tmpDir, username);
+				Download.series(series, tmpDir);
 			}
 		}
 

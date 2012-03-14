@@ -18,6 +18,10 @@ public class Files extends GenericModel {
 	@JoinColumn(name="instance_fk")
 	public Instance instance;
 
+	public String toDownloadString() {
+		return String.format("%s_%s", instance.series.toDownloadString(), instance.inst_no);
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%s", pk);

@@ -184,7 +184,7 @@ public class Application extends SecureController {
 		PersistentLogger.log("downloaded series %s", pk);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		await(new SeriesDownloader(pk, format == null ? Format.dcm : format, tmpDir, getUser().username).now());
+		await(new SeriesDownloader(pk, format == null ? Format.dcm : format, tmpDir).now());
 		File zip = new File(tmpDir, String.format("%s.zip", tmpDir.listFiles()[0].getName()));
 		Files.zip(tmpDir.listFiles()[0], zip);
 		renderBinary(zip);
@@ -231,7 +231,7 @@ public class Application extends SecureController {
 		File dcm;
 		Instance instance = Dicom.multiFrame(series);
 		if (instance != null) {
-			await(new SeriesDownloader(pk, Format.dcm, tmpDir, getUser().username).now());
+			await(new SeriesDownloader(pk, Format.dcm, tmpDir).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
 			dcm = new File(tmpDir, String.format("%s.dcm", series.pk));

@@ -18,19 +18,17 @@ public class SeriesDownloader extends Job<Void> {
 	private long pk;
 	private Format format;
 	private File tmpDir;
-	private String username;
 
-	public SeriesDownloader(long pk, Format format, File tmpDir, String username) {
+	public SeriesDownloader(long pk, Format format, File tmpDir) {
 		this.pk = pk;
 		this.format = format;
 		this.tmpDir = tmpDir;
-		this.username = username;
 	}
 
 	@Override
 	public void doJob() {
 		try {
-			Download.series(Series.<Series>findById(pk), tmpDir, username, format);
+			Download.series(Series.<Series>findById(pk), tmpDir, format);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (InterruptedException e) {

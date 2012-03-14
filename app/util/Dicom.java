@@ -37,7 +37,7 @@ public class Dicom {
 		File collated = new File(Properties.getCollations(), UUID.randomUUID().toString());
 		collated.mkdir();
 		for (Files files : Dicom.getFiles(series)) {
-			play.libs.Files.copy(new File(Properties.getArchive(), files.filepath), new File(collated, String.valueOf(files.pk)));
+			play.libs.Files.copy(new File(Properties.getArchive(), files.filepath), new File(collated, files.toDownloadString()));
 		}
 		return collated;
 	}

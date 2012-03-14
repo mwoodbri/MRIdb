@@ -4,6 +4,7 @@ prog="mridb"
 
 rm -fr /tmp/$prog
 REV=$(svn export https://cisbic.bioinformatics.ic.ac.uk/svn/MRIdb/$prog /tmp/$prog | grep "^Exported revision" | egrep -o "[0-9]+")
+echo $(date +%Y%m%d)r$REV >/tmp/$prog/VERSION
 play dependencies /tmp/$prog --forceCopy --forProd
 play precompile /tmp/$prog
 find /tmp/$prog/app -mindepth 1 -maxdepth 1 ! -iname views -exec rm -r {} \;

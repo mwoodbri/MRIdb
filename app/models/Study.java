@@ -1,7 +1,9 @@
 package models;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -9,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import org.apache.commons.lang.StringUtils;
 
 import play.db.jpa.GenericModel;
 import ext.JavaExtensions;
@@ -36,16 +40,20 @@ public class Study extends GenericModel {
 		return ProjectAssociation.find("select projectAssociation from Project project, in(project.projectAssociations) projectAssociation where projectAssociation.study = ?", this).first();
 	}
 
-	public String toDownloadString(String username) {
-		String string = String.format("%s_%s", new SimpleDateFormat("yyyyMMddHHmm").format(study_datetime), pk);
+	public String toDownloadString() {
+		List<String> parts = new ArrayList<String>();
+		parts.add(new SimpleDateFormat("yyyyMMddHHmm").format(study_datetime));
+		if (series.size() > 0 && series.iterator().next().station_name != null) {
+			parts.add(series.iterator().next().station_name);
+		}
 		ProjectAssociation projectAssociation = getProjectAssociation();
 		if (projectAssociation != null) {
-			string = String.format("%s_%s", string, projectAssociation.project.name);
+			parts.add(projectAssociation.project.name);
 			if (projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
-				string = String.format("%s_%s", string, projectAssociation.participationID);
+				parts.add(projectAssociation.participationID);
 			}
 		}
-		return string.replaceAll("\\W+", "");
+		return StringUtils.join(parts, "_").replaceAll("\\W+", "");
 	}
 
 	public String toClipboardString() {
