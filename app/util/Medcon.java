@@ -31,6 +31,9 @@ public class Medcon {
 					"-o", to.getName()
 					));
 		}
+		if (format == Format.nii || format == Format.img) {
+			prefix.add("-fv");
+		}
 		prefix.add("-f");
 		String[] command = Arrays.copyOf(prefix.toArray(new String[0]), prefix.size() + files.length);
 		for (int i = 0; i < files.length; i++) {
