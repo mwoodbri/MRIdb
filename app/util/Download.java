@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import jobs.SeriesDownloader.Format;
 import models.Files;
+import models.ProjectAssociation;
 import models.Series;
 import models.Study;
 
@@ -40,8 +41,13 @@ public class Download {
 		} else if (format == Format.img) {
 			Medcon.convert(Dicom.collate(series), format, dir);
 		} else {
+			String identifier = null;
+			ProjectAssociation projectAssociation = series.study.getProjectAssociation();
+			if (projectAssociation != null && projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
+				identifier = projectAssociation.participationID;
+			}
 			for (Files files : Dicom.getFiles(series)) {
-				Dicom.anonymise(new File(Properties.getArchive(), files.filepath), new File(dir, String.format("%s.dcm", files.toDownloadString())));
+				Dicom.anonymise(new File(Properties.getArchive(), files.filepath), new File(dir, String.format("%s.dcm", files.toDownloadString())), identifier);
 			}
 		}
 	}

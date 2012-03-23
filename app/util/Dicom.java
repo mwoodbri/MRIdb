@@ -77,7 +77,16 @@ public class Dicom {
 		return echoes;
 	}
 
-	public static void anonymise(File from, File to) throws IOException {
+	public static void anonymise(File from, File to, String identifier) throws IOException {
+		Dataset dataset = anonymise(from, to);
+		if (identifier != null) {
+			dataset.putPN(Tags.PatientName, identifier);
+			dataset.putLO(Tags.PatientID, identifier);
+		}
+		dataset.writeFile(to, null);
+	}
+
+	public static Dataset anonymise(File from, File to) throws IOException {
 		Dataset dataset = DcmObjectFactory.getInstance().newDataset();
 		dataset.readFile(from, null, -1);
 		dataset.remove(Tags.PatientID);
@@ -89,7 +98,7 @@ public class Dicom {
 		dataset.remove(Tags.InstitutionName);
 		dataset.remove(Tags.StationName);
 		dataset.remove(Tags.ManufacturerModelName);
-		dataset.writeFile(to, null);
+		return dataset;
 	}
 
 	//	private static final List<String> validCUIDs = Arrays.asList(
