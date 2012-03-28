@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PATH=/opt/redis-2.4.9/bin:$PATH
+PATH=/opt/redis-2.4.9/bin:/opt/dcm4che-2.0.26/bin:$PATH
 
 if [ $(pgrep redis-server) ]
 then
@@ -11,8 +11,10 @@ fi
 redis-server - <<EOF
 appendonly yes
 daemonize yes
-dir /tmp
+dir $1
 EOF
+
+echo "(Re)starting import ($(redis-cli llen dirs) remaining)"
 
 while :
 do
@@ -21,7 +23,13 @@ do
 	then
 		break
 	fi
-	redis-cli lpop dirs
+	echo -n "    Importing $DIR "
+	#dcmsnd DCM4CHEE@localhost:11112 $DIR >>$1/import.stdout 2>>$1/import.stderr
+	echo $DIR >>$1/import.stdout 2>>$1/import.stderr
+	echo "done"
+	redis-cli lpop dirs >/dev/null
 done
+
+echo "Import complete"
 
 redis-cli shutdown
