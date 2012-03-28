@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 
 import play.db.jpa.GenericModel;
@@ -43,8 +45,14 @@ public class Study extends GenericModel {
 	public String toDownloadString() {
 		List<String> parts = new ArrayList<String>();
 		parts.add(new SimpleDateFormat("yyyyMMddHHmm").format(study_datetime));
-		if (series.size() > 0 && series.iterator().next().station_name != null) {
-			parts.add(series.iterator().next().station_name);
+		Series scannedSeries = (Series) CollectionUtils.find(series, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return ((Series) arg0).station_name != null;
+			}
+		});
+		if (scannedSeries != null) {
+			parts.add(scannedSeries.station_name);
 		}
 		ProjectAssociation projectAssociation = getProjectAssociation();
 		if (projectAssociation != null) {
