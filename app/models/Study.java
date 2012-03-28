@@ -45,14 +45,9 @@ public class Study extends GenericModel {
 	public String toDownloadString() {
 		List<String> parts = new ArrayList<String>();
 		parts.add(new SimpleDateFormat("yyyyMMddHHmm").format(study_datetime));
-		Series scannedSeries = (Series) CollectionUtils.find(series, new Predicate() {
-			@Override
-			public boolean evaluate(Object arg0) {
-				return ((Series) arg0).station_name != null;
-			}
-		});
-		if (scannedSeries != null) {
-			parts.add(scannedSeries.station_name);
+		String station_name = getStation_name();
+		if (station_name != null) {
+			parts.add(station_name);
 		}
 		ProjectAssociation projectAssociation = getProjectAssociation();
 		if (projectAssociation != null) {
@@ -64,6 +59,16 @@ public class Study extends GenericModel {
 		return StringUtils.join(parts, "_").replaceAll("\\W+", "");
 	}
 
+	public String getStation_name() {
+		Series scannedSeries = (Series) CollectionUtils.find(series, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return ((Series) arg0).station_name != null;
+			}
+		});
+		return scannedSeries == null ? null : scannedSeries.station_name;
+	}
+	
 	public String toClipboardString() {
 		return String.format("%s on %s", patient.pat_name == null ? "UNKNOWN" : JavaExtensions.formatAsName(patient.pat_name), study_datetime == null ? "" : JavaExtensions.format(study_datetime));
 	}
