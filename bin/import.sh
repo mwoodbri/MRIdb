@@ -1,35 +1,24 @@
 #!/bin/sh
 
-PATH=/opt/redis-2.4.9/bin:/opt/dcm4che-2.0.26/bin:$PATH
-
-if [ $(pgrep redis-server) ]
+if [ $(pgrep dcmsnd) ]
 then
-	echo "Import is already running"
+	echo "Import is already running" >>$1/import.log
 	exit
 fi
 
-redis-server - <<EOF
-appendonly yes
-daemonize yes
-dir $1
-EOF
-
-echo "(Re)starting import ($(redis-cli llen dirs) remaining)"
+echo "(Re)starting import ($(wc -l < $1/import.txt) remaining)" >>$1/import.log
 
 while :
 do
-	DIR=$(redis-cli lindex dirs 0)
+	DIR=$(head -n1 $1/import.txt)
 	if [ -z "$DIR" ]
 	then
 		break
 	fi
-	echo -n "    Importing $DIR "
-	#dcmsnd DCM4CHEE@localhost:11112 $DIR >>$1/import.stdout 2>>$1/import.stderr
-	echo $DIR >>$1/import.stdout 2>>$1/import.stderr
-	echo "done"
-	redis-cli lpop dirs >/dev/null
+	echo -n "    Importing $DIR "  >>$1/import.log
+	/opt/dcm4che-2.0.26/bin/dcmsnd DCM4CHEE@localhost:11112 $DIR >>$1/import.stdout 2>>$1/import.stderr
+	echo "done" >>$1/import.log
+	sed -i -e'1d' $1/import.txt
 done
 
-echo "Import complete"
-
-redis-cli shutdown
+echo "Import complete" >>$1/import.log
