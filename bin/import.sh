@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash -eu
 
 if [ $(pgrep dcmsnd) ]
 then
@@ -6,7 +6,7 @@ then
 	exit
 fi
 
-echo "(Re)starting import ($(wc -l < $1/import.txt) remaining)" >>$1/import.log
+echo "(Re)starting import at $(date) ($(wc -l < $1/import.txt) remaining)" >>$1/import.log
 
 while :
 do
