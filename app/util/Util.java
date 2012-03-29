@@ -61,7 +61,7 @@ public class Util {
 	}
 
 	public static void exec(File directory, Map<String, String> environment, String... command) throws InterruptedException, IOException {
-		System.out.println(StringUtils.join(command, ' '));
+		System.out.printf("exec '%s' %s %s%n", StringUtils.join(command, ' '), environment, directory);
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		processBuilder.directory(directory);
 		processBuilder.environment().putAll(environment);
