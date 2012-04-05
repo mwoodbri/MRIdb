@@ -82,21 +82,21 @@ public class Application extends SecureController {
 		List<Object> args = new ArrayList<Object>();
 
 		if (!name.isEmpty()) {
-			where.add("lower(patient.pat_name) like ?");
+			where.add("lower(study.patient.pat_name) like ?");
 			args.add("%" + name.toLowerCase() + "%");
 		}
 		if (!id.isEmpty()) {
-			where.add("(lower(patient.pat_id) like ? or lower(study_custom1) like ?)");
+			where.add("(lower(study.patient.pat_id) like ? or lower(study.study_custom1) like ?)");
 			args.add("%" + id.toLowerCase() + "%");
 			args.add("%" + id.toLowerCase() + "%");
 		}
 		if (age != null) {
-			where.add("cast(study_datetime as date) - cast(patient.pat_birthdate as date) >= ? and cast(study_datetime as date) - cast(patient.pat_birthdate as date) < ?");
+			where.add("cast(study.study_datetime as date) - cast(study.patient.pat_birthdate as date) >= ? and cast(study.study_datetime as date) - cast(study.patient.pat_birthdate as date) < ?");
 			args.add(365D * age);
 			args.add(365D * (age + 1));
 		}
 		if (sex != null) {
-			where.add("patient.pat_sex = ?");
+			where.add("study.patient.pat_sex = ?");
 			args.add(sex);
 		}
 		if (!protocol.isEmpty()) {
@@ -105,12 +105,12 @@ public class Application extends SecureController {
 			args.add("%" + protocol.toLowerCase() + "%");
 		}
 		if (!study.isEmpty()) {
-			where.add("lower(study_desc) like ?");
+			where.add("lower(study.study_desc) like ?");
 			args.add("%" + study.toLowerCase() + "%");
 		}
 		if (!acquisition.isEmpty()) {
 			//where.add(String.format("(study_datetime is null or cast(study_datetime as date) %s ?)", comparators.get(acquisition)));
-			where.add(String.format("cast(study_datetime as date) %s ?", comparators.get(acquisition)));
+			where.add(String.format("cast(study.study_datetime as date) %s ?", comparators.get(acquisition)));
 			args.add(params.get(acquisition, Date.class));
 		}
 		if (project != null || !participationID.isEmpty()) {
