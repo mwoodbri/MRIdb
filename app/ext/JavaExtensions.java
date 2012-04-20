@@ -47,6 +47,6 @@ public class JavaExtensions extends play.templates.JavaExtensions {
 
 	public static String formatAsName(String string) {
 		String[] parts = string.split("\\^", -1);
-		return String.format("%s %s %s %s %s", parts[3], parts[0], parts[1], parts[2], parts[4]);
+		return String.format("%s %s %s %s %s", parts[3], parts[0], parts[1], parts[2], parts[4]).replaceAll("[ ]+", " ");
 	}
 }
