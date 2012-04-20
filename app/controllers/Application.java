@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -144,7 +145,8 @@ public class Application extends SecureController {
 		Series series = Series.findById(pk);
 		Instance instance = Dicom.multiFrame(series);
 		if (instance == null) {
-			instance = (Instance) Dicom.singleFrames(series).iterator().next();
+			Collection instances = Dicom.singleFrames(series);
+			instance = instances.size() > 0 ? (Instance) instances.iterator().next() : Dicom.spectrogram(series);
 		}
 		Dataset dataset = Dicom.dataset(Dicom.file(instance));
 		Set<String> echoes = Dicom.echoes(dataset);
@@ -153,6 +155,9 @@ public class Application extends SecureController {
 
 	public static void image(long pk, Integer columns) throws MalformedURLException, IOException {
 		Series series = Series.findById(pk);
+		if (!Dicom.renderable(series)) {
+			renderBinary(new File(Play.applicationPath, "public/images/spectrogram.png"));
+		}
 		int frameNumber;
 		String objectUID = null;
 		Instance instance = Dicom.multiFrame(series);
@@ -260,6 +265,7 @@ public class Application extends SecureController {
 			association.participationID = participationID;
 			association.save();
 		}
+		PersistentLogger.log("study %s linked to project: %s (%s)", study.pk, project, participationID);
 		redirect(request.headers.get("referer").value());
 	}
 

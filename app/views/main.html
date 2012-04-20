@@ -53,6 +53,7 @@
     #{script 'jquery.form.js'/}
     <script>
         $(function() {
+            "use strict";
             $.datepicker.setDefaults({
                 dateFormat: 'yy-mm-dd',
                 changeMonth: true,
@@ -63,7 +64,7 @@
                 return false;
             });
             $("#clipboard").on("click", "a.export", function(event) {
-                var password = prompt("Encryption password", "");
+                var password = window.prompt("Encryption password", "");
                 if (password) {
                     this.href += "?" + $.param({password: password});
                     $('#clipboard').load(this.href);
@@ -74,7 +75,7 @@
                 $('#clipboard').load('@{clipboard()}');
             }, 10000);
             $(".thumbnail img").each(function() {
-            	var img = this;
+                var img = this;
                 $("<img />").attr('src', this.alt).load(function() {
                     $(img).before(this).remove();
                 });

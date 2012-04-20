@@ -4,14 +4,17 @@
 #{set 'moreScripts'}
 <script>
 	function params(url) {
+		"use strict";
 		var e,
-			p = {},
-			r = /[?&](\w+)=?([a-zA-Z_0-9\-]*)/g;
-		while (e = r.exec(url))
+			r = /[?&](\w+)=?([a-zA-Z_0-9\-]*)/g,
+			p = {};
+		while (e = r.exec(url)) {
 			p[e[1]] = e[2];
+		}
 		return p;
 	}
 	$(function() {
+		"use strict";
 		$('th.header').on('click', function() {
 			var search = $.extend(params(window.location.search), {
 				order: this.id,

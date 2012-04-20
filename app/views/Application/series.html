@@ -3,6 +3,7 @@
 #{set 'moreScripts'}
 <script>
 	$('a.imagej').on('click', function() {
+		"use strict";
 		$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej(series.pk)}&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
 	});
 </script>
@@ -13,14 +14,16 @@
 &nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, series.class.simpleName, series.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
 <br><br>
 #{a @download(series.pk), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
+#{if util.Dicom.renderable(series)}
 #{a @download(series.pk, 'nii'), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
 #{a @download(series.pk, 'img'), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
 <a href="#" class="btn btn-info imagej"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
 <a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="btn btn-info"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
+#{/if}
 <br><br>
 <h3>Subject details</h3>
 <div class="row">
-	<div class="span8">
+	<div class="span7">
 		<table class="table table-bordered">
 			<thead>
 				<tr>
@@ -63,16 +66,20 @@
 			</tbody>
 		</table>
 	</div>
-	<div class="span2">
+	<div class="span3">
 		<ul class="thumbnails">
+			#{if util.Dicom.renderable(series)}
 			<li>
 				<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="thumbnail">
-					<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 128)}">
+					<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 160)}">
 				</a>
 			</li>
+			#{/if}
 		</ul>
 	</div>
 </div>
+
+#{if util.Dicom.renderable(series)}
 
 <h3>Image description</h3>
 <table class="table table-bordered">
@@ -123,5 +130,7 @@
 		</tr>
 	</tbody>
 </table>
+
+#{/if}
 
 <div id="imagej"></div>

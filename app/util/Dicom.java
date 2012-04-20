@@ -50,7 +50,11 @@ public class Dicom {
 				filesList.add(((Instance) instance).files.iterator().next());
 			}
 		} else {
-			filesList.add(Dicom.multiFrame(series).files.iterator().next());
+			Instance instance = Dicom.multiFrame(series);
+			if (instance == null) {
+				instance = spectrogram(series);
+			}
+			filesList.add(instance.files.iterator().next());
 		}
 		return filesList;
 	}
@@ -101,12 +105,6 @@ public class Dicom {
 		return dataset;
 	}
 
-	//	private static final List<String> validCUIDs = Arrays.asList(
-	//			"1.2.840.10008.5.1.4.1.1.4",//MR Image Storage
-	//			"1.2.840.10008.5.1.4.1.1.4.1",//Enhanced MR Image Storage
-	//			"1.2.840.10008.5.1.4.1.1.7"//Secondary Capture Image Storage
-	//			);
-
 	public static int numberOfFrames(Series series) throws IOException {
 		Instance instance = multiFrame(series);
 		if (instance != null) {
@@ -117,11 +115,22 @@ public class Dicom {
 		return singleFrames(series).size();
 	}
 
+	private enum CUID {
+		MRImageStorage("1.2.840.10008.5.1.4.1.1.4"),
+		EnhancedMRImageStorage("1.2.840.10008.5.1.4.1.1.4.1"),
+		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2");
+
+		final String value;
+		CUID(String value) {
+			this.value = value;
+		}
+	}
+
 	public static Instance multiFrame(Series series) {
 		return (Instance) CollectionUtils.find(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
-				return "1.2.840.10008.5.1.4.1.1.4.1".equals(((Instance) arg0).sop_cuid);
+				return CUID.EnhancedMRImageStorage.value.equals(((Instance) arg0).sop_cuid);
 			}
 		});
 	}
@@ -130,17 +139,36 @@ public class Dicom {
 		return CollectionUtils.select(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
-				return "1.2.840.10008.5.1.4.1.1.4".equals(((Instance) arg0).sop_cuid);
+				return CUID.MRImageStorage.value.equals(((Instance) arg0).sop_cuid);
 			}
 		});
 	}
 
-	private static List<String> renderable = Arrays.asList("1.2.840.10008.5.1.4.1.1.4", "1.2.840.10008.5.1.4.1.1.4.1");
+	public static Instance spectrogram(Series series) {
+		return (Instance) CollectionUtils.find(series.instances, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return CUID.MRSpectroscopyStorage.value.equals(((Instance) arg0).sop_cuid);
+			}
+		});
+	}
+
+	private static final List<String> renderable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value);
 	public static boolean renderable(Series series) {
 		return CollectionUtils.exists(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
 				return renderable.contains(((Instance) arg0).sop_cuid);
+			}
+		});
+	}
+
+	private static final List<String> downloadable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value, CUID.MRSpectroscopyStorage.value);
+	public static boolean downloadable(Series series) {
+		return CollectionUtils.exists(series.instances, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return downloadable.contains(((Instance) arg0).sop_cuid);
 			}
 		});
 	}

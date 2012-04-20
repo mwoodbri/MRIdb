@@ -2,19 +2,54 @@
 #{set title:'Patient'/}
 #{set 'moreScripts'}
 <script>
+	window.onbeforeunload = function(e) {
+		"use strict";
+		e = e || window.event;
+		var input = $("input[name=participationID]");
+		if (input.val() && input.val() !== input.data("value")) {
+			var msg = "Project identifier has not been saved";
+			if (e) {
+				e.returnValue = msg;
+			}
+			return msg;
+		}
+	};
 	$(function() {
-		$('select').on('change', function() {
-			if ($("option:selected", this).val() == -1) {
-				var projectName = prompt("Project name", "");
-				if (!projectName) {
+		"use strict";
+		var select = $("select[name=projectID]");
+		var input = $("input[name=participationID]");
+		select.on('change', function() {
+			if ($("option:selected", this).val() === -1) {
+				var projectName = window.prompt("Project name", "");
+				var existing = $.map(select.children(), function(n, i) { return n.text; });
+				if (!projectName || existing.indexOf(name) !== -1) {
+					$(this).closest('form')[0].reset();
 					return;
 				}
-				$(this).siblings('input[name=projectName]').val(projectName);
-				$(this).siblings('input[name=participationID]').val('');
-				$(this).closest('form').submit();
-			} else {
-				$(this).siblings('input[name=participationID]').attr("disabled", !$("option:selected", this).val());
+				$('input[name=projectName]').val(projectName);
 			}
+			input.val('');
+			$(this).closest('form').submit();
+		});
+		$('#associate').on('submit', function() {
+			var participationID = input.val();
+			if (participationID) {
+				var disallowed = ["${patient.pat_id.toLowerCase()}"].concat("${patient.pat_name?.formatAsName()}".split(/\W/));
+				for (var i in disallowed) {
+					if (disallowed[i] && participationID.toLowerCase().indexOf(disallowed[i].toLowerCase()) !== -1) {
+						window.alert("Project identifiers cannot contain a patient's ID or name");
+						return false;
+					}
+				}
+			}
+			if ((input.data("value") && (input.val() !== input.data("value"))) || (select.data("value") && (Number(select.val()) !== select.data("value")))) {
+				if (!window.confirm("Changing a patient's project or identifier will affect all other users of the system. Are you sure?")) {
+					$(this)[0].reset();
+					return false;
+				}
+			}
+			input.data("value", participationID);
+			return true;
 		});
 	});
 </script>
@@ -25,9 +60,9 @@
 #{list patient.studies, as: 'study'}
 <h3 id="#${study.pk}" style="display: inline">${patient.pat_id} ${study.study_desc} ${study.study_datetime?.format()}</h3>#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard', style: 'padding-left: 0.5em'}<i class="icon-download-alt icon-large"></i>#{/a}
 <br><br>
-#{form @associate(), method: 'post', class: 'form-inline'}
+#{form @associate(), id: 'associate', method: 'post', class: 'form-inline'}
 	Project:&nbsp;
-	<select name="projectID">
+	<select name="projectID" data-value="${study.getProjectAssociation() ? study.getProjectAssociation().project.id : ''}">
 		<option></option>
 		#{list models.Project.find("order by name").fetch()}
 		<option value="${_.id}"#{if _.equals(study.getProjectAssociation()?.project)} selected#{/if}>${_.name}</option>
@@ -36,14 +71,14 @@
 	</select>
 	&nbsp;
 	Identifier:&nbsp;
-	<input type="text" name="participationID" value="${study.getProjectAssociation()?.participationID}"#{ifnot study.getProjectAssociation()} disabled#{/ifnot}>
+	<input type="text" name="participationID" value="${study.getProjectAssociation()?.participationID}" data-value="${study.getProjectAssociation()?.participationID}"#{ifnot study.getProjectAssociation()} disabled#{/ifnot}>
 	&nbsp;
 	<input type="hidden" name="study.pk" value="${study.pk}">
 	<input type="hidden" name="projectName">
 	<input type="submit" class="btn" value="Update">
 #{/form}
 <ul class="thumbnails">
-	#{list study.series.findAll{util.Dicom.renderable(it)}.sort{it.series_no as int}, as: 'series'}
+	#{list study.series.findAll{util.Dicom.downloadable(it)}.sort{it.series_no as int}, as: 'series'}
 	<li class="span2">
 		<a href="@{series(series.pk)}" class="thumbnail">
 			<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 128)}">
