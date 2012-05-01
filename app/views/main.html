@@ -2,8 +2,9 @@
 <html>
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
-    #{stylesheet 'vader/jquery-ui-1.8.18.custom.css'/}
+    #{stylesheet 'vader/jquery-ui-1.8.20.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
+    *{#{stylesheet 'bootstrap-responsive.min.css'/}}*
     *{#{stylesheet 'font-awesome.css'/}}*
     #{stylesheet 'main.css'/}
     #{get 'moreStyles'/}
@@ -48,7 +49,7 @@
     </div>
 
     #{script 'jquery.min.js'/}
-    #{script 'jquery-ui-1.8.18.custom.min.js'/}
+    #{script 'jquery-ui-1.8.20.custom.min.js'/}
     #{script 'bootstrap.min.js'/}
     #{script 'jquery.form.js'/}
     <script>

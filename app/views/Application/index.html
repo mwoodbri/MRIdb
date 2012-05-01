@@ -29,109 +29,107 @@
 #{/set}
 
 #{form @studies(), id: 'search', method: 'GET', class: 'form-horizontal', style: 'margin-top: 1em'}
-	<fieldset>
-		<div class="row">
-			<div class="span3">
-				<div class="control-group">
-					<label class="control-label" for="name">Name</label>
-					<div class="controls">
-						<input id="name" name="name" type="text">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="id">PatientID</label>
-					<div class="controls">
-						<input id="id" name="id" type="text">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="age">Age at scan</label>
-					<div class="controls">
-						<input id="age" name="age" type="text">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="age">Sex</label>
-					<div class="controls">
-						<select id="sex" name="sex" class="small">
-							<option></option>
-							<option value="M">Male</option>
-							<option value="F">Female</option>
-						</select>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="protocol">Protocol name</label>
-					<div class="controls">
-						<input id="protocol" name="protocol" type="text">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="study">Study description</label>
-					<div class="controls">
-						<input id="study" name="study" type="text">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="project">Project</label>
-					<div class="controls">
-						<select id="project" name="project">
-							<option></option>
-							#{list models.Project.find("order by name").fetch()}
-							<option value="${_.id}">${_.name}</option>
-							#{/list}
-						</select>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="participationID">Identifier</label>
-					<div class="controls">
-						<input id="participationID" name="participationID" type="text">
-					</div>
-				</div>
-			</div>
-			<div class="span4 offset2">
-				<div class="control-group">
-					<label class="control-label">Acquisition</label>
-					<div class="controls">
-						<label class="radio">
-							<input type="radio" name="acquisition" value="before" checked>
-							On or before
-						</label>
-						<input id="before" name="before" class="input-small" type="text" style="margin-left: 18px; margin-bottom: 5px">
-						<label class="radio">
-							<input type="radio" name="acquisition" value="on">
-							On
-						</label>
-						<input id="on" name="on" class="input-small" type="text" style="margin-left: 18px; margin-bottom: 5px">
-						<label class="radio">
-							<input type="radio" name="acquisition" value="after">
-							After
-						</label>
-						<input id="after" name="after" class="input-small" type="text" style="margin-left: 18px; margin-bottom: 5px">
-						<label class="radio">
-							<input type="radio" name="acquisition" value="since">
-							In the last
-						</label>
-						<select id="relative" class="input-small" style="margin-left: 18px; margin-bottom: 5px">
-							<option value="-1d">1 Day</option>
-							<option value="-2d">2 Days</option>
-							<option value="-3d">3 Days</option>
-							<option value="-1w">Week</option>
-							<option value="-2w">2 Weeks</option>
-							<option value="-1m">Month</option>
-						</select>
-						<input id="since" name="since" type="hidden">
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="form-actions">
-			<button type="submit" class="btn btn-primary">Search</button>
-			<button type="reset" class="btn">Reset</button>
-		</div>
-	</fieldset>
 	<input name="page" type="hidden" value="0"/>
 	<input name="order" type="hidden" value="patient.pat_name"/>
 	<input name="sort" type="hidden"/>
+	<div class="row-fluid">
+		<div class="span5">
+			<div class="control-group">
+				<label class="control-label" for="name">Name</label>
+				<div class="controls">
+					<input id="name" name="name" type="text">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="id">PatientID</label>
+				<div class="controls">
+					<input id="id" name="id" type="text">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="age">Age at scan</label>
+				<div class="controls">
+					<input id="age" name="age" type="text">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="age">Sex</label>
+				<div class="controls">
+					<select id="sex" name="sex" class="small">
+						<option></option>
+						<option value="M">Male</option>
+						<option value="F">Female</option>
+					</select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="protocol">Protocol name</label>
+				<div class="controls">
+					<input id="protocol" name="protocol" type="text">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="study">Study description</label>
+				<div class="controls">
+					<input id="study" name="study" type="text">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="project">Project</label>
+				<div class="controls">
+					<select id="project" name="project">
+						<option></option>
+						#{list models.Project.find("order by name").fetch()}
+						<option value="${_.id}">${_.name}</option>
+						#{/list}
+					</select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="participationID">Identifier</label>
+				<div class="controls">
+					<input id="participationID" name="participationID" type="text">
+				</div>
+			</div>
+		</div>
+		<div class="span4">
+			<div class="control-group">
+				<label class="control-label">Acquisition</label>
+				<div class="controls">
+					<label class="radio">
+						<input type="radio" name="acquisition" value="before" checked>
+						On or before
+					</label>
+					<input id="before" name="before" class="input-small" type="text" style="margin-left: 18px; margin-bottom: 5px">
+					<label class="radio">
+						<input type="radio" name="acquisition" value="on">
+						On
+					</label>
+					<input id="on" name="on" class="input-small" type="text" style="margin-left: 18px; margin-bottom: 5px">
+					<label class="radio">
+						<input type="radio" name="acquisition" value="after">
+						After
+					</label>
+					<input id="after" name="after" class="input-small" type="text" style="margin-left: 18px; margin-bottom: 5px">
+					<label class="radio">
+						<input type="radio" name="acquisition" value="since">
+						In the last
+					</label>
+					<select id="relative" class="input-small" style="margin-left: 18px; margin-bottom: 5px">
+						<option value="-1d">1 Day</option>
+						<option value="-2d">2 Days</option>
+						<option value="-3d">3 Days</option>
+						<option value="-1w">Week</option>
+						<option value="-2w">2 Weeks</option>
+						<option value="-1m">Month</option>
+					</select>
+					<input id="since" name="since" type="hidden">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary">Search</button>
+		<button type="reset" class="btn">Reset</button>
+	</div>
 #{/form}
