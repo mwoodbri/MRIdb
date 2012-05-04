@@ -246,17 +246,24 @@ public class Application extends SecureController {
 	}
 
 	public static void associate(Study study, Long projectID, String participationID, String projectName) {
-		ProjectAssociation association = ProjectAssociation.find("byStudy", study).first();
-		if (association != null && projectID == null) {
-			association.delete();
-		}
 		Project project = null;
 		if (!projectName.isEmpty()) {
 			project = new Project(projectName).save();
 		} else if (projectID != null) {
 			project = Project.findById(projectID);
 		}
-		if (project != null) {
+		associate(study, project, participationID);
+		PersistentLogger.log("study %s linked to project: %s (%s)", study.pk, project, participationID);
+		redirect(request.headers.get("referer").value());
+	}
+
+	static void associate(Study study, Project project, String participationID) {
+		ProjectAssociation association = ProjectAssociation.find("byStudy", study).first();
+		if (project == null) {
+			if (association != null) {
+				association.delete();
+			}
+		} else {
 			if (association != null) {
 				association.project = project;
 			} else {
@@ -265,8 +272,6 @@ public class Application extends SecureController {
 			association.participationID = participationID;
 			association.save();
 		}
-		PersistentLogger.log("study %s linked to project: %s (%s)", study.pk, project, participationID);
-		redirect(request.headers.get("referer").value());
 	}
 
 	@Finally

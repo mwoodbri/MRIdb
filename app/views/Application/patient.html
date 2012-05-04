@@ -19,10 +19,10 @@
 		var select = $("select[name=projectID]");
 		var input = $("input[name=participationID]");
 		select.on('change', function() {
-			if ($("option:selected", this).val() === -1) {
+			if ($("option:last", this).attr('selected')) {
 				var projectName = window.prompt("Project name", "");
 				var existing = $.map(select.children(), function(n, i) { return n.text; });
-				if (!projectName || existing.indexOf(name) !== -1) {
+				if (!projectName || existing.indexOf(projectName) !== -1) {
 					$(this).closest('form')[0].reset();
 					return;
 				}
