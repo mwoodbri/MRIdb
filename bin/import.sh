@@ -6,6 +6,12 @@ then
 	exit
 fi
 
+if [ ! -f "$1/import.txt" ]
+then
+	echo "Import list doesn't exist" >>$1/import.log
+	exit
+fi
+
 echo "(Re)starting import at $(date) ($(wc -l < $1/import.txt) remaining)" >>$1/import.log
 
 while :
