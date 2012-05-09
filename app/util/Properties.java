@@ -17,7 +17,7 @@ public class Properties {
 
 	public static File getArchive() {
 		File archive = new File(Filesystem.<Filesystem>findAll().get(0).dirpath);
-		return archive.isAbsolute() ? archive : new File(getString("dcm4chee"), String.format("server/default/%s", archive.getPath()));
+		return archive.isAbsolute() ? archive : new File("/opt/dcm4chee", String.format("server/default/%s", archive.getPath()));
 	}
 
 	public static int pageSize() {
