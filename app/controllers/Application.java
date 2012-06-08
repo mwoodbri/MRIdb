@@ -186,7 +186,7 @@ public class Application extends SecureController {
 		}
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-			Logger.warn("Image not found for series %s", series);
+			Logger.warn("Image not found for %s", series);
 			renderBinary(new File(Play.applicationPath, "public/images/missing.png"));
 		}
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
