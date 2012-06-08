@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -u
 
 if [ $(pgrep dcmsnd) ]
 then
@@ -22,9 +22,7 @@ do
 		break
 	fi
 	echo -n "    Importing $DIR " >>$1/import.log
-	/opt/dcm4che-2.0.26/bin/dcmsnd DCM4CHEE@localhost:11112 $DIR >>$1/import.stdout 2>>$1/import.stderr
-	echo "done" >>$1/import.log
-	sed -i -e'1d' $1/import.txt
+	/opt/dcm4che-2.0.26/bin/dcmsnd DCM4CHEE@localhost:11112 $DIR >>$1/import.stdout 2>>$1/import.stderr && echo done >>$1/import.log && sed -i -e'1d' $1/import.txt || echo failed >>$1/import.log
 done
 
 echo "Import complete" >>$1/import.log
