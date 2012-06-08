@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
 import play.Invoker;
+import play.Logger;
 import play.Play;
 import play.cache.Cache;
 import play.libs.Files;
@@ -185,6 +186,7 @@ public class Application extends SecureController {
 		}
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+			Logger.warn("Image not found for series %s", series);
 			renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 		}
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
