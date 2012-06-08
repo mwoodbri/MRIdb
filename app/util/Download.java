@@ -2,12 +2,14 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import jobs.SeriesDownloader.Format;
 import models.Files;
 import models.ProjectAssociation;
 import models.Series;
 import models.Study;
+import play.Play;
 
 public class Download {
 
@@ -28,16 +30,14 @@ public class Download {
 		dir.mkdirs();
 
 		if (format == Format.nii) {
-			//			Collection singleFrames = Dicom.singleFrames(series);
-			//			if (singleFrames.size() > 0) {
-			//				Medcon.convert(Dicom.collate(series), format, dir);
-			//			} else {
-			//				Instance instance = Dicom.multiFrame(series);
-			//				File dcm = Dicom.file(instance);
-			//				File nii = new File(dir, String.format("%s.nii", dcm.getName()));
-			//				Util.exec(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), nii.getPath());
-			//			}
-			Medcon.convert(Dicom.collate(series), format, dir);
+			Collection singleFrames = Dicom.singleFrames(series);
+			if (singleFrames.size() > 0) {
+				//Medcon.convert(Dicom.collate(series), format, dir);
+				Util.exec(Properties.getString("dcm2nii"), "-g", "n", "-p", "n", "-d", "n", "-o", dir.getPath(), Dicom.collate(series).getPath());
+			} else {
+				File dcm = Dicom.file(Dicom.multiFrame(series));
+				Util.exec(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), new File(dir, String.format("%s.nii", dcm.getName())).getPath());
+			}
 		} else if (format == Format.img) {
 			Medcon.convert(Dicom.collate(series), format, dir);
 		} else {
