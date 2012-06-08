@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -181,6 +182,10 @@ public class Application extends SecureController {
 		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s", request.domain, objectUID, frameNumber);
 		if (columns != null) {
 			url += String.format("&columns=%s", columns);
+		}
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+			renderBinary(new File(Play.applicationPath, "public/images/128x128.gif"));
 		}
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
