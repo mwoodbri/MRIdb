@@ -1,5 +1,7 @@
 #!/bin/bash -u
 
+echo >>$1/import.log
+
 if [ $(pgrep dcmsnd) ]
 then
 	echo "Import is already running" >>$1/import.log
