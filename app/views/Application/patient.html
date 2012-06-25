@@ -22,7 +22,7 @@
 			if ($("option:last", this).attr('selected')) {
 				var projectName = window.prompt("Project name", "");
 				var existing = $.map(select.children(), function(n, i) { return n.text; });
-				if (!projectName || existing.indexOf(projectName) !== -1) {
+				if (!projectName || $.inArray(projectName, existing) !== -1) {
 					$(this).closest('form')[0].reset();
 					return;
 				}
@@ -33,8 +33,8 @@
 		});
 		$('#associate').on('submit', function() {
 			var participationID = input.val();
-			if (participationID) {
-				var disallowed = ["${patient.pat_id.toLowerCase()}"].concat("${patient.pat_name?.formatAsName()}".split(/\W/));
+			if (participationID && !participationID.match(/(3T)|(1.5T)|(NNU)/)) {
+				var disallowed = ["${patient.pat_id.toLowerCase()}"].concat("${patient.pat_name?.formatAsName()}".split(/[\s,]/));
 				for (var i in disallowed) {
 					if (disallowed[i] && participationID.toLowerCase().indexOf(disallowed[i].toLowerCase()) !== -1) {
 						window.alert("Project identifiers cannot contain a patient's ID or name");

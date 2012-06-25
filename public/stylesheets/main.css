@@ -38,3 +38,11 @@ th.headerSortDown {
 th.headerSortUp {
   background-image: url(../../public/images/asc.gif);
 }
+
+input, textarea, select, .uneditable-input {
+  color: #282828 !important;
+}
+
+input[readonly] {
+  background-color: #CCC
+}

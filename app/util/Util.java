@@ -61,13 +61,12 @@ public class Util {
 	}
 
 	public static void exec(File directory, Map<String, String> environment, String... command) throws InterruptedException, IOException {
-		System.out.printf("exec '%s' %s %s%n", StringUtils.join(command, ' '), environment, directory);
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		processBuilder.directory(directory);
 		processBuilder.environment().putAll(environment);
 		int exit = processBuilder.start().waitFor();
 		if (exit != 0) {
-			throw new IOException(String.format("command failed: %s", StringUtils.join(command, ' ')));
+			throw new IOException(String.format("command failed: %s %s %s", StringUtils.join(command, ' '), environment, directory));
 		}
 	}
 

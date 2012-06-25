@@ -1,11 +1,18 @@
 Person(doregan):
-    username: doregan
-    role: Administrator
+  username: doregan
+  role: Administrator
 
 Person(gfagiolo):
-    username: gfagiolo
-    role: Administrator
+  username: gfagiolo
+  role: Administrator
 
 Person(mwoodbri):
-    username: mwoodbri
-    role: Administrator
+  username: mwoodbri
+  role: Administrator
+
+Help(help):
+  faq: |
+    <dt>Where did my downloads go?
+    <dd>Clipboard downloads are automatically deleted after 24 hours.
+    <dt>How can I get more help?
+    <dd>Please contact the <a href="http://www.csc.mrc.ac.uk/ComputingServiceDesk">Computing Service Desk</a>

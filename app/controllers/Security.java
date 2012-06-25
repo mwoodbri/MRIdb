@@ -38,17 +38,19 @@ public class Security extends Secure.Security {
 	}
 
 	static void onAuthenticated() {
-		Person person = Person.findById(Security.connected());
+		String username = Security.connected().toLowerCase();
+		Person person = Person.findById(username);
 		if (person == null) {
-			person = new Person(Security.connected());
+			person = new Person(username);
 			person.validateAndCreate();
 		}
 		PersistentLogger.log("logged in");
 	}
 
 	static boolean check(String profile) {
+		String username = Security.connected().toLowerCase();
 		if ("admin".equals(profile)) {
-			return Person.<Person>findById(Security.connected()).role == Role.Administrator;
+			return Person.<Person>findById(username).role == Role.Administrator;
 		}
 		return false;
 	}

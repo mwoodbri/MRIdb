@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
-    #{stylesheet 'vader/jquery-ui-1.8.20.custom.css'/}
+    #{stylesheet 'vader/jquery-ui-1.8.21.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
     *{#{stylesheet 'bootstrap-responsive.min.css'/}}*
     *{#{stylesheet 'font-awesome.css'/}}*
@@ -14,7 +14,7 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
-          <a class="brand" href="@{Application.index}"><img src="@{'/public/images/title.png'}"></a>
+          <a class="brand" href="@{Application.index}"><img src="@{'/public/images/title.png'}" alt="logo"></a>
           <ul class="nav">
             <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @Application.index()}Search#{/a}
             <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @Application.help()}Help#{/a}
@@ -49,9 +49,10 @@
     </div>
 
     #{script 'jquery.min.js'/}
-    #{script 'jquery-ui-1.8.20.custom.min.js'/}
+    #{script 'jquery-ui-1.8.21.custom.min.js'/}
     #{script 'bootstrap.min.js'/}
     #{script 'jquery.form.js'/}
+    #{script 'URI.min.js'/}
     <script>
         $(function() {
             "use strict";

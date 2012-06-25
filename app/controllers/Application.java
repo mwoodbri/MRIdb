@@ -229,7 +229,7 @@ public class Application extends SecureController {
 			Person person = getUser();
 			person.clipboard = clipboard.toString();
 			person.merge()._save();
-			Cache.delete(Security.connected());
+			Cache.delete(Security.connected().toLowerCase());
 		}
 		render();
 	}

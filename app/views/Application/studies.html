@@ -3,25 +3,21 @@
 
 #{set 'moreScripts'}
 <script>
-	function params(url) {
-		"use strict";
-		var e,
-			r = /[?&](\w+)=?([a-zA-Z_0-9\-]*)/g,
-			p = {};
-		while (e = r.exec(url)) {
-			p[e[1]] = e[2];
-		}
-		return p;
-	}
 	$(function() {
 		"use strict";
 		$('th.header').on('click', function() {
-			var search = $.extend(params(window.location.search), {
-				order: this.id,
-				sort: $(this).hasClass('headerSortDown') ? "desc" : "asc",
-				page: 0
-			});
-			window.location = window.location.pathname + "?" + $.param(search);
+			window.location = URI(window.location.href)
+				.removeSearch({
+					order: undefined,
+					sort: undefined,
+					page: undefined
+				})
+				.addSearch({
+					order: this.id,
+					sort: $(this).hasClass('headerSortDown') ? "desc" : "asc",
+					page: 0
+				})
+				.toString();
 		});
 	});
 </script>
