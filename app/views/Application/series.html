@@ -70,8 +70,8 @@
 		<ul class="thumbnails">
 			#{if util.Dicom.renderable(series)}
 			<li>
-				<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="thumbnail">
-					<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 160)}">
+				<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="thumbnail" style="width: 160px; height: 160px">
+					<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk)}">
 				</a>
 			</li>
 			#{/if}

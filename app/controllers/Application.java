@@ -180,10 +180,8 @@ public class Application extends SecureController {
 			});
 			objectUID = ((Instance) instances[instances.length / 2]).sop_iuid;
 		}
-		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s", request.domain, objectUID, frameNumber);
-		if (columns != null) {
-			url += String.format("&columns=%s", columns);
-		}
+		//columns=256 matches prefetch configuration
+		String url = String.format("http://%s:8080/wado?requestType=WADO&studyUID=&seriesUID=&objectUID=%s&frameNumber=%s&columns=%s", request.domain, objectUID, frameNumber, columns == null ? 256 : columns);
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 		if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
 			Logger.warn("Image not found for %s", series);

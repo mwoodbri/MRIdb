@@ -81,7 +81,7 @@
 	#{list study.series.findAll{util.Dicom.downloadable(it)}.sort{it.series_no as int}, as: 'series'}
 	<li class="span2" style="margin-left: 2.127659574%">
 		<a href="@{series(series.pk)}" class="thumbnail">
-			<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk, 128)}">
+			<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk)}">
 			<h5 class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(16)}</h5>
 		</a>
 	</li>
