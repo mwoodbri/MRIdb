@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.IOException;
 
 import models.Series;
+import models.Study;
 import play.jobs.Job;
 import util.Download;
 
-public class SeriesDownloader extends Job<Void> {
+public class Downloader extends Job<Void> {
 
 	public static enum Format {
 		dcm, //DICOM
@@ -15,12 +16,12 @@ public class SeriesDownloader extends Job<Void> {
 		img  //Analyze
 	}
 
-	private long pk;
+	private long[] pks;
 	private Format format;
 	private File tmpDir;
 
-	public SeriesDownloader(long pk, Format format, File tmpDir) {
-		this.pk = pk;
+	public Downloader(long[] pks, Format format, File tmpDir) {
+		this.pks = pks;
 		this.format = format;
 		this.tmpDir = tmpDir;
 	}
@@ -28,7 +29,14 @@ public class SeriesDownloader extends Job<Void> {
 	@Override
 	public void doJob() {
 		try {
-			Download.series(Series.<Series>findById(pk), tmpDir, format);
+			for (long pk : pks) {
+				Study study = Study.findById(pk);
+				if (study != null) {
+					Download.study(study, tmpDir);
+				} else {
+					Download.series(Series.<Series>findById(pk), tmpDir, format);
+				}
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (InterruptedException e) {

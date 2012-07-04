@@ -20,7 +20,6 @@ public class Log extends Model {
 		this.message = message;
 	}
 
-	@SuppressWarnings("unused")
 	@PrePersist
 	private void prePersist() {
 		timestamp = new Date();

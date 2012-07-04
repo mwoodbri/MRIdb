@@ -18,6 +18,7 @@ public class Series extends GenericModel {
 	public String series_no;
 	public String series_iuid;
 	public String station_name;
+	public String series_desc;
 	public String series_custom1;
 	public String modality;
 	@ManyToOne
@@ -33,4 +34,5 @@ public class Series extends GenericModel {
 	public String toClipboardString() {
 		return String.format("%s of %s", series_custom1, study.toClipboardString());
 	}
+
 }

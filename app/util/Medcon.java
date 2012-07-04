@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jobs.SeriesDownloader.Format;
+import jobs.Downloader.Format;
 
 public class Medcon {
 

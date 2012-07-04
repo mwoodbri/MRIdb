@@ -1,5 +1,5 @@
 <ul class="nav nav-list">
-  <li class="nav-header">Clipboard</li>
+  <li class="nav-header">Clipboard
   #{if clipboard.items}
   #{list clipboard.items}
   <li>
@@ -10,16 +10,13 @@
     </span>
   </li>
   #{/list}
-  <li>&nbsp;</li>
-  <li>#{a @export(), class: 'export'}Export files#{/a}</li>
-  <li>#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}Remove all#{/a}</li>
+  <li style="padding-top: 0.5em"><span>#{a @export(), class: 'export'}Export files#{/a}&nbsp;|&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}Remove all#{/a}</span>
   #{/if}
   #{else}
-  <li>Use&nbsp;&nbsp;<i class="icon-download-alt icon-large"></i>&nbsp;&nbsp;to add to clipboard</li>
+  <li>Use&nbsp;&nbsp;<i class="icon-download-alt icon-large"></i>&nbsp;&nbsp;to add to clipboard
   #{/else}
   #{if exports}
-  <li>&nbsp;</li>
-  <li class="nav-header">Downloads</li>
+  <li class="nav-header">Downloads
   #{list exports}
   <li>#{if _.exists()}#{a @retrieve(org.apache.commons.io.FilenameUtils.getBaseName(_.name))}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/a}#{/if}#{else}<span class="loading">${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}</span>#{/else}
   #{/list}

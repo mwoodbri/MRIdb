@@ -10,6 +10,14 @@ body {
 
 a.thumbnail:hover {
   text-decoration: none;
+  border-color: #222;
+}
+
+a.thumbnail.selected {
+  border-color:#33b5e5;
+  -webkit-box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);
+  -moz-box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);
+  box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);
 }
 
 .loading {

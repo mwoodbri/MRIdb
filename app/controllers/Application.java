@@ -1,10 +1,14 @@
 package controllers;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,10 +21,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import jobs.ClipboardExporter;
-import jobs.SeriesDownloader;
-import jobs.SeriesDownloader.Format;
+import jobs.Downloader;
+import jobs.Downloader.Format;
 import models.Instance;
-import models.Patient;
 import models.Person;
 import models.Project;
 import models.ProjectAssociation;
@@ -44,6 +47,8 @@ import util.Dicom;
 import util.Medcon;
 import util.PersistentLogger;
 import util.Properties;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 import controllers.Secure.Security;
 
 public class Application extends SecureController {
@@ -63,12 +68,58 @@ public class Application extends SecureController {
 		render();
 	}
 
-	public static void admin() {
+	public static void recent() {
 		render();
 	}
 
 	public static void help() {
 		render();
+	}
+
+	@Check("admin")
+	public static void audit(File spreadsheet) throws IOException, ParseException {
+		if (spreadsheet == null) {
+			render();
+		}
+		response.contentType = "text/csv";
+		response.setHeader("Content-Disposition", "attachment; filename='audit.csv'");
+		CSVReader reader = new CSVReader(new FileReader(spreadsheet));
+		CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.out));
+		String[] headers = reader.readNext();
+		writer.writeNext(headers);
+		String[] line = null;
+		while ((line = reader.readNext()) != null) {
+			String pat_id = line[3].toLowerCase();
+			Date study_datetime = new SimpleDateFormat("dd/MM/yyyy").parse(line[9]);
+			Study study = Study.find("lower(patient.pat_id) = ? and cast(study_datetime as date) = ?", pat_id, study_datetime).first();
+			if (study != null) {
+				line[10] = "Yes";
+				Project project = Project.find("byName", line[1]).first();
+				if (project == null) {
+					project = new Project(line[1]).save();
+				}
+				associate(study, project, line[2]);
+			} else {
+				line[10] = "No";
+			}
+			Boolean singleFrames = null;
+			for (int i = 12; i < headers.length; i++) {
+				String series_desc = headers[i].toLowerCase();
+				Series series = Series.find("from Series where lower(series_desc) = ? and lower(study.patient.pat_id) = ? and cast(study.study_datetime as date) = ?", series_desc, pat_id, study_datetime).first();
+				if (series != null) {
+					line[i] = "Yes";
+					singleFrames = true;
+					singleFrames &= Dicom.singleFrames(series).size() > 0;
+				} else {
+					line[i] = "No";
+				}
+				line[i] = series != null ? "Yes" : "No";
+			}
+			line[11] = Boolean.TRUE.equals(singleFrames) ? "Yes" : "No";
+			writer.writeNext(line);
+		}
+		reader.close();
+		writer.close();
 	}
 
 	private static Map<String, String> comparators = new HashMap<String, String>() {{
@@ -138,9 +189,9 @@ public class Application extends SecureController {
 		render(studies, studyCount, page);
 	}
 
-	public static void patient(long pk) throws Exception {
-		Patient patient = Patient.findById(pk);
-		render(patient);
+	public static void study(long pk) {
+		Study study = Study.findById(pk);
+		render(study);
 	}
 
 	public static void series(long pk) throws IOException {
@@ -190,11 +241,11 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	public static void download(long pk, Format format) throws InterruptedException, IOException {
-		PersistentLogger.log("downloaded series %s", pk);
+	public static void download(long[] pk, Format format) throws InterruptedException, IOException {
+		PersistentLogger.log("downloaded series %s", Arrays.toString(pk));
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		await(new SeriesDownloader(pk, format == null ? Format.dcm : format, tmpDir).now());
+		await(new Downloader(pk, format == null ? Format.dcm : format, tmpDir).now());
 		File zip = new File(tmpDir, String.format("%s.zip", tmpDir.listFiles()[0].getName()));
 		Files.zip(tmpDir.listFiles()[0], zip);
 		renderBinary(zip);
@@ -241,7 +292,7 @@ public class Application extends SecureController {
 		File dcm;
 		Instance instance = Dicom.multiFrame(series);
 		if (instance != null) {
-			await(new SeriesDownloader(pk, Format.dcm, tmpDir).now());
+			await(new Downloader(new long[] { pk }, Format.dcm, tmpDir).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
 			dcm = new File(tmpDir, String.format("%s.dcm", series.pk));

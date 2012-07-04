@@ -44,17 +44,17 @@ public class Study extends GenericModel {
 
 	public String toDownloadString() {
 		List<String> parts = new ArrayList<String>();
+		ProjectAssociation projectAssociation = getProjectAssociation();
+		if (projectAssociation != null) {
+			if (projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
+				parts.add(projectAssociation.participationID);
+			}
+			parts.add(projectAssociation.project.name);
+		}
 		parts.add(new SimpleDateFormat("yyyyMMddHHmm").format(study_datetime));
 		String station_name = getStation_name();
 		if (station_name != null) {
 			parts.add(station_name);
-		}
-		ProjectAssociation projectAssociation = getProjectAssociation();
-		if (projectAssociation != null) {
-			parts.add(projectAssociation.project.name);
-			if (projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
-				parts.add(projectAssociation.participationID);
-			}
 		}
 		return StringUtils.join(parts, "_").replaceAll("\\W+", "");
 	}
@@ -72,4 +72,5 @@ public class Study extends GenericModel {
 	public String toClipboardString() {
 		return String.format("%s on %s", patient.pat_name == null ? "UNKNOWN" : JavaExtensions.formatAsName(patient.pat_name), study_datetime == null ? "" : JavaExtensions.format(study_datetime));
 	}
+
 }

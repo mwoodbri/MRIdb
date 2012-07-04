@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import jobs.SeriesDownloader.Format;
+import jobs.Downloader.Format;
 import models.Files;
 import models.ProjectAssociation;
 import models.Series;

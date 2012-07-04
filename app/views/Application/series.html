@@ -1,136 +1,31 @@
-#{extends 'main.html'/}
-#{set title:'Series'/}
-#{set 'moreScripts'}
-<script>
-	$('a.imagej').on('click', function() {
-		"use strict";
-		$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej(series.pk)}&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
-	});
-</script>
-#{/set}
+<ul class="nav nav-list" #{if util.Dicom.renderable(series)}data-pk="${series.pk}"#{/if}>
 
-<h3 style="display: inline">#{a @patient(series.study.patient.pk)}${series.study.patient.pat_id}#{/a} - ${series.study.patient.pat_name?.formatAsName()} - ${series.study.study_datetime?.format()} - ${series.series_custom1}(${series.series_no})</h3>
-&nbsp;&nbsp;#{stats series}%s files (%s)#{/stats}
-&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, series.class.simpleName, series.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
-<br><br>
-#{a @download(series.pk), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
-#{if util.Dicom.renderable(series)}
-#{a @download(series.pk, 'nii'), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
-#{a @download(series.pk, 'img'), class: "btn btn-info"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
-<a href="#" class="btn btn-info imagej"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
-<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="btn btn-info"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
-#{/if}
-<br><br>
-<h3>Subject details</h3>
-<div class="row-fluid">
-	<div class="span7">
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					<th>PatientID</th>
-					<th>Name</th>
-					<th>Sex</th>
-					<th>Date of birth</th>
-					<th>Weight</th>
-					<th>Age</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>${series.study.patient.pat_id}</td>
-					<td>${series.study.patient.pat_name?.formatAsName()}</td>
-					<td>${series.study.patient.pat_sex}</td>
-					<td>${series.study.patient.pat_birthdate?.formatAsDate()}</td>
-					<td>${series.study.patient.pat_attrs.get('PatientWeight')} kg</td>
-					<td>${series.study.patient.pat_birthdate?.formatAsRelativeAge(series.study.study_datetime)}</td>
-				</tr>
-			</tbody>
-		</table>
-		<h3>Study details</h3>
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					<th>Study description</th>
-					<th>Date of scan</th>
-					<th>Time of scan</th>
-					<th>Study ID</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>${series.study.study_desc}</td>
-					<td>${series.study.study_datetime?.format()}</td>
-					<td>${series.study.study_datetime?.time()}</td>
-					<td>${series.study.study_id}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="span3">
-		<ul class="thumbnails">
-			#{if util.Dicom.renderable(series)}
-			<li>
-				<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${series.series_iuid}" class="thumbnail" style="width: 160px; height: 160px">
-					<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk)}">
-				</a>
-			</li>
-			#{/if}
-		</ul>
-	</div>
-</div>
+	<li class="nav-header">Subject details
+	<li>Sex: ${series.study.patient.pat_sex}
+	<li>Weight: ${series.study.patient.pat_attrs.get('PatientWeight')} kg
+	<li>Age: ${series.study.patient.pat_birthdate?.formatAsRelativeAge(series.study.study_datetime)}
+	
+	<li class="nav-header">Study details
+	<li>Time of scan: ${series.study.study_datetime?.time()}</td>
+	<li>Study ID: ${series.study.study_id}</td>
+	
+	#{if util.Dicom.renderable(series)}
+	<li class="nav-header">Image description
+	<li>Matrix: #{attr dataset, tag:'Columns'/} / #{attr dataset, tag:'Rows'/} / #{NumberOfFrames series/}
+	<li>Pixel spacing: #{PixelSpacing dataset, axis: 'X'/} / #{PixelSpacing dataset, axis: 'Y'/} / #{SliceThickness dataset/}
+	<li>In plane phase encoding: #{InPlanePhaseEncodingDirection dataset/}
+	<li>Phase encoding steps: #{MRAcquisitionPhaseEncodingStepsInPlane dataset/}
+	
+	<li class="nav-header">Sequence description
+	<li>Seq #${series.series_no}
+	<li>Protocol name: ${series.series_custom1}
+	<li>Sequence: #{attr dataset, tag:'ScanningSeq'/}
+	<li>Variant: #{attr dataset, tag:'SeqVariant'/}
+	<li>Receive coil: #{ReceiveCoilName dataset/}
+	<li>Repetition time: #{RepetitionTime dataset/} ms
+	<li>Echo time: ${echoes.collect{it + ' ms'}.join(' / ')}
+	<li>Number of echoes: ${echoes.size()}
+	<li>Temporal positions: #{attr dataset, tag:'NumberOfTemporalPositions'/}
+	#{/if}
 
-#{if util.Dicom.renderable(series)}
-
-<h3>Image description</h3>
-<table class="table table-bordered">
-	<thead>
-		<tr>
-			<th>Matrix (cols / rows / slices)</th>
-			<th>Pixel spacing (x / y / z)</th>
-			<th>In plane phase encoding</th>
-			<th>Phase encoding steps</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>#{attr dataset, tag:'Columns'/} / #{attr dataset, tag:'Rows'/} / #{NumberOfFrames series/}</td>
-			<td>#{PixelSpacing dataset, axis: 'X'/} / #{PixelSpacing dataset, axis: 'Y'/} / #{SliceThickness dataset/}</td>
-			<td>#{InPlanePhaseEncodingDirection dataset/}</td>
-			<td>#{MRAcquisitionPhaseEncodingStepsInPlane dataset/}</td>
-		</tr>
-	</tbody>
-</table>
-
-<h3>Sequence description</h3>
-<table class="table table-bordered">
-	<thead>
-		<tr>
-			<th>Seq #
-			<th>Protocol name
-			<th>Sequence
-			<th>Variant
-			<th>Receive coil
-			<th>Repetition time
-			<th>Echo time
-			<th>Number of echoes
-			<th>Temporal positions
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>${series.series_no}
-			<td>${series.series_custom1}
-			<td>#{attr dataset, tag:'ScanningSeq'/}
-			<td>#{attr dataset, tag:'SeqVariant'/}
-			<td>#{ReceiveCoilName dataset/}
-			<td>#{RepetitionTime dataset/} ms
-			<td>${echoes.collect{it + ' ms'}.join(' / ')}
-			<td>${echoes.size()}
-			<td>#{attr dataset, tag:'NumberOfTemporalPositions'/}
-		</tr>
-	</tbody>
-</table>
-
-#{/if}
-
-<div id="imagej"></div>
+</ul>

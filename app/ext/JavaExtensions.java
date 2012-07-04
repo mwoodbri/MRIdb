@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang.WordUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Years;
@@ -47,6 +48,16 @@ public class JavaExtensions extends play.templates.JavaExtensions {
 
 	public static String formatAsName(String string) {
 		String[] parts = string.split("\\^", -1);
-		return String.format("%s %s %s %s %s", parts[3], parts[0], parts[1], parts[2], parts[4]).replaceAll("[ ]+", " ");
+		return String.format("%s %s %s %s %s", parts[0].toUpperCase(), WordUtils.capitalizeFully(parts[1]), WordUtils.capitalizeFully(parts[2]), WordUtils.capitalizeFully(parts[3]), WordUtils.capitalizeFully(parts[4])).replaceAll("[ ]+", " ");
 	}
+
+	public static String formatAsSize(Long bytes) {
+		int unit = 1024;
+		if (bytes < unit) {
+			return String.format("%s B", bytes);
+		}
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		return String.format("%.1f %siB", bytes / Math.pow(unit, exp), "KMGTPE".charAt(exp - 1));
+	}
+
 }
