@@ -77,7 +77,7 @@ public class Util {
 	}
 
 	public static long size(File file) throws IOException {
-		return new Scanner(Runtime.getRuntime().exec(new String[]{"du", "-bs", file.getPath()}).getInputStream()).nextLong();
+		return new Scanner(Runtime.getRuntime().exec(new String[]{"du", "-Hbs", file.getPath()}).getInputStream()).nextLong();
 	}
 
 }
