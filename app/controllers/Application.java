@@ -185,8 +185,11 @@ public class Application extends SecureController {
 			query += " where " + StringUtils.join(where, " and ");
 		}
 		query += " order by " + "study." + (order.isEmpty() ? "patient.pk" : order) + " " + ("desc".equals(sort) ? "desc" : "asc");
+		long time = System.currentTimeMillis();
 		List<Study> studies = Study.find(query, args.toArray()).fetch(page + 1, Properties.pageSize());
+		Logger.warn("0 " + (System.currentTimeMillis() - time)); time = System.currentTimeMillis();
 		int studyCount = Study.find(query, args.toArray()).fetch().size();
+		Logger.warn("1 " + (System.currentTimeMillis() - time)); time = System.currentTimeMillis();
 		render(studies, studyCount, page);
 	}
 
