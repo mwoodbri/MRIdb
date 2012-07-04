@@ -62,7 +62,7 @@ public class Dicom {
 	//retrieve attributes that aren't in the table or blob by looking in the file
 	public static Dataset dataset(File dicom) throws IOException {
 		Dataset dataset = DcmObjectFactory.getInstance().newDataset();
-		dataset.readFile(dicom, null, -1);
+		dataset.readFile(dicom, null, Tags.PixelData);
 		return dataset;
 	}
 
