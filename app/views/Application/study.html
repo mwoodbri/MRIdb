@@ -34,9 +34,9 @@
 		$('#associate').on('submit', function() {
 			var participationID = input.val();
 			if (participationID && !participationID.match(/(3T)|(1.5T)|(NNU)/)) {
-				var disallowed = ["${study.patient.pat_id.toLowerCase()}"].concat("${study.patient.pat_name?.formatAsName()}".split(/[\s,]/));
+				var disallowed = ["${study.patient.pat_id.toLowerCase()}"].concat("${study.patient.pat_name?.formatAsName()}".split(/[\s,']/));
 				for (var i in disallowed) {
-					if (disallowed[i] && participationID.toLowerCase().indexOf(disallowed[i].toLowerCase()) !== -1) {
+					if (disallowed[i] && disallowed[i].length > 1 && participationID.toLowerCase().indexOf(disallowed[i].toLowerCase()) !== -1) {
 						window.alert("Project identifiers cannot contain a patient's ID or name");
 						return false;
 					}
