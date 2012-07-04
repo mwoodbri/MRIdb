@@ -37,13 +37,14 @@
 	</thead>
 	<tbody>
 		#{list studies}
+		#{set projectAssociation: _.getProjectAssociation()/}
 		<tr>
 			<td>#{a @study(_.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/a}
 			<td>${_.patient.pat_id}
 			<td>${_.patient.pat_birthdate?.formatAsDate()}
 			<td>${_.study_desc}
 			<td>${_.study_datetime?.format()}
-			<td>${_.getProjectAssociation()?.project}#{if _.getProjectAssociation()?.participationID} (${_.getProjectAssociation()?.participationID})#{/if}
+			<td>${projectAssociation?.project}#{if projectAssociation?.participationID} (${projectAssociation?.participationID})#{/if}
 			<td>#{a @clipboard(controllers.Application.ClipboardOp.ADD, _.class.simpleName, _.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
 		</tr>
 		#{/list}
