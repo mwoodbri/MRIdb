@@ -95,6 +95,11 @@
 			$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej()}?pk=" + $("a.selected").data("pk") + "&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
 			return false;
 		});
+		$('a.weasis').on('click', function() {
+			window.location = this.href + $("a.selected").data("pk");
+			return false;
+		});
+		series_iuid
 	});
 </script>
 #{/set}
@@ -106,16 +111,16 @@
 	<br><br>
 	#{form @associate(), id: 'associate', method: 'post', class: 'form-inline'}
 		Project:&nbsp;
-		<select name="projectID" data-value="${study.getProjectAssociation() ? study.getProjectAssociation().project.id : ''}">
+		<select name="projectID" data-value="${projectAssociation ? projectAssociation.project.id : ''}">
 			<option></option>
 			#{list models.Project.find("order by name").fetch()}
-			<option value="${_.id}"#{if _.equals(study.getProjectAssociation()?.project)} selected#{/if}>${_.name}</option>
+			<option value="${_.id}"#{if _.equals(projectAssociation?.project)} selected#{/if}>${_.name}</option>
 			#{/list}
 			<option value="-1">New project...</option>
 		</select>
 		&nbsp;
 		Identifier:&nbsp;
-		<input type="text" name="participationID" value="${study.getProjectAssociation()?.participationID}" data-value="${study.getProjectAssociation()?.participationID}"#{ifnot study.getProjectAssociation()} disabled#{/ifnot}>
+		<input type="text" name="participationID" value="${projectAssociation?.participationID}" data-value="${projectAssociation?.participationID}"#{ifnot projectAssociation} disabled#{/ifnot}>
 		&nbsp;
 		<input type="hidden" name="study.pk" value="${study.pk}">
 		<input type="hidden" name="projectName">
@@ -125,7 +130,7 @@
 	#{a @download(null, 'nii'), class: "btn btn-info download single", style: "visibility: hidden"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
 	#{a @download(null, 'img'), class: "btn btn-info download single", style: "visibility: hidden"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
 	<a href="#" class="btn btn-info single imagej" style="visibility: hidden"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
-	<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=${models.Series.findAll().first().series_iuid}" class="btn btn-info single" style="visibility: hidden"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
+	<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis" style="visibility: hidden"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
 	<p style="margin: 1em 0">Ctrl-click to select multiple exams</p>
 	<div class="row-fluid">
 		<ul class="thumbnails">
