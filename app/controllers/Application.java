@@ -15,11 +15,12 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.persistence.Query;
 
 import jobs.ClipboardExporter;
 import jobs.Downloader;
@@ -39,6 +40,7 @@ import play.Invoker;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
+import play.db.jpa.JPA;
 import play.libs.Files;
 import play.libs.IO;
 import play.mvc.Before;
@@ -180,15 +182,18 @@ public class Application extends SecureController {
 			}
 		}
 
-		String query = "select study from " + StringUtils.join(from, ", ");
+		String query = "from " + StringUtils.join(from, ", ");
 		if (!where.isEmpty()) {
 			query += " where " + StringUtils.join(where, " and ");
 		}
-		query += " order by " + "study." + (order.isEmpty() ? "patient.pk" : order) + " " + ("desc".equals(sort) ? "desc" : "asc");
 		long time = System.currentTimeMillis();
-		List<Study> studies = Study.find(query, args.toArray()).fetch(page + 1, Properties.pageSize());
+		List<Study> studies = Study.find("select study " + query + " order by " + "study." + (order.isEmpty() ? "patient.pk" : order) + " " + ("desc".equals(sort) ? "desc" : "asc"), args.toArray()).fetch(page + 1, Properties.pageSize());
 		Logger.warn("0 " + (System.currentTimeMillis() - time)); time = System.currentTimeMillis();
-		int studyCount = Study.find(query, args.toArray()).fetch().size();
+		Query count = JPA.em().createQuery("select count(study) " + query);
+		for (int i = 0; i < args.size(); i++) {
+			count.setParameter(i + 1, args.get(i));
+		}
+		int studyCount = ((Long) count.getSingleResult()).intValue();
 		Logger.warn("1 " + (System.currentTimeMillis() - time)); time = System.currentTimeMillis();
 		render(studies, studyCount, page);
 	}
