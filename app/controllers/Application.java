@@ -186,15 +186,12 @@ public class Application extends SecureController {
 		if (!where.isEmpty()) {
 			query += " where " + StringUtils.join(where, " and ");
 		}
-		long time = System.currentTimeMillis();
 		List<Study> studies = Study.find("select study " + query + " order by " + "study." + (order.isEmpty() ? "patient.pk" : order) + " " + ("desc".equals(sort) ? "desc" : "asc"), args.toArray()).fetch(page + 1, Properties.pageSize());
-		Logger.warn("0 " + (System.currentTimeMillis() - time)); time = System.currentTimeMillis();
 		Query count = JPA.em().createQuery("select count(study) " + query);
 		for (int i = 0; i < args.size(); i++) {
 			count.setParameter(i + 1, args.get(i));
 		}
 		int studyCount = ((Long) count.getSingleResult()).intValue();
-		Logger.warn("1 " + (System.currentTimeMillis() - time)); time = System.currentTimeMillis();
 		render(studies, studyCount, page);
 	}
 
