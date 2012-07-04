@@ -191,20 +191,9 @@ public class Application extends SecureController {
 	}
 
 	public static void study(long pk) {
-		long time = System.currentTimeMillis();;
-		System.out.println("0 " + (System.currentTimeMillis() - time));
 		Study study = Study.findById(pk);
-		System.out.println("1 " + (System.currentTimeMillis() - time));
 		ProjectAssociation projectAssociation = study.getProjectAssociation();
-		System.out.println("2 " + (System.currentTimeMillis() - time));
-		Set<Series> serieses = new HashSet();
-		for (Series series : study.series) {
-			if (Dicom.downloadable(series)) {
-				serieses.add(series);
-			}
-		}
-		System.out.println("3 " + (System.currentTimeMillis() - time));
-		render(study, projectAssociation, serieses);
+		render(study, projectAssociation);
 	}
 
 	public static void series(long pk) throws IOException {
