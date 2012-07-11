@@ -75,7 +75,7 @@ public class Application extends SecureController {
 		if (page == null) {
 			index(0, order, sort);
 		}
-		List<Study> studies = Study.find(String.format("order by %s %s", order == null || order.isEmpty() ? "study_datetime" : order, "asc".equals(sort) ? "asc" : "desc")).fetch(page + 1, Properties.pageSize());
+		List<Study> studies = Study.find(String.format("from Study where study_datetime is not null order by %s %s", order == null || order.isEmpty() ? "study_datetime" : order, "asc".equals(sort) ? "asc" : "desc")).fetch(page + 1, Properties.pageSize());
 		int studyCount = (int) Study.count();
 		render(studies, studyCount, page);
 	}
