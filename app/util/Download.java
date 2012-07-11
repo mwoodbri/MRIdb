@@ -31,7 +31,7 @@ public class Download {
 				Util.exec(Properties.getString("dcm2nii"), "-g", "n", "-p", "n", "-d", "n", "-o", dir.getPath(), Dicom.collate(series).getPath());
 			} else {
 				File dcm = Dicom.file(Dicom.multiFrame(series));
-				Util.exec(new File(Play.applicationPath, "bin/dicom_2_nifti.py").getPath(), dcm.getPath(), new File(dir, String.format("%s.nii", dcm.getName())).getPath());
+				Util.exec("python", Properties.getString("dicom_2_nifti"), dcm.getPath(), new File(dir, String.format("%s.nii.gz", series.toDownloadString())).getPath());
 			}
 		} else if (format == Format.img) {
 			Medcon.convert(Dicom.collate(series), format, dir);
