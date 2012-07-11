@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import jobs.Downloader.Format;
 import models.Series;
 import models.Study;
 
@@ -46,10 +47,10 @@ public class ClipboardExporter extends Job {
 		for (GenericModel object : clipboard.getObjects()) {
 			if (object instanceof Study) {
 				Study study = (Study) object;
-				Download.study(study, tmpDir);
+				Download.study(study, tmpDir, Format.dcm);
 			} else if (object instanceof Series) {
 				Series series = (Series) object;
-				Download.series(series, tmpDir);
+				Download.series(series, tmpDir, Format.dcm);
 			}
 		}
 

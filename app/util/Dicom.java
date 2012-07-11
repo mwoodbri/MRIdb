@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import models.Series;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.io.FileUtils;
 import org.dcm4che.data.Dataset;
 import org.dcm4che.data.DcmObjectFactory;
 import org.dcm4che.dict.Tags;
@@ -81,28 +83,37 @@ public class Dicom {
 		return echoes;
 	}
 
-	public static void anonymise(File from, File to, String identifier) throws IOException {
-		Dataset dataset = anonymise(from, to);
-		if (identifier != null) {
-			dataset.putPN(Tags.PatientName, identifier);
-			dataset.putLO(Tags.PatientID, identifier);
+	public static void anonymise(File inFile, File outFile, String identifier) throws Exception {
+		FileUtils.copyFile(inFile, outFile);
+		int[] tags = new int[] {
+				Tags.PatientID,
+				Tags.PatientName,
+				Tags.PatientSex,
+				Tags.PatientBirthDate,
+				Tags.PatientAddress,
+				Tags.ReferringPhysicianName,
+				Tags.InstitutionName,
+				Tags.StationName,
+				Tags.ManufacturerModelName
+		};
+		String[] command = new String[3 + 2 * tags.length + 1];
+		int i = 0;
+		command[i++] = new File(Properties.getString("dcmtk"), "bin/dcmodify").getPath();
+		command[i++] = "-nb";
+		command[i++] = "-imt";
+		for (int tag : tags) {
+			if (identifier != null && (tag == Tags.PatientID || tag == Tags.PatientName)) {
+				command[i++] = "-m";
+				command[i++] = String.format("%s=%s", Tags.toString(tag), identifier);
+			} else {
+				command[i++] = "-e";
+				command[i++] = Tags.toString(tag);
+			}
 		}
-		dataset.writeFile(to, null);
-	}
-
-	public static Dataset anonymise(File from, File to) throws IOException {
-		Dataset dataset = DcmObjectFactory.getInstance().newDataset();
-		dataset.readFile(from, null, -1);
-		dataset.remove(Tags.PatientID);
-		dataset.remove(Tags.PatientName);
-		dataset.remove(Tags.PatientSex);
-		dataset.remove(Tags.PatientBirthDate);
-		dataset.remove(Tags.PatientAddress);
-		dataset.remove(Tags.ReferringPhysicianName);
-		dataset.remove(Tags.InstitutionName);
-		dataset.remove(Tags.StationName);
-		dataset.remove(Tags.ManufacturerModelName);
-		return dataset;
+		command[i++] = outFile.getPath();
+		Util.exec(null, new HashMap<String, String>() {{
+			put("DCMDICTPATH", new File(Properties.getString("dcmtk"), "share/dcmtk/dicom.dic").getPath());
+		}}, command);
 	}
 
 	public static int numberOfFrames(Series series) throws IOException {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -67,8 +68,13 @@ public class Application extends SecureController {
 		}
 	}
 
-	public static void index() {
-		render();
+	public static void index(int page, String order, String sort) {
+		if (!Security.connected().equals("mwoodbri")) {
+			advanced();
+		}
+		List<Study> studies = Study.find(String.format("order by %s %s", order == null || order.isEmpty() ? "study_datetime" : order, "asc".equals(sort) ? "asc" : "desc")).fetch(page + 1, Properties.pageSize());
+		long studyCount = Study.count();
+		render(studies, studyCount, page);
 	}
 
 	public static void recent() {
@@ -76,6 +82,10 @@ public class Application extends SecureController {
 	}
 
 	public static void help() {
+		render();
+	}
+
+	public static void advanced() {
 		render();
 	}
 
@@ -125,13 +135,51 @@ public class Application extends SecureController {
 		writer.close();
 	}
 
+	//http://localhost:9000/application/simple?query=bloggs&page=0&sort=&order=
+	public static void simpleSearch(String terms, int page, String order, String sort) {
+		if (terms.trim().isEmpty()) {
+			index(0, null, null);
+		}
+		//String[] termsArray = terms.toLowerCase().split(" ");
+		//no view, no full text
+		//String query = "from study, (select study.pk, patient.pk pat_pk, pat_name, pat_id, pat_birthdate, study_desc, study_datetime, lower(study_desc || ' ' || pat_name || ' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '')) result from study join patient on (study.patient_fk = patient.pk) left join projectassociation on (projectassociation.study_pk = study.pk) left join project on (projectassociation.project_id = project.id)) as subquery where study.pk = subquery.pk";
+		//for (int i = 0; i < termsArray.length; i++) {
+		//	query += " and subquery.result like ?";
+		//}
+		//view, no full text
+		//String query = "from study, studyfulltext where study.pk = studyfulltext.pk";
+		//for (int i = 0; i < termsArray.length; i++) {
+		//	query += " and studyfulltext.fulltext like ?";
+		//}
+		//full text
+		String query = "from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || ' ' || pat_name || ' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '')) @@ to_tsquery('english_nostop', ?)";
+
+		Query studyCountQuery = JPA.em().createNativeQuery("select count(*) " + query);
+//		for (int i = 0; i < termsArray.length; i++) {
+//			studyCountQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
+//		}
+		studyCountQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
+		int studyCount = ((BigInteger) studyCountQuery.getSingleResult()).intValue();
+
+		order = order.contains(".") ? order.split("[.]")[1] : order;
+		query = "select study.* " + query + String.format(" order by %s %s", order, "desc".equals(sort) ? "desc" : "asc");
+		Query studiesQuery = JPA.em().createNativeQuery(query, Study.class).setFirstResult(page * Properties.pageSize()).setMaxResults(Properties.pageSize());
+//		for (int i = 0; i < termsArray.length; i++) {
+//			studiesQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
+//		}
+		studiesQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
+		List studies = studiesQuery.getResultList();
+
+		renderTemplate("@index", studies, studyCount, page);
+	}
+
 	private static Map<String, String> comparators = new HashMap<String, String>() {{
 		put("before", "<=");
 		put("on", "=");
 		put("after", ">");
 		put("since", ">");
 	}};
-	public static void studies(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort, Long project, String participationID) throws Exception {
+	public static void advancedSearch(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort, Long project, String participationID) throws Exception {
 		List<String> from = new ArrayList<String>();
 		from.add("Study study");
 
@@ -186,13 +234,15 @@ public class Application extends SecureController {
 		if (!where.isEmpty()) {
 			query += " where " + StringUtils.join(where, " and ");
 		}
-		List<Study> studies = Study.find("select study " + query + " order by " + "study." + (order.isEmpty() ? "patient.pk" : order) + " " + ("desc".equals(sort) ? "desc" : "asc"), args.toArray()).fetch(page + 1, Properties.pageSize());
-		Query count = JPA.em().createQuery("select count(study) " + query);
+		String entityQuery = String.format("select study %s order by study.%s %s", query, order.isEmpty() ? "patient.pk" : order, "desc".equals(sort) ? "desc" : "asc");
+		List<Study> studies = Study.find(entityQuery, args.toArray()).fetch(page + 1, Properties.pageSize());
+		String countQuery = String.format("select count(study) %s", query);
+		Query count = JPA.em().createQuery(countQuery);
 		for (int i = 0; i < args.size(); i++) {
 			count.setParameter(i + 1, args.get(i));
 		}
 		int studyCount = ((Long) count.getSingleResult()).intValue();
-		render(studies, studyCount, page);
+		renderTemplate("@index", studies, studyCount, page);
 	}
 
 	public static void study(long pk) {

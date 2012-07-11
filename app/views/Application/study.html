@@ -2,18 +2,6 @@
 #{set title:'Study'/}
 #{set 'moreScripts'}
 <script>
-	window.onbeforeunload = function(e) {
-		"use strict";
-		e = e || window.event;
-		var input = $("input[name=participationID]");
-		if (input.val() && input.val() !== input.data("value")) {
-			var msg = "Project identifier has not been saved";
-			if (e) {
-				e.returnValue = msg;
-			}
-			return msg;
-		}
-	};
 	$(function() {
 		"use strict";
 		var select = $("select[name=projectID]");
@@ -26,12 +14,72 @@
 					$(this).closest('form')[0].reset();
 					return;
 				}
-				$('input[name=projectName]').val(projectName);
+				$('input[name=projectName]').val(projectName).show();
+				$(this).hide();
 			}
 			input.val('');
-			$(this).closest('form').submit();
+			input.prop('disabled', $("option:first", this).attr('selected') ? 'disabled' : '');
 		});
-		$('#associate').on('submit', function() {
+		$("a.download").click(function(e) {
+			var selected = $("a.selected");
+			if (!selected.size()) {
+				selected = $('h3');
+			}
+			var href = this.href;
+			selected.each(function() {
+				href += "&pk=" + $(this).data("pk");
+			});
+			window.location = href;
+			return false;
+		});
+		$("a.thumbnail").click(function(e) {
+			if (e.ctrlKey || e.metaKey) {
+				$(this).toggleClass("selected");
+			} else {
+				$("a.thumbnail").removeClass("selected");
+				$(this).addClass("selected");
+			}
+			if ($(this).hasClass("selected")) {
+				var series = #{jsAction @series(':pk')/};
+				$('#series').load(series({pk: $(this).data("pk")}), function() {
+					$(this).show();
+				});
+			}
+			if ($(this).data("renderable") && $("a.thumbnail.selected").size() === 1) {
+				$('a.single').css("visibility", "visible");
+			}
+			return false;
+		});
+		$('a.imagej').on('click', function() {
+			$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej()}?pk=" + $("a.selected").data("pk") + "&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
+			return false;
+		});
+		$('a.weasis').on('click', function() {
+			window.location = this.href + $("a.selected").data("iuid");
+			return false;
+		});
+		$('a.all').on('click', function() {
+			$('a.thumbnail').addClass('selected');
+			return false;
+		});
+		$('a.none').on('click', function() {
+			$('a.thumbnail').removeClass('selected');
+			return false;
+		});
+		$('a.update').on('click', function() {
+			switch ($("a.thumbnail.selected").size()) {
+				case 0:
+					$('#series').hide();
+					$('a.single').css("visibility", "hidden");
+					break;
+				case 1:
+					break;
+				default:
+					$('a.single').css("visibility", "hidden");
+			}
+			return false;
+		});
+		$('#submit').on('click', function() {
 			var participationID = input.val();
 			if (participationID && !participationID.match(/(3T)|(1.5T)|(NNU)/)) {
 				var disallowed = ["${study.patient.pat_id.toLowerCase()}"].concat("${study.patient.pat_name?.formatAsName()}".split(/[\s,']/));
@@ -49,55 +97,13 @@
 				}
 			}
 			input.data("value", participationID);
-			return true;
-		});
-		$("a.download").click(function(e) {
-			var selected = $("a.selected");
-			if (!selected.size()) {
-				selected = $('h3');
-			}
-			var href = this.href;
-			selected.each(function() {
-				href += "&pk=" + $(this).data("pk");
+			$('#associate').ajaxSubmit(function() {
+				window.location.reload();
 			});
-			window.location = href;
 			return false;
 		});
-		$("a.thumbnail").click(function(e) {
-			if (e.ctrlKey) {
-				$(this).toggleClass("selected");
-			} else {
-				$("a.thumbnail").removeClass("selected");
-				$(this).addClass("selected");
-			}
-			if ($(this).hasClass("selected")) {
-				var series = #{jsAction @series(':pk')/};
-				$('#series').load(series({pk: $(this).data("pk")}), function() {
-					$(this).show();
-				});
-			}
-			switch($("a.thumbnail.selected").size()) {
-				case 0:
-					$('#series').hide();
-					$('a.single').css("visibility", "hidden");
-					break;
-				case 1:
-					if ($(this).data("renderable")) {
-						$('a.single').css("visibility", "visible");
-					}
-					break;
-				default:
-					$('a.single').css("visibility", "hidden");
-			}
-			return false;
-		});
-		$('a.imagej').on('click', function() {
-			$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej()}?pk=" + $("a.selected").data("pk") + "&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
-			return false;
-		});
-		$('a.weasis').on('click', function() {
-			window.location = this.href + $("a.selected").data("iuid");
-			return false;
+		$('#myModal').on('hide', function() {
+			$('#associate')[0].reset();
 		});
 	});
 </script>
@@ -107,35 +113,18 @@
 	<h2>${study.patient.pat_id} - ${study.patient.pat_name?.formatAsName()} - ${study.patient.pat_birthdate?.formatAsDate()}</h2>
 	<h3 style="display: inline" data-pk="${study.pk}">${study.study_desc} - ${study.study_datetime?.format()}</h3>
 	&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
-	<br><br>
-	#{form @associate(), id: 'associate', method: 'post', class: 'form-inline'}
-		Project:&nbsp;
-		<select name="projectID" data-value="${projectAssociation ? projectAssociation.project.id : ''}">
-			<option></option>
-			#{list models.Project.find("order by name").fetch()}
-			<option value="${_.id}"#{if _.equals(projectAssociation?.project)} selected#{/if}>${_.name}</option>
-			#{/list}
-			<option value="-1">New project...</option>
-		</select>
-		&nbsp;
-		Identifier:&nbsp;
-		<input type="text" name="participationID" value="${projectAssociation?.participationID}" data-value="${projectAssociation?.participationID}"#{ifnot projectAssociation} disabled#{/ifnot}>
-		&nbsp;
-		<input type="hidden" name="study.pk" value="${study.pk}">
-		<input type="hidden" name="projectName">
-		<input type="submit" class="btn btn-primary" value="Update">
-	#{/form}
+	<p style="margin: 1em 0"><span style="padding-right: 1em">Project: #{if projectAssociation}<span style="color: white; font-weight: bold">${projectAssociation.project.name}</span>#{/if}#{else}None#{/else}</span><span style="padding-right: 1em">Identifier: #{if projectAssociation && projectAssociation.participationID}<span style="color: white; font-weight: bold">${projectAssociation.participationID}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#myModal">Update...</a></p>
 	#{a @download(null, 'dcm'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
-	#{a @download(null, 'nii'), class: "btn btn-info download single", style: "visibility: hidden"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
-	#{a @download(null, 'img'), class: "btn btn-info download single", style: "visibility: hidden"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
+	#{a @download(null, 'nii'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
+	#{a @download(null, 'img'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
 	<a href="#" class="btn btn-info single imagej" style="visibility: hidden"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
 	<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis" style="visibility: hidden"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
-	<p style="margin: 1em 0">Ctrl-click to select multiple exams</p>
+	<p style="margin: 1em 0">Ctrl-click or ⌘-click to select multiple exams | <a href="#" class="all update">Select all</a> | <a class="none update" href="#">Select none</a></p>
 	<div class="row-fluid">
 		<ul class="thumbnails">
 		#{list study.series.findAll{util.Dicom.downloadable(it)}.sort{it.series_no as int}, as: 'series'}
 		<li class="span2" style="margin-right: 2.127659574%; margin-left: 0" title="${series.series_no + " " + series.series_custom1}">
-			<a href="#" class="thumbnail" data-pk="${series.pk}" data-iuid="${series.series_iuid}" data-renderable="${util.Dicom.renderable(series)}">
+			<a href="#" class="thumbnail update" data-pk="${series.pk}" data-iuid="${series.series_iuid}" data-renderable="${util.Dicom.renderable(series)}">
 				<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk)}">
 				<h5 class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(16)}</h5>
 			</a>
@@ -152,3 +141,28 @@
 	</div>
 </div>
 <div id="imagej"></div>
+<div class="modal hide" id="myModal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">×</button>
+		<h3>Assign study to project</h3>
+	</div>
+	#{form @associate(), id: 'associate', method: 'post', class: 'modal-body', style: 'margin: 0'}
+		<span style="display: inline-block; width: 8em; text-align: right; padding-right: 1em">Project:</span>
+		<select name="projectID" data-value="${projectAssociation ? projectAssociation.project.id : ''}">
+			<option>None</option>
+			#{list models.Project.find("order by name").fetch()}
+			<option value="${_.id}"#{if _.equals(projectAssociation?.project)} selected#{/if}>${_.name}</option>
+			#{/list}
+			<option value="-1">New project...</option>
+		</select>
+		<input type="text" readonly name="projectName" style="display: none">
+		<br><br>
+		<span style="display: inline-block; width: 8em; text-align: right; padding-right: 1em">Identifier:</span>
+		<input type="text" name="participationID" value="${projectAssociation?.participationID}" data-value="${projectAssociation?.participationID}"#{ifnot projectAssociation} disabled#{/ifnot}>
+		<input type="hidden" name="study.pk" value="${study.pk}">
+	#{/form}
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" id="close">Close</a>
+		<a href="#" class="btn btn-primary" id="submit">Save changes</a>
+	</div>
+</div>

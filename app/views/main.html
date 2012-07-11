@@ -4,8 +4,6 @@
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
     #{stylesheet 'vader/jquery-ui-1.8.21.custom.css'/}
     #{stylesheet 'bootstrap.min.css'/}
-    *{#{stylesheet 'bootstrap-responsive.min.css'/}}*
-    *{#{stylesheet 'font-awesome.css'/}}*
     #{stylesheet 'main.css'/}
     #{get 'moreStyles'/}
   </head>
@@ -16,7 +14,7 @@
         <div class="container-fluid">
           <a class="brand" href="@{Application.index}"><img src="@{'/public/images/title.png'}" alt="logo"></a>
           <ul class="nav">
-            <li#{if request.action == "Application.index"} class="active"#{/if}>#{a @index()}Search#{/a}
+            *{<li#{if request.action == "Application.index"} class="active"#{/if}>#{a @index()}Search#{/a}}*
             <li#{if request.action == "Application.recent"} class="active"#{/if}>#{a @recent()}Recent#{/a}
             <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @help()}Help#{/a}
             #{secure.check 'admin'}

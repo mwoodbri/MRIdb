@@ -1,7 +1,6 @@
 package jobs;
 
 import java.io.File;
-import java.io.IOException;
 
 import models.Series;
 import models.Study;
@@ -32,14 +31,12 @@ public class Downloader extends Job<Void> {
 			for (long pk : pks) {
 				Study study = Study.findById(pk);
 				if (study != null) {
-					Download.study(study, tmpDir);
+					Download.study(study, tmpDir, format);
 				} else {
 					Download.series(Series.<Series>findById(pk), tmpDir, format);
 				}
 			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

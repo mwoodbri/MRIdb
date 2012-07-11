@@ -1,7 +1,6 @@
 package util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 
 import jobs.Downloader.Format;
@@ -13,19 +12,15 @@ import play.Play;
 
 public class Download {
 
-	public static void study(Study study, File tmpDir) throws IOException, InterruptedException {
+	public static void study(Study study, File tmpDir, Format format) throws Exception {
 		for (Series series : study.series) {
 			if ("MR".equals(series.modality)) {
-				series(series, tmpDir);
+				series(series, tmpDir, format);
 			}
 		}
 	}
 
-	public static void series(Series series, File tmpDir) throws IOException, InterruptedException {
-		series(series, tmpDir, Format.dcm);
-	}
-
-	public static void series(Series series, File tmpDir, Format format) throws IOException, InterruptedException {
+	public static void series(Series series, File tmpDir, Format format) throws Exception {
 		File dir = new File(new File(tmpDir, series.study.toDownloadString()), series.toDownloadString());
 		dir.mkdirs();
 

@@ -17,7 +17,7 @@
 	<li>Phase encoding steps: #{MRAcquisitionPhaseEncodingStepsInPlane dataset/}
 	
 	<li class="nav-header">Sequence description
-	<li>Seq #${series.series_no}
+	<li>Seq #${series.series_no}: #{stats series}%s file(s), %s#{/stats}
 	<li>Protocol name: ${series.series_custom1}
 	<li>Sequence: #{attr dataset, tag:'ScanningSeq'/}
 	<li>Variant: #{attr dataset, tag:'SeqVariant'/}

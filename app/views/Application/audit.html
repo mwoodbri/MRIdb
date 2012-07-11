@@ -2,7 +2,7 @@
 #{set title:'Audit' /}
 
 <h3>Database Audit</h3>
-<p style="margin-top: 0.5em">Upload a comma-separated file (<a href="@{'/public/files/audit.csv'}">example</a>)</p>
+<p style="margin-top: 0.5em">Upload a comma-separated file (<a href="@{'/public/files/audit.csv'}">example</a>). Patients are matched on <b>Hospital No.</b> and <b>Date of MRI</b>.</p>
 #{form @audit(), enctype:'multipart/form-data'}
 <p style="margin-top: 0.5em">
 	<input type="file" name="spreadsheet" style="color: white !important"/><br><br>
