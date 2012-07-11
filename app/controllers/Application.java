@@ -68,10 +68,13 @@ public class Application extends SecureController {
 		}
 	}
 
-	public static void index(int page, String order, String sort) {
+	public static void index(Integer page, String order, String sort) {
 //		if (!Security.connected().equals("mwoodbri")) {
 //			advanced();
 //		}
+		if (page == null) {
+			index(0, order, sort);
+		}
 		List<Study> studies = Study.find(String.format("order by %s %s", order == null || order.isEmpty() ? "study_datetime" : order, "asc".equals(sort) ? "asc" : "desc")).fetch(page + 1, Properties.pageSize());
 		int studyCount = (int) Study.count();
 		render(studies, studyCount, page);
