@@ -73,7 +73,7 @@ public class Application extends SecureController {
 			advanced();
 		}
 		List<Study> studies = Study.find(String.format("order by %s %s", order == null || order.isEmpty() ? "study_datetime" : order, "asc".equals(sort) ? "asc" : "desc")).fetch(page + 1, Properties.pageSize());
-		long studyCount = Study.count();
+		int studyCount = (int) Study.count();
 		render(studies, studyCount, page);
 	}
 

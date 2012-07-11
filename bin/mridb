@@ -7,7 +7,7 @@ prog="mridb"
 
 . /etc/rc.d/init.d/functions
 
-PLAY=/opt/play-1.2.4/play
+PLAY=/opt/play-1.2.5/play
 APP_PATH=/opt/$prog
 
 PLAY_OPTS=""
