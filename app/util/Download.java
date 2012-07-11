@@ -8,7 +8,6 @@ import models.Files;
 import models.ProjectAssociation;
 import models.Series;
 import models.Study;
-import play.Play;
 
 public class Download {
 

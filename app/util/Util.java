@@ -13,7 +13,7 @@ import org.apache.commons.lang.StringUtils;
 public class Util {
 
 	public static List<Integer> pages(int count, int pageSize, int currentPage) {
-		int pageCount = 1 + (count -1) / pageSize;
+		int pageCount = 1 + (count - 1) / pageSize;
 		List<Integer> pages = new ArrayList<Integer>();
 		pages.add(1);
 		if (pageCount < 2) {

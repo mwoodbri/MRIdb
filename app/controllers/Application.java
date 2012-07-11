@@ -69,9 +69,9 @@ public class Application extends SecureController {
 	}
 
 	public static void index(Integer page, String order, String sort) {
-//		if (!Security.connected().equals("mwoodbri")) {
-//			advanced();
-//		}
+		//		if (!Security.connected().equals("mwoodbri")) {
+		//			advanced();
+		//		}
 		if (page == null) {
 			index(0, order, sort);
 		}
@@ -158,18 +158,18 @@ public class Application extends SecureController {
 		String query = "from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || ' ' || pat_name || ' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '')) @@ to_tsquery('english_nostop', ?)";
 
 		Query studyCountQuery = JPA.em().createNativeQuery("select count(*) " + query);
-//		for (int i = 0; i < termsArray.length; i++) {
-//			studyCountQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
-//		}
+		//		for (int i = 0; i < termsArray.length; i++) {
+		//			studyCountQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
+		//		}
 		studyCountQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
 		int studyCount = ((BigInteger) studyCountQuery.getSingleResult()).intValue();
 
 		order = order.contains(".") ? order.split("[.]")[1] : order;
 		query = "select study.* " + query + String.format(" order by %s %s", order, "desc".equals(sort) ? "desc" : "asc");
 		Query studiesQuery = JPA.em().createNativeQuery(query, Study.class).setFirstResult(page * Properties.pageSize()).setMaxResults(Properties.pageSize());
-//		for (int i = 0; i < termsArray.length; i++) {
-//			studiesQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
-//		}
+		//		for (int i = 0; i < termsArray.length; i++) {
+		//			studiesQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
+		//		}
 		studiesQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
 		List studies = studiesQuery.getResultList();
 
