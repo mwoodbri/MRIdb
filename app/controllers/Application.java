@@ -105,6 +105,9 @@ public class Application extends SecureController {
 		writer.writeNext(headers);
 		String[] line = null;
 		while ((line = reader.readNext()) != null) {
+			if (StringUtils.isEmpty(line[3]) || StringUtils.isEmpty(line[9])) {
+				continue;
+			}
 			String pat_id = line[3].toLowerCase();
 			Date study_datetime = new SimpleDateFormat("dd/MM/yyyy").parse(line[9]);
 			Study study = Study.find("lower(patient.pat_id) = ? and cast(study_datetime as date) = ?", pat_id, study_datetime).first();
