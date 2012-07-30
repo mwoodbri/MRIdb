@@ -10,7 +10,7 @@
 			if ($("option:last", this).attr('selected')) {
 				var projectName = window.prompt("Project name", "");
 				var existing = $.map(select.children(), function(n, i) { return n.text; });
-				if (!projectName || $.inArray(projectName, existing) !== -1) {
+				if (!$.trim(projectName) || $.inArray(projectName, existing) !== -1) {
 					$(this).closest('form')[0].reset();
 					return;
 				}
