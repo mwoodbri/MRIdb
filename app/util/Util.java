@@ -76,8 +76,8 @@ public class Util {
 		exec(null, Collections.EMPTY_MAP, command);
 	}
 
-	public static long size(File file) throws IOException {
-		return new Scanner(Runtime.getRuntime().exec(new String[]{"du", "-Hbs", file.getPath()}).getInputStream()).nextLong();
-	}
+//	public static long size(File file) throws IOException {
+//		return new Scanner(Runtime.getRuntime().exec(new String[]{"du", "-Hbs", file.getPath()}).getInputStream()).nextLong();
+//	}
 
 }
