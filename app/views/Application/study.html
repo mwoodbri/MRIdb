@@ -23,7 +23,7 @@
 		$("a.download").click(function(e) {
 			var selected = $("a.selected");
 			if (!selected.size()) {
-				selected = $('h3');
+				selected = $('.study');
 			}
 			var href = this.href;
 			selected.each(function() {
@@ -111,7 +111,7 @@
 
 <div class="span9">
 	<h2>${study.patient.pat_id} - ${study.patient.pat_name?.formatAsName()} - ${study.patient.pat_birthdate?.formatAsDate()}</h2>
-	<h3 style="display: inline" data-pk="${study.pk}">${study.study_desc} - ${study.study_datetime?.format()}</h3>
+	<h3 style="display: inline" class="study" data-pk="${study.pk}">${study.study_desc} - ${study.study_datetime?.format()}</h3>
 	&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
 	<p style="margin: 1em 0"><span style="padding-right: 1em">Project: #{if projectAssociation}<span style="color: white; font-weight: bold">${projectAssociation.project.name}</span>#{/if}#{else}None#{/else}</span><span style="padding-right: 1em">Identifier: #{if projectAssociation && projectAssociation.participationID}<span style="color: white; font-weight: bold">${projectAssociation.participationID}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#myModal">Update...</a></p>
 	#{a @download(null, 'dcm'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
