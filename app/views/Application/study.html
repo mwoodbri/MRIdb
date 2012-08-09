@@ -46,16 +46,20 @@
 				});
 			}
 			if ($(this).data("renderable") && $("a.thumbnail.selected").size() === 1) {
-				$('a.single').css("visibility", "visible");
+				$('a.single').addClass('enabled');
 			}
 			return false;
 		});
 		$('a.imagej').on('click', function() {
-			$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej()}?pk=" + $("a.selected").data("pk") + "&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
+			if ($(this).hasClass('enabled')) {
+				$('#imagej').html("<applet archive=@{'/public/applets/ij.jar'} code=ij.ImageJApplet.class width=0 height=0><param name=adjustBrightnessContrast value=true><param name=url1 value=@@{imagej()}?pk=" + $("a.selected").data("pk") + "&.dcm><div class='alert-message error'><p>Your browser does not support Java, please contact computing support</p></div></applet>");
+			}
 			return false;
 		});
 		$('a.weasis').on('click', function() {
-			window.location = this.href + $("a.selected").data("iuid");
+			if ($(this).hasClass('enabled')) {
+				window.location = this.href + $("a.selected").data("iuid");
+			}
 			return false;
 		});
 		$('a.all').on('click', function() {
@@ -70,12 +74,12 @@
 			switch ($("a.thumbnail.selected").size()) {
 				case 0:
 					$('#series').hide();
-					$('a.single').css("visibility", "hidden");
+					$('a.single').removeClass('enabled');
 					break;
 				case 1:
 					break;
 				default:
-					$('a.single').css("visibility", "hidden");
+					$('a.single').removeClass('enabled');
 			}
 			return false;
 		});
@@ -117,8 +121,8 @@
 	#{a @download(null, 'dcm'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
 	#{a @download(null, 'nii'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
 	#{a @download(null, 'img'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
-	<a href="#" class="btn btn-info single imagej" style="visibility: hidden"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
-	<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis" style="visibility: hidden"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
+	<a href="#" class="btn btn-info single imagej"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
+	<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
 	<p style="margin: 1em 0">Ctrl-click or ⌘-click to select multiple exams | <a href="#" class="all update">Select all</a> | <a class="none update" href="#">Select none</a></p>
 	<div class="row-fluid">
 		<ul class="thumbnails">

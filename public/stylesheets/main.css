@@ -54,3 +54,11 @@ input, textarea, select, .uneditable-input {
 input[readonly] {
   background-color: #CCC
 }
+
+a.single {
+  color: black;
+}
+
+a.single.enabled {
+  color: white;
+}
