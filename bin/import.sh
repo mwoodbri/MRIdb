@@ -16,8 +16,7 @@ fi
 
 echo "(Re)starting import at $(date) ($(wc -l < $1/import.txt) remaining)" >>$1/import.log
 
-while :
-do
+while [ -s $1/import.txt ]; do
 	DIR=$(head -n1 $1/import.txt)
 	echo -n "    Importing $DIR " >>$1/import.log
 	if find $DIR -type f -exec file -ib {} + 2>/dev/null | grep dicom >/dev/null
