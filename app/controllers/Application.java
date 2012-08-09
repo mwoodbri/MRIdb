@@ -309,6 +309,7 @@ public class Application extends SecureController {
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		await(new Downloader(pk, format == null ? Format.dcm : format, tmpDir).now());
+		Logger.warn(Arrays.toString(tmpDir.listFiles()[0].list()));
 		if (tmpDir.listFiles()[0].list().length == 0) {
 			error("Failed to convert files");
 		}
