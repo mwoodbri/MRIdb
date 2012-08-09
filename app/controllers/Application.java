@@ -34,6 +34,8 @@ import models.Series;
 import models.Study;
 import notifiers.Mail;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.dcm4che.data.Dataset;
 
@@ -309,8 +311,7 @@ public class Application extends SecureController {
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		await(new Downloader(pk, format == null ? Format.dcm : format, tmpDir).now());
-		Logger.warn(Arrays.toString(tmpDir.listFiles()[0].list()));
-		if (tmpDir.listFiles()[0].list().length == 0) {
+		if (FileUtils.listFiles(tmpDir.listFiles()[0], TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).size() == 0) {
 			error("Failed to convert files");
 		}
 		File zip = new File(tmpDir, String.format("%s.zip", tmpDir.listFiles()[0].getName()));
