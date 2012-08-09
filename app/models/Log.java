@@ -3,6 +3,7 @@ package models;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 
 import play.db.jpa.Model;
@@ -14,6 +15,7 @@ public class Log extends Model {
 
 	public Date timestamp;
 	public String username;
+	@Lob
 	public String message;
 
 	public Log(String message) {
