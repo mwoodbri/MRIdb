@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -76,8 +75,8 @@ public class Util {
 		exec(null, Collections.EMPTY_MAP, command);
 	}
 
-//	public static long size(File file) throws IOException {
-//		return new Scanner(Runtime.getRuntime().exec(new String[]{"du", "-Hbs", file.getPath()}).getInputStream()).nextLong();
-//	}
+	//	public static long size(File file) throws IOException {
+	//		return new Scanner(Runtime.getRuntime().exec(new String[]{"du", "-Hbs", file.getPath()}).getInputStream()).nextLong();
+	//	}
 
 }
