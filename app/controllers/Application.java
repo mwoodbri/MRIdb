@@ -309,6 +309,9 @@ public class Application extends SecureController {
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		await(new Downloader(pk, format == null ? Format.dcm : format, tmpDir).now());
+		if (tmpDir.listFiles()[0].list().length == 0) {
+			error("Failed to convert files");
+		}
 		File zip = new File(tmpDir, String.format("%s.zip", tmpDir.listFiles()[0].getName()));
 		Files.zip(tmpDir.listFiles()[0], zip);
 		renderBinary(zip);
