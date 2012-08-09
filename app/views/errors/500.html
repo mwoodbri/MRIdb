@@ -1,5 +1,11 @@
-#{extends 'main.html' /}
-#{set title:'Application error' /}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Application error</title>
+    #{stylesheet 'bootstrap.min.css'/}
+    #{stylesheet 'main.css'/}
+  </head>
+  <body>
 
 #{if play.mode.name() == 'DEV'}
 	#{500 exception /}
@@ -11,3 +17,6 @@
 		<p>This exception has been logged with id <strong>${exception.id}</strong>.</p>
 	#{/if}
 #{/else}
+
+  </body>
+</html>
