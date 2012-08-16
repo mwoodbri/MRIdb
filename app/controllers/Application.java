@@ -111,7 +111,7 @@ public class Application extends SecureController {
 				continue;
 			}
 			String pat_id = line[3].trim().toLowerCase();
-			Date study_datetime = new SimpleDateFormat("dd/MM/yyyy").parse(line[9].trim());
+			Date study_datetime = new SimpleDateFormat("dd/MM/yyyy").parse(line[9]);
 			Study study = Study.find("lower(patient.pat_id) = ? and cast(study_datetime as date) = ?", pat_id, study_datetime).first();
 			if (study != null) {
 				line[10] = "Yes";
