@@ -307,7 +307,17 @@ public class Application extends SecureController {
 	}
 
 	public static void download(long[] pk, Format format) throws InterruptedException, IOException {
-		PersistentLogger.log("downloaded series %s", Arrays.toString(pk));
+		{
+			Study study = Study.findById(pk[0]);
+			String type = null;
+			if (study != null) {
+				type = "study";
+			} else {
+				type = "series";
+				study = Series.<Series>findById(pk[0]).study;
+			}
+			PersistentLogger.log("downloaded %s %s %s", type, Arrays.toString(pk), study.patient.pat_id);
+		}
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
 		await(new Downloader(pk, format == null ? Format.dcm : format, tmpDir).now());
