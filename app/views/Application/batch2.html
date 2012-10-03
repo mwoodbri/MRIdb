@@ -1,0 +1,54 @@
+#{extends 'main.html' /}
+#{set title:'Batch export' /}
+#{set 'moreScripts'}
+<script>
+$(function() {
+	$('#choose').click(function() {
+		document.applets[0].browse();
+		return false;
+	});
+	$('#download').click(function() {
+		$('#download').hide();
+		$('#spinner').css('visibility', 'visible');
+		document.applets[0].download();
+		return false;
+	});
+});
+function init() {
+	$('#spinner').css('visibility', 'hidden');
+	$('#message').hide();
+	$('#applet').css('visibility', 'hidden');
+}	
+function selected(path) {
+	if (path !== 'null') {
+		$('#folder').text(path);
+		$('#choose').hide();
+		$('#download').show();
+	}
+}
+function log(message) {
+	$('#message').text(message);
+}
+function complete(err) {
+	if (err) {
+		alert('Error during data upload: ' + err);
+	} else {
+		$('#message').text('Successfully downloaded ${studies.size()} #{if studies.size() == 1}study#{/if}#{else}studies#{/else}');
+		$('#spinner').html('<i class="icon-ok icon-large"></i>');
+	}
+}
+</script>
+#{/set}
+
+<h3>Batch export</h3>
+<p style="margin-top: 1em">${studies.size()} #{if studies.size() == 1}study#{/if}#{else}studies#{/else} selected</p>
+<p>Download destination: <span id="folder"><button id="choose">Browse...</button></span></p>
+<p id="download" style="display: none"><button>Download</button></p>
+<p><span id="spinner" style='margin-right: 0.5em'><img src="@{'/public/images/spinner-small.gif'}"></span> <b id="message">Loading Java</b></p>
+<applet id="applet" archive="@{'/public/applets/download.jar'}" code="DownloadApplet.class" codebase="@{'/public/applets'}" width="1" height="1" MAYSCRIPT>
+	<param name="url" value="@@{Application.download()}?pk={0}">
+	<param name="pks" value="${studies.collect{it.pk}.join(",")}">
+	<param name="patients" value="${studies.collect{it.patient.pat_id}.join(",")}">
+	<param name="files" value="${studies.collect{it.toDownloadString()}.join(",")}">
+	You must have Java to perform a batch download. Please visit java.com to install it.
+</applet>

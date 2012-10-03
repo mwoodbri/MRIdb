@@ -5,7 +5,7 @@ require:
     - play -> secure
     - play -> crud
     - dcm4che14 -> dcm4che 1.4.31
-    - net.sf.opencsv -> opencsv 2.0
+    - net.sf.opencsv -> opencsv 2.3
 repositories:
     - local:
         type: local

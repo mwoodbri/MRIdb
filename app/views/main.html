@@ -25,6 +25,7 @@
                 <li>#{a @crud.Projects.list()}Projects#{/a}</li>
                 <li>#{a @crud.Logs.list(order: 'DESC')}Usage#{/a}</li>
                 <li>#{a @audit()}Audit#{/a}</li>
+                <li>#{a @batch()}Batch export#{/a}</li>
               </ul>
             </li>
             #{/secure.check}

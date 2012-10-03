@@ -1,0 +1,26 @@
+#{extends 'main.html' /}
+#{set title:'Batch export' /}
+#{set 'moreScripts'}
+<script type="text/javascript">
+$("input:file").change(function (){
+	if ($(this).val()) {
+		$("input:submit").show();
+	}
+});
+</script>
+#{/set}
+
+<h3>Batch export</h3>
+<p style="margin-top: 0.5em">Upload a list of study identifiers (<a href="@{'/public/files/batch.csv'}">example</a>).</p>
+#{form @batch(), enctype:'multipart/form-data', style:'margin-top: 0.5em'}
+	<input type="file" name="spreadsheet"><br><br>
+	<input type="submit" value="Upload" style="display: none">
+#{/form}
+#{ifErrors}
+<dl style="color: red">
+	<dt>Validation failed:</dt>
+	#{errors}
+	<dd>${error}
+	#{/errors}
+</dl>
+#{/ifErrors}

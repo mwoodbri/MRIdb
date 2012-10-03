@@ -43,6 +43,7 @@ import play.Invoker;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
+import play.data.validation.Validation;
 import play.db.jpa.JPA;
 import play.libs.Files;
 import play.libs.IO;
@@ -53,6 +54,7 @@ import util.Dicom;
 import util.Medcon;
 import util.PersistentLogger;
 import util.Properties;
+import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import controllers.Secure.Security;
@@ -71,9 +73,6 @@ public class Application extends SecureController {
 	}
 
 	public static void index(Integer page, String order, String sort) {
-		//		if (!Security.connected().equals("mwoodbri")) {
-		//			advanced();
-		//		}
 		if (page == null) {
 			index(0, order, sort);
 		}
@@ -92,6 +91,49 @@ public class Application extends SecureController {
 
 	public static void advanced() {
 		render();
+	}
+
+	@Check("admin")
+	public static void batch(File spreadsheet) throws IOException {
+		if (spreadsheet == null) {
+			if ("POST".equals(request.method)) {
+				Validation.addError("spreadsheet", "Please select a file");
+			}
+			render();
+		}
+
+		List<Long> pks = new ArrayList<Long>();
+
+		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
+		for (String[] line : reader.readAll()) {
+			String pat_id = line[0];
+			Study study = Study.find("patient.pat_id", pat_id).first();
+			if (study == null) {
+				Validation.addError(pat_id, "Study '%s' not found");
+			} else {
+				pks.add(study.pk);
+			}
+		}
+		reader.close();
+
+		if (Validation.hasErrors()) {
+			render();
+		}
+
+		batch2(pks);
+	}
+
+	@Check("admin")
+	public static void batch2(List<Long> pks) {
+		List<Study> studies = new ArrayList<Study>();
+		for (Long pk : pks) {
+			studies.add(Study.<Study>findById(pk));
+		}
+		render(studies);
+	}
+
+	public static void blah() {
+		renderText("hello!");
 	}
 
 	@Check("admin")
@@ -143,7 +185,6 @@ public class Application extends SecureController {
 		writer.close();
 	}
 
-	//http://localhost:9000/application/simple?query=bloggs&page=0&sort=&order=
 	public static void simpleSearch(String terms, int page, String order, String sort) {
 		if (terms.trim().isEmpty()) {
 			index(0, null, null);
