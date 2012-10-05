@@ -107,11 +107,13 @@ public class Application extends SecureController {
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
 			String pat_id = line[0];
-			Study study = Study.find("patient.pat_id", pat_id).first();
-			if (study == null) {
+			List<Study> studies = Study.find("patient.pat_id", pat_id).fetch();
+			if (studies.size() == 0) {
 				Validation.addError(pat_id, "Study '%s' not found");
 			} else {
-				pks.add(study.pk);
+				for (Study study : studies) {
+					pks.add(study.pk);
+				}
 			}
 		}
 		reader.close();
