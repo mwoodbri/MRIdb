@@ -40,18 +40,20 @@
 					<input id="id" name="id" type="text">
 				</div>
 			</div>
+			#{ifNotVisitor}
 			<div class="control-group">
 				<label class="control-label" for="name">Name</label>
 				<div class="controls">
-					<input id="name" name="name" type="text" #{ifVisitor}disabled#{/ifVisitor}>
+					<input id="name" name="name" type="text">
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="age">Age at scan</label>
 				<div class="controls">
-					<input id="age" name="age" type="text" #{ifVisitor}disabled#{/ifVisitor}>
+					<input id="age" name="age" type="text">
 				</div>
 			</div>
+			#{/ifNotVisitor}
 			<div class="control-group">
 				<label class="control-label" for="age">Sex</label>
 				<div class="controls">
