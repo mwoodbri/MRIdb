@@ -3,7 +3,9 @@
 	<li class="nav-header">Subject details
 	<li>Sex: ${series.study.patient.pat_sex}
 	<li>Weight: ${series.study.patient.pat_attrs.get('PatientWeight')} kg
+	#{ifNotVisitor}
 	<li>Age: ${series.study.patient.pat_birthdate?.formatAsRelativeAge(series.study.study_datetime)}
+	#{/ifNotVisitor}
 	
 	<li class="nav-header">Study details
 	<li>Time of scan: ${series.study.study_datetime?.time()}</td>

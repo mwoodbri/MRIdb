@@ -86,7 +86,7 @@
 		$('#submit').on('click', function() {
 			var participationID = input.val();
 			if (participationID && !participationID.match(/(3T)|(1.5T)|(NNU)/)) {
-				var disallowed = ["${study.patient.pat_id.toLowerCase()}"].concat("${study.patient.pat_name?.formatAsName()}".split(/[\s,']/));
+				var disallowed = ["${study.patient.pat_id.toLowerCase()}"]#{ifNotVisitor}.concat("${study.patient.pat_name?.formatAsName()}".split(/[\s,']/))#{/ifNotVisitor};
 				for (var i in disallowed) {
 					if (disallowed[i] && disallowed[i].length > 1 && participationID.toLowerCase().indexOf(disallowed[i].toLowerCase()) !== -1) {
 						window.alert("Project identifiers cannot contain a patient's ID or name");
@@ -114,7 +114,7 @@
 #{/set}
 
 <div class="span9">
-	<h2>${study.patient.pat_id} - ${study.patient.pat_name?.formatAsName()} - ${study.patient.pat_birthdate?.formatAsDate()}</h2>
+	<h2>${study.patient.pat_id}#{ifNotVisitor} - ${study.patient.pat_name?.formatAsName()} - ${study.patient.pat_birthdate?.formatAsDate()}#{/ifNotVisitor}</h2>
 	<h3 style="display: inline" class="study" data-pk="${study.pk}">${study.study_desc} - ${study.study_datetime?.format()}</h3>
 	&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
 	<p style="margin: 1em 0"><span style="padding-right: 1em">Project: #{if projectAssociation}<span style="color: white; font-weight: bold">${projectAssociation.project.name}</span>#{/if}#{else}None#{/else}</span><span style="padding-right: 1em">Identifier: #{if projectAssociation && projectAssociation.participationID}<span style="color: white; font-weight: bold">${projectAssociation.participationID}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#myModal">Update...</a></p>
@@ -122,7 +122,7 @@
 	#{a @download(null, 'nii'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
 	#{a @download(null, 'img'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
 	<a href="#" class="btn btn-info single imagej"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
-	<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>
+	#{ifNotVisitor}<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>#{/ifNotVisitor}
 	<p style="margin: 1em 0">Ctrl-click or ⌘-click to select multiple exams | <a href="#" class="all update">Select all</a> | <a class="none update" href="#">Select none</a></p>
 	<div class="row-fluid">
 		<ul class="thumbnails">

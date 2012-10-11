@@ -38,7 +38,7 @@
 	<table id="studies" class="table table-striped table-bordered">
 		<thead>
 			<tr>
-				#{list items:['patient.pat_name':'Name', 'patient.pat_id':'Subject ID', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study']}
+				#{list items:['patient.pat_id':'Subject ID', 'patient.pat_name':'Name', 'patient.pat_birthdate':'Date of Birth', 'study_desc':'Study Description', 'study_datetime':'Date of Study']}
 				<th id="${_.key}" class="header#{if _.key == params.order} headerSort${params.sort == 'desc' ? 'Up' : 'Down'}#{/if}">${_.value}
 				#{/list}
 				<th>Scanner
@@ -50,9 +50,9 @@
 			#{list studies}
 			#{set projectAssociation: _.getProjectAssociation()/}
 			<tr>
-				<td>#{a @study(_.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/a}
-				<td>${_.patient.pat_id}
-				<td>${_.patient.pat_birthdate?.formatAsDate()}
+				<td>#{a @study(_.pk)}${_.patient.pat_id}#{/a}
+				<td>#{ifNotVisitor}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/ifNotVisitor}
+				<td>#{ifNotVisitor}${_.patient.pat_birthdate?.formatAsDate()}#{/ifNotVisitor}
 				<td>${_.study_desc}
 				<td>${_.study_datetime?.format()}
 				<td>${_.station_name}

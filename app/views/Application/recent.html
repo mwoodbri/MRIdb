@@ -6,8 +6,8 @@
 <table id="studies" class="table table-bordered table-striped">
 	<thead>
 		<tr>
-			<th>Name
 			<th>Subject ID
+			<th>Name
 			<th>Study Description
 			<th>Date of Study
 			<th>Scanner
@@ -17,8 +17,8 @@
 	<tbody>
 		#{list models.Study.find("order by created_time desc").fetch(util.Properties.pageSize())}
 		<tr>
-			<td>#{a @study(_.pk)}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/a}
-			<td>${_.patient.pat_id}
+			<td>#{a @study(_.pk)}${_.patient.pat_id}#{/a}
+			<td>#{ifNotVisitor}${_.patient.pat_name ? _.patient.pat_name.formatAsName() : 'UNKNOWN'}#{/ifNotVisitor}
 			<td>${_.study_desc}
 			<td>${_.study_datetime?.format()}
 			<td>${_.station_name}

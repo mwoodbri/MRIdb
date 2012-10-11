@@ -32,6 +32,7 @@ import models.Project;
 import models.ProjectAssociation;
 import models.Series;
 import models.Study;
+import models.Person.Role;
 import notifiers.Mail;
 
 import org.apache.commons.io.FileUtils;
@@ -134,10 +135,6 @@ public class Application extends SecureController {
 		render(studies);
 	}
 
-	public static void blah() {
-		renderText("hello!");
-	}
-
 	@Check("admin")
 	public static void audit(File spreadsheet) throws IOException, ParseException {
 		if (spreadsheet == null) {
@@ -203,7 +200,7 @@ public class Application extends SecureController {
 		//	query += " and studyfulltext.fulltext like ?";
 		//}
 		//full text
-		String query = "from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || ' ' || pat_name || ' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '')) @@ plainto_tsquery('english_nostop', ?)";
+		String query = String.format("from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || %s' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '')) @@ plainto_tsquery('english_nostop', ?)", getUser().role == Role.Visitor ? "" : "' ' || pat_name || ");
 
 		Query studyCountQuery = JPA.em().createNativeQuery("select count(*) " + query);
 		//		for (int i = 0; i < termsArray.length; i++) {
@@ -230,26 +227,28 @@ public class Application extends SecureController {
 		put("after", ">");
 		put("since", ">");
 	}};
-	public static void advancedSearch(String name, String id, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort, Long project, String participationID) throws Exception {
+	public static void advancedSearch(String id, String name, Integer age, Character sex, String protocol, String acquisition, String study, int page, String order, String sort, Long project, String participationID) throws Exception {
 		List<String> from = new ArrayList<String>();
 		from.add("Study study");
 
 		List<String> where = new ArrayList<String>();
 		List<Object> args = new ArrayList<Object>();
 
-		if (!name.isEmpty()) {
-			where.add("lower(study.patient.pat_name) like ?");
-			args.add("%" + name.toLowerCase() + "%");
-		}
 		if (!id.isEmpty()) {
 			where.add("(lower(study.patient.pat_id) like ? or lower(study.study_custom1) like ?)");
 			args.add("%" + id.toLowerCase() + "%");
 			args.add("%" + id.toLowerCase() + "%");
 		}
-		if (age != null) {
-			where.add("cast(study.study_datetime as date) - cast(study.patient.pat_birthdate as date) >= ? and cast(study.study_datetime as date) - cast(study.patient.pat_birthdate as date) < ?");
-			args.add(365D * age);
-			args.add(365D * (age + 1));
+		if (getUser().role != Role.Visitor) {
+			if (!name.isEmpty()) {
+				where.add("lower(study.patient.pat_name) like ?");
+				args.add("%" + name.toLowerCase() + "%");
+			}
+			if (age != null) {
+				where.add("cast(study.study_datetime as date) - cast(study.patient.pat_birthdate as date) >= ? and cast(study.study_datetime as date) - cast(study.patient.pat_birthdate as date) < ?");
+				args.add(365D * age);
+				args.add(365D * (age + 1));
+			}
 		}
 		if (sex != null) {
 			where.add("study.patient.pat_sex = ?");
