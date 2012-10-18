@@ -2,7 +2,9 @@ package models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PostUpdate;
 
+import play.cache.Cache;
 import play.db.jpa.GenericModel;
 
 @Entity
@@ -15,6 +17,11 @@ public class Person extends GenericModel {
 
 	public Person(String username) {
 		this.username = username;
+	}
+
+	@PostUpdate
+	public void postUpdate() {
+		Cache.delete(username);
 	}
 
 	@Override
