@@ -403,7 +403,7 @@ public class Application extends SecureController {
 		render();
 	}
 
-	public static void imagej(long pk) throws InterruptedException, IOException {
+	public static void imagej(long pk) throws Exception {
 		Series series = Series.findById(pk);
 
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
@@ -415,8 +415,11 @@ public class Application extends SecureController {
 			await(new Downloader(new long[] { pk }, Format.dcm, tmpDir).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
+			File unanonymised = new File(tmpDir, String.format("%s.unanonymised.dcm", series.pk));
+			//medcon has a -anon flag but it doesn't work with -stack3d, so we anonymise manually in line with other exports 
+			Medcon.convert(Dicom.collate(series), Format.dcm, unanonymised);
 			dcm = new File(tmpDir, String.format("%s.dcm", series.pk));
-			Medcon.convert(Dicom.collate(series), Format.dcm, dcm);
+			Dicom.anonymise(unanonymised, dcm, null);
 		}
 		renderBinary(dcm);
 	}
