@@ -1,7 +1,7 @@
 /*!
  * jQuery Form Plugin
- * version: 3.09 (16-APR-2012)
- * @requires jQuery v1.3.2 or later
+ * version: 3.18 (28-SEP-2012)
+ * @requires jQuery v1.5 or later
  *
  * Examples and documentation at: http://malsup.com/jquery/form/
  * Project repository: https://github.com/malsup/form
@@ -165,7 +165,7 @@ $.fn.ajaxSubmit = function(options) {
     }
 
     options.success = function(data, status, xhr) { // jQuery 1.4+ passes xhr as 3rd arg
-        var context = options.context || options;    // jQuery 1.4+ supports scope context 
+        var context = options.context || this ;    // jQuery 1.4+ supports scope context 
         for (var i=0, max=callbacks.length; i < max; i++) {
             callbacks[i].apply(context, [data, status, xhr || $form, $form]);
         }
@@ -181,6 +181,8 @@ $.fn.ajaxSubmit = function(options) {
     log("fileAPI :" + fileAPI);
     var shouldUseFrame = (hasFileInputs || multipart) && !fileAPI;
 
+    var jqxhr;
+
     // options.iframe allows user to force iframe mode
     // 06-NOV-09: now defaulting to iframe mode if file input is detected
     if (options.iframe !== false && (options.iframe || shouldUseFrame)) {
@@ -188,19 +190,21 @@ $.fn.ajaxSubmit = function(options) {
         // see:  http://groups.google.com/group/jquery-dev/browse_thread/thread/36395b7ab510dd5d
         if (options.closeKeepAlive) {
             $.get(options.closeKeepAlive, function() {
-                fileUploadIframe(a);
+                jqxhr = fileUploadIframe(a);
             });
         }
-          else {
-            fileUploadIframe(a);
-          }
+        else {
+            jqxhr = fileUploadIframe(a);
+        }
     }
     else if ((hasFileInputs || multipart) && fileAPI) {
-        fileUploadXhr(a);
+        jqxhr = fileUploadXhr(a);
     }
     else {
-        $.ajax(options);
+        jqxhr = $.ajax(options);
     }
+
+    $form.removeData('jqxhr').data('jqxhr', jqxhr);
 
     // clear element array
     for (var k=0; k < elements.length; k++)
@@ -209,6 +213,19 @@ $.fn.ajaxSubmit = function(options) {
     // fire 'notify' event
     this.trigger('form-submit-notify', [this, options]);
     return this;
+
+    // utility fn for deep serialization
+    function deepSerialize(extraData){
+        var serialized = $.param(extraData).split('&');
+        var len = serialized.length;
+        var result = {};
+        var i, part;
+        for (i=0; i < len; i++) {
+            part = serialized[i].split('=');
+            result[decodeURIComponent(part[0])] = decodeURIComponent(part[1]);
+        }
+        return result;
+    }
 
      // XMLHttpRequest Level 2 file uploads (big hat tip to francois2metz)
     function fileUploadXhr(a) {
@@ -219,9 +236,10 @@ $.fn.ajaxSubmit = function(options) {
         }
 
         if (options.extraData) {
-            for (var p in options.extraData)
-                if (options.extraData.hasOwnProperty(p))
-                    formdata.append(p, options.extraData[p]);
+            var serializedData = deepSerialize(options.extraData);
+            for (var p in serializedData)
+                if (serializedData.hasOwnProperty(p))
+                    formdata.append(p, serializedData[p]);
         }
 
         options.data = null;
@@ -230,7 +248,7 @@ $.fn.ajaxSubmit = function(options) {
             contentType: false,
             processData: false,
             cache: false,
-            type: 'POST'
+            type: method || 'POST'
         });
         
         if (options.uploadProgress) {
@@ -253,25 +271,27 @@ $.fn.ajaxSubmit = function(options) {
         }
 
         s.data = null;
-          var beforeSend = s.beforeSend;
-          s.beforeSend = function(xhr, o) {
-              o.data = formdata;
-            if(beforeSend)
-                beforeSend.call(o, xhr, options);
+            var beforeSend = s.beforeSend;
+            s.beforeSend = function(xhr, o) {
+                o.data = formdata;
+                if(beforeSend)
+                    beforeSend.call(this, xhr, o);
         };
-        $.ajax(s);
+        return $.ajax(s);
     }
 
     // private function for handling file uploads (hat tip to YAHOO!)
     function fileUploadIframe(a) {
         var form = $form[0], el, i, s, g, id, $io, io, xhr, sub, n, timedOut, timeoutHandle;
         var useProp = !!$.fn.prop;
+        var deferred = $.Deferred();
 
         if ($(':input[name=submit],:input[id=submit]', form).length) {
             // if there is an input with a name or id of 'submit' then we won't be
             // able to invoke the submit fn on the form (at least not x-browser)
             alert('Error: Form elements must not have name or id of "submit".');
-            return;
+            deferred.reject();
+            return deferred;
         }
         
         if (a) {
@@ -316,6 +336,12 @@ $.fn.ajaxSubmit = function(options) {
                 var e = (status === 'timeout' ? 'timeout' : 'aborted');
                 log('aborting upload... ' + e);
                 this.aborted = 1;
+                // #214
+                if (io.contentWindow.document.execCommand) {
+                    try { // #214
+                        io.contentWindow.document.execCommand('Stop');
+                    } catch(ignore) {}
+                }
                 $io.attr('src', s.iframeSrc); // abort op in progress
                 xhr.error = e;
                 if (s.error)
@@ -340,10 +366,12 @@ $.fn.ajaxSubmit = function(options) {
             if (s.global) {
                 $.active--;
             }
-            return;
+            deferred.reject();
+            return deferred;
         }
         if (xhr.aborted) {
-            return;
+            deferred.reject();
+            return deferred;
         }
 
         // add submitting element to data if we know it
@@ -426,9 +454,16 @@ $.fn.ajaxSubmit = function(options) {
                 if (s.extraData) {
                     for (var n in s.extraData) {
                         if (s.extraData.hasOwnProperty(n)) {
-                            extraInputs.push(
-                                $('<input type="hidden" name="'+n+'">').attr('value',s.extraData[n])
-                                    .appendTo(form)[0]);
+                           // if using the $.param format that allows for multiple values with the same name
+                           if($.isPlainObject(s.extraData[n]) && s.extraData[n].hasOwnProperty('name') && s.extraData[n].hasOwnProperty('value')) {
+                               extraInputs.push(
+                               $('<input type="hidden" name="'+s.extraData[n].name+'">').attr('value',s.extraData[n].value)
+                                   .appendTo(form)[0]);
+                           } else {
+                               extraInputs.push(
+                               $('<input type="hidden" name="'+n+'">').attr('value',s.extraData[n])
+                                   .appendTo(form)[0]);
+                           }
                         }
                     }
                 }
@@ -478,10 +513,12 @@ $.fn.ajaxSubmit = function(options) {
             }
             if (e === CLIENT_TIMEOUT_ABORT && xhr) {
                 xhr.abort('timeout');
+                deferred.reject(xhr, 'timeout');
                 return;
             }
             else if (e == SERVER_ABORT && xhr) {
                 xhr.abort('server abort');
+                deferred.reject(xhr, 'error', 'server abort');
                 return;
             }
 
@@ -586,6 +623,7 @@ $.fn.ajaxSubmit = function(options) {
             if (status === 'success') {
                 if (s.success)
                     s.success.call(s.context, data, 'success', xhr);
+                deferred.resolve(xhr.responseText, 'success', xhr);
                 if (g)
                     $.event.trigger("ajaxSuccess", [xhr, s]);
             }
@@ -594,6 +632,7 @@ $.fn.ajaxSubmit = function(options) {
                     errMsg = xhr.statusText;
                 if (s.error)
                     s.error.call(s.context, xhr, status, errMsg);
+                deferred.reject(xhr, 'error', errMsg);
                 if (g)
                     $.event.trigger("ajaxError", [xhr, s, errMsg]);
             }
@@ -658,6 +697,8 @@ $.fn.ajaxSubmit = function(options) {
             }
             return data;
         };
+
+        return deferred;
     }
 };
 
@@ -997,7 +1038,7 @@ $.fn.clearFields = $.fn.clearInputs = function(includeHidden) {
             this.selectedIndex = -1;
         }
         else if (includeHidden) {
-            // includeHidden can be the valud true, or it can be a selector string
+            // includeHidden can be the value true, or it can be a selector string
             // indicating a special test; for example:
             //  $('#myForm').clearForm('.special:hidden')
             // the above would clean hidden inputs that have the class of 'special'

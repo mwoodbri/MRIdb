@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>#{get 'title'}${play.configuration.getProperty("application.name")}#{/get}</title>
-    #{stylesheet 'vader/jquery-ui-1.8.21.custom.css'/}
+    #{stylesheet 'vader/jquery-ui-1.9.0.custom.min.css'/}
     #{stylesheet 'bootstrap.min.css'/}
     #{stylesheet 'main.css'/}
     #{get 'moreStyles'/}
@@ -17,15 +17,15 @@
             *{<li#{if request.action == "Application.index"} class="active"#{/if}>#{a @index()}Search#{/a}}*
             <li#{if request.action == "Application.recent"} class="active"#{/if}>#{a @recent()}Recent#{/a}
             <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @help()}Help#{/a}
+            <li#{if request.action == "Application.help"} class="active"#{/if}>#{a @batch()}Export#{/a}
             #{secure.check 'admin'}
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li>#{a @crud.Persons.list()}Users#{/a}</li>
-                <li>#{a @crud.Projects.list()}Projects#{/a}</li>
-                <li>#{a @crud.Logs.list(order: 'DESC')}Usage#{/a}</li>
-                <li>#{a @audit()}Audit#{/a}</li>
-                <li>#{a @batch()}Batch export#{/a}</li>
+                <li>#{a @crud.Persons.list()}Users#{/a}
+                <li>#{a @crud.Projects.list()}Projects#{/a}
+                <li>#{a @crud.Logs.list(order: 'DESC')}Usage#{/a}
+                <li>#{a @audit()}Audit#{/a}
               </ul>
             </li>
             #{/secure.check}
@@ -42,7 +42,7 @@
     </div>
 
     #{script 'jquery.min.js'/}
-    #{script 'jquery-ui-1.8.21.custom.min.js'/}
+    #{script 'jquery-ui-1.9.0.custom.min.js'/}
     #{script 'bootstrap.min.js'/}
     #{script 'jquery.form.js'/}
     #{script 'URI.min.js'/}

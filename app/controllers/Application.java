@@ -27,12 +27,13 @@ import jobs.ClipboardExporter;
 import jobs.Downloader;
 import jobs.Downloader.Format;
 import models.Instance;
+import models.Patient;
 import models.Person;
+import models.Person.Role;
 import models.Project;
 import models.ProjectAssociation;
 import models.Series;
 import models.Study;
-import models.Person.Role;
 import notifiers.Mail;
 
 import org.apache.commons.io.FileUtils;
@@ -94,7 +95,6 @@ public class Application extends SecureController {
 		render();
 	}
 
-	@Check("admin")
 	public static void batch(File spreadsheet) throws IOException {
 		if (spreadsheet == null) {
 			if ("POST".equals(request.method)) {
@@ -107,12 +107,35 @@ public class Application extends SecureController {
 
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
-			String pat_id = line[0];
-			List<Study> studies = Study.find("patient.pat_id", pat_id).fetch();
-			if (studies.size() == 0) {
-				Validation.addError(pat_id, "Study '%s' not found");
+			Patient patient = null;
+			String pat_id = line[0].trim();
+			if (!pat_id.isEmpty()) {
+				patient = Patient.find("pat_id", pat_id).first();
+				if (patient == null) {
+					Validation.addError(pat_id, "Patient '%s' not found");
+					continue;
+				}
 			} else {
-				for (Study study : studies) {
+				String participationID = line[1].trim();
+				if (!participationID.isEmpty()) {
+					ProjectAssociation projectAssociation = ProjectAssociation.find("byParticipationID", participationID).<ProjectAssociation>first();
+					if (projectAssociation == null) {
+						Validation.addError(participationID, "Patient '%s' not found");
+						continue;
+					}
+					patient = projectAssociation.study.patient;
+				}
+			}
+			if (patient == null) {
+				Validation.addError(pat_id, "No patient specified");
+				continue;
+			}
+			List<String> filter = new ArrayList<String>();
+			for (int i = 2; line.length > i && !line[i].trim().isEmpty(); i++) {
+				filter.add(line[i].trim());
+			}
+			for (Study study : patient.studies) {
+				if (filter.isEmpty() || filter.contains(study.study_desc)) {
 					pks.add(study.pk);
 				}
 			}
@@ -126,7 +149,6 @@ public class Application extends SecureController {
 		batch2(pks);
 	}
 
-	@Check("admin")
 	public static void batch2(List<Long> pks) {
 		List<Study> studies = new ArrayList<Study>();
 		for (Long pk : pks) {
@@ -416,7 +438,7 @@ public class Application extends SecureController {
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
 			File unanonymised = new File(tmpDir, String.format("%s.unanonymised.dcm", series.pk));
-			//medcon has a -anon flag but it doesn't work with -stack3d, so we anonymise manually in line with other exports 
+			//medcon has a -anon flag but it doesn't work with -stack3d, so we anonymise manually in line with other exports
 			Medcon.convert(Dicom.collate(series), Format.dcm, unanonymised);
 			dcm = new File(tmpDir, String.format("%s.dcm", series.pk));
 			Dicom.anonymise(unanonymised, dcm, null);

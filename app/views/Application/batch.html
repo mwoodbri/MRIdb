@@ -4,7 +4,7 @@
 <script type="text/javascript">
 $("input:file").change(function (){
 	if ($(this).val()) {
-		$("input:submit").show();
+		$("button").show();
 	}
 });
 </script>
@@ -14,7 +14,7 @@ $("input:file").change(function (){
 <p style="margin-top: 0.5em">Upload a list of study identifiers (<a href="@{'/public/files/batch.csv'}">example</a>).</p>
 #{form @batch(), enctype:'multipart/form-data', style:'margin-top: 0.5em'}
 	<input type="file" name="spreadsheet"><br><br>
-	<input type="submit" value="Upload" style="display: none">
+	<button type="submit" class="btn btn-small" style="display: none">Upload</button>
 #{/form}
 #{ifErrors}
 <dl style="color: red">
