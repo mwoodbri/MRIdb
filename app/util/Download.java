@@ -28,10 +28,10 @@ public class Download {
 			Collection singleFrames = Dicom.singleFrames(series);
 			if (singleFrames.size() > 0) {
 				//Medcon.convert(Dicom.collate(series), format, dir);
-				Util.exec(Properties.getString("dcm2nii"), "-g", "n", "-p", "n", "-d", "n", "-o", dir.getPath(), Dicom.collate(series).getPath());
+				Util.exec("timeout", Properties.getString("exec.timeout"), Properties.getString("dcm2nii"), "-g", "n", "-p", "n", "-d", "n", "-o", dir.getPath(), Dicom.collate(series).getPath());
 			} else {
 				File dcm = Dicom.file(Dicom.multiFrame(series));
-				Util.exec("python", Properties.getString("dicom_2_nifti"), dcm.getPath(), new File(dir, String.format("%s.nii.gz", series.toDownloadString())).getPath());
+				Util.exec("timeout", Properties.getString("exec.timeout"), "python", Properties.getString("dicom_2_nifti"), dcm.getPath(), new File(dir, String.format("%s.nii.gz", series.toDownloadString())).getPath());
 			}
 		} else if (format == Format.img) {
 			Medcon.convert(Dicom.collate(series), format, dir);
