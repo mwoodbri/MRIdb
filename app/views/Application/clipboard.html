@@ -12,7 +12,7 @@
     </span>
   </li>
   #{/list}
-  <li style="padding-top: 0.5em"><span>#{a @export(), class: 'export'}Export files#{/a}&nbsp;|&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}Remove all#{/a}</span>
+  <li style="padding-top: 0.5em"><span>#{a @export(), class: 'export', 'data-size': clipboard.items.size()}Export files#{/a}&nbsp;|&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.CLEAR), class: 'clipboard'}Remove all#{/a}</span>
   #{/if}
   #{else}
   <li>Use&nbsp;&nbsp;<i class="icon-download-alt icon-large"></i>&nbsp;&nbsp;to add to clipboard
