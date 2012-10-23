@@ -2,6 +2,7 @@ package models;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.PostUpdate;
 
 import play.cache.Cache;
@@ -13,6 +14,7 @@ public class Person extends GenericModel {
 	@Id
 	public String username;
 	public Role role = Role.Visitor;
+	@Lob
 	public String clipboard;
 
 	public Person(String username) {
