@@ -13,7 +13,8 @@ public class Download {
 
 	public static void study(Study study, File tmpDir, Format format) throws Exception {
 		for (Series series : study.series) {
-			if ("MR".equals(series.modality)) {
+			//if ("MR".equals(series.modality)) {
+			if (Dicom.downloadable(series)) {
 				series(series, tmpDir, format);
 			}
 		}
