@@ -27,7 +27,6 @@ import jobs.ClipboardExporter;
 import jobs.Downloader;
 import jobs.Downloader.Format;
 import models.Instance;
-import models.Patient;
 import models.Person;
 import models.Person.Role;
 import models.Project;
@@ -107,40 +106,35 @@ public class Application extends SecureController {
 
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
-			Patient patient = null;
+			List<String> study_descs = new ArrayList<String>();
+			for (int i = 2; line.length > i && !line[i].trim().isEmpty(); i++) {
+				study_descs.add(line[i].trim());
+			}
+			List<Study> studies;
 			String pat_id = line[0].trim();
 			if (!pat_id.isEmpty()) {
-				patient = Patient.find("pat_id", pat_id).first();
-				if (patient == null) {
-					Validation.addError(pat_id, "Patient '%s' not found");
-					continue;
+				if (study_descs.isEmpty()) {
+					studies = Study.find("patient.pat_id", pat_id).fetch();
+				} else {
+					studies = Study.find("patient.pat_id = ?1 and study_desc in ?2", pat_id, study_descs).fetch();
 				}
 			} else {
 				String participationID = line[1].trim();
-				if (!participationID.isEmpty()) {
-					ProjectAssociation projectAssociation = ProjectAssociation.find("byParticipationID", participationID).<ProjectAssociation>first();
-					if (projectAssociation == null) {
-						Validation.addError(participationID, "Patient '%s' not found");
-						continue;
-					}
-					patient = projectAssociation.study.patient;
+				if (study_descs.isEmpty()) {
+					studies = Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).fetch();
+				} else {
+					studies = Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and study_desc in ?2", participationID, study_descs).fetch();
 				}
 			}
-			if (patient == null) {
-				Validation.addError(pat_id, "No patient specified");
-				continue;
-			}
-			List<String> filter = new ArrayList<String>();
-			for (int i = 2; line.length > i && !line[i].trim().isEmpty(); i++) {
-				filter.add(line[i].trim());
-			}
-			for (Study study : patient.studies) {
-				if (filter.isEmpty() || filter.contains(study.study_desc)) {
-					pks.add(study.pk);
-				}
+			for (Study study : studies) {
+				pks.add(study.pk);
 			}
 		}
 		reader.close();
+
+		if (pks.size() == 0) {
+			Validation.addError(null, "No studies found");
+		}
 
 		if (Validation.hasErrors()) {
 			render();
