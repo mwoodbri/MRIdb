@@ -61,7 +61,7 @@ function complete(cancelled) {
 <applet id="applet" archive="@{'/public/applets/download.jar'}" code="DownloadApplet.class" codebase="@{'/public/applets'}" width="1" height="1" MAYSCRIPT>
 	<param name="url" value="@@{Application.download()}?pk={0}">
 	<param name="pks" value="${items.collect{it.pk}.join(",")}">
-	<param name="patients" value="${items.collect{(it.class.name == "Study" ? it.patient : it.study.patient).pat_id}.join(",")}">
+	<param name="patients" value="${items.collect{(it.class.simpleName == "Study" ? it.patient : it.study.patient).pat_id}.join(",")}">
 	<param name="files" value="${items.collect{it.toDownloadString()}.join(",")}">
 	You must have Java to perform a batch download. Please visit java.com to install it.
 </applet>
