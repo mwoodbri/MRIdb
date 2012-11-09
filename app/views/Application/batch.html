@@ -11,7 +11,7 @@ $("input:file").change(function (){
 #{/set}
 
 <h3>Batch export</h3>
-<p style="margin-top: 0.5em">Upload a list of study identifiers (<a href="@{'/public/files/batch.csv'}">example</a>).</p>
+<p style="margin-top: 0.5em">Upload a list of study/series identifiers (<a href="@{'/public/files/batch.csv'}">example</a>).</p>
 #{form @batch(), enctype:'multipart/form-data', style:'margin-top: 0.5em'}
 	<input type="file" name="spreadsheet"><br><br>
 	<button type="submit" class="btn btn-small" style="display: none">Upload</button>

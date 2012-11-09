@@ -45,6 +45,7 @@ import play.Logger;
 import play.Play;
 import play.cache.Cache;
 import play.data.validation.Validation;
+import play.db.jpa.GenericModel;
 import play.db.jpa.JPA;
 import play.libs.Files;
 import play.libs.IO;
@@ -106,34 +107,38 @@ public class Application extends SecureController {
 
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
-			List<String> study_descs = new ArrayList<String>();
+			List<String> series_descs = new ArrayList<String>();
 			for (int i = 2; line.length > i && !line[i].trim().isEmpty(); i++) {
-				study_descs.add(line[i].trim());
+				series_descs.add(line[i].trim().toUpperCase());
 			}
-			List<Study> studies;
 			String pat_id = line[0].trim();
 			if (!pat_id.isEmpty()) {
-				if (study_descs.isEmpty()) {
-					studies = Study.find("patient.pat_id", pat_id).fetch();
+				if (series_descs.isEmpty()) {
+					for (Study study : Study.find("patient.pat_id", pat_id).<Study>fetch()) {
+						pks.add(study.pk);
+					}
 				} else {
-					studies = Study.find("patient.pat_id = ?1 and study_desc in ?2", pat_id, study_descs).fetch();
+					for (Series series : Series.find("study.patient.pat_id = ?1 and series_desc in ?2", pat_id, series_descs).<Series>fetch()) {
+						pks.add(series.pk);
+					}
 				}
 			} else {
 				String participationID = line[1].trim();
-				if (study_descs.isEmpty()) {
-					studies = Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).fetch();
+				if (series_descs.isEmpty()) {
+					for (Study study : Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<Study>fetch()) {
+						pks.add(study.pk);
+					}
 				} else {
-					studies = Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and study_desc in ?2", participationID, study_descs).fetch();
+					for (Series series : Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc in ?2", participationID, series_descs).<Series>fetch()) {
+						pks.add(series.pk);
+					}
 				}
-			}
-			for (Study study : studies) {
-				pks.add(study.pk);
 			}
 		}
 		reader.close();
 
 		if (pks.size() == 0) {
-			Validation.addError(null, "No studies found");
+			Validation.addError(null, "No studies or series found");
 		}
 
 		if (Validation.hasErrors()) {
@@ -144,11 +149,15 @@ public class Application extends SecureController {
 	}
 
 	public static void batch2(List<Long> pks) {
-		List<Study> studies = new ArrayList<Study>();
+		List<GenericModel> items = new ArrayList<GenericModel>();
 		for (Long pk : pks) {
-			studies.add(Study.<Study>findById(pk));
+			GenericModel item = Study.findById(pk);
+			if (item == null) {
+				item = Series.findById(pk);
+			}
+			items.add(item);
 		}
-		render(studies);
+		render(items);
 	}
 
 	@Check("admin")
