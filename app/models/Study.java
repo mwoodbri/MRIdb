@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -16,15 +15,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 
-import play.db.jpa.GenericModel;
 import ext.JavaExtensions;
 
 @Entity
 //@NamedNativeQuery(name = "nativeSQL", query = "select * from study", resultClass = Study.class)
-public class Study extends GenericModel {
+public class Study extends DomainModel {
 
-	@Id
-	public long pk;
 	public String study_id;
 	public String study_desc;
 	public Date study_datetime;

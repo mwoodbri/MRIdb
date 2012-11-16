@@ -3,16 +3,11 @@ package models;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import play.db.jpa.GenericModel;
-
 @Entity
-public class Patient extends GenericModel {
+public class Patient extends DomainModel {
 
-	@Id
-	public long pk;
 	public String pat_id;
 	public String pat_name;
 	public String pat_birthdate;

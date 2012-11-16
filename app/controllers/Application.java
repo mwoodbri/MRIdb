@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -26,6 +27,7 @@ import javax.persistence.Query;
 import jobs.ClipboardExporter;
 import jobs.Downloader;
 import jobs.Downloader.Format;
+import models.DomainModel;
 import models.Instance;
 import models.Person;
 import models.Person.Role;
@@ -44,15 +46,17 @@ import play.Invoker;
 import play.Logger;
 import play.Play;
 import play.cache.Cache;
+import play.data.binding.As;
 import play.data.validation.Validation;
-import play.db.jpa.GenericModel;
 import play.db.jpa.JPA;
 import play.libs.Files;
 import play.libs.IO;
 import play.mvc.Before;
 import play.mvc.Finally;
 import util.Clipboard;
+import util.Clipboard.Item;
 import util.Dicom;
+import util.DomainModelBinder;
 import util.Medcon;
 import util.PersistentLogger;
 import util.Properties;
@@ -95,7 +99,7 @@ public class Application extends SecureController {
 		render();
 	}
 
-	public static void batch(File spreadsheet) throws IOException {
+	public static void batch(File spreadsheet) throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
 		if (spreadsheet == null) {
 			if ("POST".equals(request.method)) {
 				Validation.addError("spreadsheet", "Please select a file");
@@ -103,7 +107,7 @@ public class Application extends SecureController {
 			render();
 		}
 
-		List<Long> pks = new ArrayList<Long>();
+		List<DomainModel> objects = new ArrayList<DomainModel>();
 
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
@@ -115,29 +119,29 @@ public class Application extends SecureController {
 			if (!pat_id.isEmpty()) {
 				if (series_descs.isEmpty()) {
 					for (Study study : Study.find("patient.pat_id", pat_id).<Study>fetch()) {
-						pks.add(study.pk);
+						objects.add(study);
 					}
 				} else {
 					for (Series series : Series.find("study.patient.pat_id = ?1 and series_desc in ?2", pat_id, series_descs).<Series>fetch()) {
-						pks.add(series.pk);
+						objects.add(series);
 					}
 				}
 			} else {
 				String participationID = line[1].trim();
 				if (series_descs.isEmpty()) {
 					for (Study study : Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<Study>fetch()) {
-						pks.add(study.pk);
+						objects.add(study);
 					}
 				} else {
 					for (Series series : Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc in ?2", participationID, series_descs).<Series>fetch()) {
-						pks.add(series.pk);
+						objects.add(series);
 					}
 				}
 			}
 		}
 		reader.close();
 
-		if (pks.size() == 0) {
+		if (objects.size() == 0) {
 			Validation.addError(null, "No studies or series found");
 		}
 
@@ -145,19 +149,7 @@ public class Application extends SecureController {
 			render();
 		}
 
-		batch2(pks);
-	}
-
-	public static void batch2(List<Long> pks) {
-		List<GenericModel> items = new ArrayList<GenericModel>();
-		for (Long pk : pks) {
-			GenericModel item = Study.findById(pk);
-			if (item == null) {
-				item = Series.findById(pk);
-			}
-			items.add(item);
-		}
-		render(items);
+		renderTemplate("@batch2", objects);
 	}
 
 	@Check("admin")
@@ -373,21 +365,14 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	public static void download(long[] pk, Format format) throws InterruptedException, IOException {
+	public static void download(@As(binder=DomainModelBinder.class) DomainModel[] pk, Format format) throws InterruptedException, IOException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
 		{
-			Study study = Study.findById(pk[0]);
-			String type = null;
-			if (study != null) {
-				type = "study";
-			} else {
-				type = "series";
-				study = Series.<Series>findById(pk[0]).study;
-			}
-			PersistentLogger.log("downloaded %s %s %s", type, Arrays.toString(pk), study.patient.pat_id);
+			Study study = pk[0] instanceof Study ? (Study) pk[0] : ((Series) pk[0]).study;
+			PersistentLogger.log("downloaded %s %s %s", pk[0] instanceof Study ? "study" : "series", Arrays.toString(pk), study.patient.pat_id);
 		}
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		await(new Downloader(pk, format == null ? Format.dcm : format, tmpDir).now());
+		await(new Downloader(format == null ? Format.dcm : format, tmpDir, Item.serialize(pk)).now());
 		if (FileUtils.listFiles(tmpDir.listFiles()[0], TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).size() == 0) {
 			error("Failed to convert files");
 		}
@@ -437,7 +422,7 @@ public class Application extends SecureController {
 		File dcm;
 		Instance instance = Dicom.multiFrame(series);
 		if (instance != null) {
-			await(new Downloader(new long[] { pk }, Format.dcm, tmpDir).now());
+			await(new Downloader(Format.dcm, tmpDir, new Item(series)).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
 			File unanonymised = new File(tmpDir, String.format("%s.unanonymised.dcm", series.pk));

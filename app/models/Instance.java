@@ -3,18 +3,13 @@ package models;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import play.db.jpa.GenericModel;
-
 @Entity
-public class Instance extends GenericModel {
+public class Instance extends DomainModel {
 
-	@Id
-	public long pk;
 	public String sop_iuid;
 	public String sop_cuid;
 	public byte[] inst_attrs;

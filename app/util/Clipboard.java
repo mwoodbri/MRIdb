@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import models.DomainModel;
 import models.Series;
 import models.Study;
 
@@ -17,7 +18,7 @@ import play.db.jpa.GenericModel;
 
 public class Clipboard {
 
-	private static final char SEPARATOR = ',';
+	static final char SEPARATOR = ',';
 
 	private Set<Item> items = new HashSet<Item>();
 
@@ -44,7 +45,7 @@ public class Clipboard {
 	public Set<GenericModel> getObjects() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		Set<GenericModel> objects = new HashSet<GenericModel>();
 		for (Item item : items) {
-			GenericModel object = (GenericModel) item.type.getMethod("findById", Object.class).invoke(null, item.pk);
+			GenericModel object = item.getModel();
 			if (!(object instanceof Series) || !objects.contains(((Series) object).study)) {
 				objects.add(object);
 			}
@@ -70,9 +71,34 @@ public class Clipboard {
 			pk = Long.parseLong(item.split(String.valueOf(DELIMITER))[1]);
 		}
 
-		public Item(String type, long pk) throws ClassNotFoundException {
-			this.type = Class.forName(String.format("models.%s", type));
+		private Item(Class type, long pk) {
+			this.type = type;
 			this.pk = pk;
+		}
+
+		public Item(String type, long pk) throws ClassNotFoundException {
+			this(Class.forName(String.format("models.%s", type)), pk);
+		}
+
+		public Item(DomainModel object) {
+			this(object.getClass(), object.pk);
+		}
+
+		public static Item[] serialize(DomainModel[] objects) {
+			Item[] items = new Item[objects.length];
+			for (int i = 0; i < objects.length; i++) {
+				DomainModel object = objects[i];
+				items[i] = new Item(object);
+			}
+			return items;
+		}
+
+		public static String toString(List<DomainModel> objects) {
+			return StringUtils.join(serialize(objects.toArray(new DomainModel[0])), SEPARATOR);
+		}
+
+		public DomainModel getModel() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			return (DomainModel) type.getMethod("findById", Object.class).invoke(null, pk);
 		}
 
 		@Override
@@ -90,4 +116,5 @@ public class Clipboard {
 			return String.format("%s%s%s", types.indexOf(type), DELIMITER, pk);
 		}
 	}
+
 }

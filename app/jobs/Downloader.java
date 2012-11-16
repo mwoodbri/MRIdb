@@ -2,9 +2,12 @@ package jobs;
 
 import java.io.File;
 
+import models.DomainModel;
 import models.Series;
 import models.Study;
 import play.jobs.Job;
+import util.Clipboard;
+import util.Clipboard.Item;
 import util.Download;
 
 public class Downloader extends Job<Void> {
@@ -15,25 +18,25 @@ public class Downloader extends Job<Void> {
 		img  //Analyze
 	}
 
-	private long[] pks;
+	private Item[] items;
 	private Format format;
 	private File tmpDir;
 
-	public Downloader(long[] pks, Format format, File tmpDir) {
-		this.pks = pks;
+	public Downloader(Format format, File tmpDir, Item... items) {
 		this.format = format;
 		this.tmpDir = tmpDir;
+		this.items = items;
 	}
 
 	@Override
 	public void doJob() {
 		try {
-			for (long pk : pks) {
-				Study study = Study.findById(pk);
-				if (study != null) {
-					Download.study(study, tmpDir, format);
-				} else {
-					Download.series(Series.<Series>findById(pk), tmpDir, format);
+			for (Item item : items) {
+				DomainModel model = item.getModel();
+				if (model instanceof Study) {
+					Download.study((Study) model, tmpDir, format);
+				} else if (model instanceof Series) {
+					Download.series((Series) model, tmpDir, format);
 				}
 			}
 		} catch (Exception e) {

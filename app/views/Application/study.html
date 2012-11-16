@@ -22,13 +22,14 @@
 		});
 		$("a.download").click(function(e) {
 			var selected = $("a.selected");
-			if (!selected.size()) {
-				selected = $('.study');
-			}
 			var href = this.href;
-			selected.each(function() {
-				href += "&pk=" + $(this).data("pk");
-			});
+			if (selected.size()) {
+				selected.each(function() {
+					href += "&pk=1:" + $(this).data("pk");
+				});
+			} else {
+				href += "&pk=0:" + $('.study').data("pk");
+			}
 			window.location = href;
 			return false;
 		});

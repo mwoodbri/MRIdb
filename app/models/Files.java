@@ -1,19 +1,14 @@
 package models;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import org.apache.commons.lang.StringUtils;
 
-import play.db.jpa.GenericModel;
-
 @Entity
-public class Files extends GenericModel {
+public class Files extends DomainModel {
 
-	@Id
-	public long pk;
 	public String filepath;
 	public long file_size;
 	@ManyToOne
