@@ -93,10 +93,6 @@ public class Clipboard {
 			return items;
 		}
 
-		public static String toString(List<DomainModel> objects) {
-			return StringUtils.join(serialize(objects), SEPARATOR);
-		}
-
 		public DomainModel getModel() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 			return (DomainModel) type.getMethod("findById", Object.class).invoke(null, pk);
 		}

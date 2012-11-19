@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -107,7 +108,7 @@ public class Application extends SecureController {
 			render();
 		}
 
-		List<DomainModel> objects = new ArrayList<DomainModel>();
+		List<List<DomainModel>> objects = new ArrayList<List<DomainModel>>();
 
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
@@ -118,24 +119,20 @@ public class Application extends SecureController {
 			String pat_id = line[0].trim();
 			if (!pat_id.isEmpty()) {
 				if (series_descs.isEmpty()) {
-					for (Study study : Study.find("patient.pat_id", pat_id).<Study>fetch()) {
-						objects.add(study);
+					for (DomainModel study : Study.find("patient.pat_id", pat_id).<DomainModel>fetch()) {
+						objects.add(Collections.singletonList(study));
 					}
 				} else {
-					for (Series series : Series.find("study.patient.pat_id = ?1 and series_desc in ?2", pat_id, series_descs).<Series>fetch()) {
-						objects.add(series);
-					}
+					objects.add(Series.find("study.patient.pat_id = ?1 and series_desc in ?2", pat_id, series_descs).<DomainModel>fetch());
 				}
 			} else {
 				String participationID = line[1].trim();
 				if (series_descs.isEmpty()) {
-					for (Study study : Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<Study>fetch()) {
-						objects.add(study);
+					for (DomainModel study : Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<DomainModel>fetch()) {
+						objects.add(Collections.singletonList(study));
 					}
 				} else {
-					for (Series series : Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc in ?2", participationID, series_descs).<Series>fetch()) {
-						objects.add(series);
-					}
+					objects.add(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc in ?2", participationID, series_descs).<DomainModel>fetch());
 				}
 			}
 		}
@@ -365,6 +362,7 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
+	//pk is EITHER a Study OR a list of Series from a common Study
 	public static void download(@As(binder=DomainModelBinder.class) List<DomainModel> pk, Format format) throws InterruptedException, IOException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
 		{
 			Study study = pk.get(0) instanceof Study ? (Study) pk.get(0) : ((Series) pk.get(0)).study;
