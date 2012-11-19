@@ -46,7 +46,7 @@ function complete(cancelled) {
 		$('#message').text('Export cancelled');
 		$('#spinner').html('<i class="icon-exclamation-sign icon-large"></i>');
 	} else {
-		$('#message').text('Successfully downloaded ${objects.size()} item${objects.pluralize()}');
+		$('#message').text('Export complete');
 		$('#spinner').html('<i class="icon-ok icon-large"></i>');
 	}
 }
