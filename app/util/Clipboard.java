@@ -84,17 +84,17 @@ public class Clipboard {
 			this(object.getClass(), object.pk);
 		}
 
-		public static Item[] serialize(DomainModel[] objects) {
-			Item[] items = new Item[objects.length];
-			for (int i = 0; i < objects.length; i++) {
-				DomainModel object = objects[i];
+		public static Item[] serialize(List<DomainModel> objects) {
+			Item[] items = new Item[objects.size()];
+			for (int i = 0; i < objects.size(); i++) {
+				DomainModel object = objects.get(i);
 				items[i] = new Item(object);
 			}
 			return items;
 		}
 
 		public static String toString(List<DomainModel> objects) {
-			return StringUtils.join(serialize(objects.toArray(new DomainModel[0])), SEPARATOR);
+			return StringUtils.join(serialize(objects), SEPARATOR);
 		}
 
 		public DomainModel getModel() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

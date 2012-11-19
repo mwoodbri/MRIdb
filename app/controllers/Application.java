@@ -52,7 +52,7 @@ import play.db.jpa.JPA;
 import play.libs.Files;
 import play.libs.IO;
 import play.mvc.Before;
-import play.mvc.Finally;
+import play.mvc.Catch;
 import util.Clipboard;
 import util.Clipboard.Item;
 import util.Dicom;
@@ -365,10 +365,10 @@ public class Application extends SecureController {
 		IO.copy(new URL(url).openConnection().getInputStream(), response.out);
 	}
 
-	public static void download(@As(binder=DomainModelBinder.class) DomainModel[] pk, Format format) throws InterruptedException, IOException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+	public static void download(@As(binder=DomainModelBinder.class) List<DomainModel> pk, Format format) throws InterruptedException, IOException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
 		{
-			Study study = pk[0] instanceof Study ? (Study) pk[0] : ((Series) pk[0]).study;
-			PersistentLogger.log("downloaded %s %s %s", pk[0] instanceof Study ? "study" : "series", Arrays.toString(pk), study.patient.pat_id);
+			Study study = pk.get(0) instanceof Study ? (Study) pk.get(0) : ((Series) pk.get(0)).study;
+			PersistentLogger.log("downloaded %s %s %s", pk.get(0) instanceof Study ? "study" : "series", pk, study.patient.pat_id);
 		}
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
@@ -463,10 +463,11 @@ public class Application extends SecureController {
 		}
 	}
 
-	@Finally
+	@Catch(Throwable.class)
 	static void log(Throwable e) {
-		if (e != null && !(e instanceof Invoker.Suspend) && Properties.getString("mail.from") != null) {
+		if (!(e instanceof Invoker.Suspend) && Properties.getString("mail.from") != null) {
 			Mail.exception(request, session, e);
 		}
 	}
+
 }
