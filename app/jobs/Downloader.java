@@ -6,7 +6,6 @@ import models.DomainModel;
 import models.Series;
 import models.Study;
 import play.jobs.Job;
-import util.Clipboard;
 import util.Clipboard.Item;
 import util.Download;
 
