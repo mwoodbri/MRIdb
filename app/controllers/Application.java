@@ -118,21 +118,27 @@ public class Application extends SecureController {
 			}
 			String pat_id = line[0].trim();
 			if (!pat_id.isEmpty()) {
-				if (series_descs.isEmpty()) {
+				if (!series_descs.isEmpty()) {
+					List<DomainModel> series = Series.find("study.patient.pat_id = ?1 and series_desc in ?2", pat_id, series_descs).<DomainModel>fetch();
+					if (!series.isEmpty()) {
+						objects.add(series);
+					}
+				} else {
 					for (DomainModel study : Study.find("patient.pat_id", pat_id).<DomainModel>fetch()) {
 						objects.add(Collections.singletonList(study));
 					}
-				} else {
-					objects.add(Series.find("study.patient.pat_id = ?1 and series_desc in ?2", pat_id, series_descs).<DomainModel>fetch());
 				}
 			} else {
 				String participationID = line[1].trim();
-				if (series_descs.isEmpty()) {
+				if (!series_descs.isEmpty()) {
+					List<DomainModel> series = Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc in ?2", participationID, series_descs).<DomainModel>fetch();
+					if (!series.isEmpty()) {
+						objects.add(series);
+					}
+				} else {
 					for (DomainModel study : Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<DomainModel>fetch()) {
 						objects.add(Collections.singletonList(study));
 					}
-				} else {
-					objects.add(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc in ?2", participationID, series_descs).<DomainModel>fetch());
 				}
 			}
 		}
