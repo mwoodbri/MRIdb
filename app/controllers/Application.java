@@ -109,6 +109,8 @@ public class Application extends SecureController {
 		}
 
 		List<List<DomainModel>> objects = new ArrayList<List<DomainModel>>();
+		List<String> found = new ArrayList<String>();
+		List<String> missing = new ArrayList<String>();
 
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
@@ -116,28 +118,58 @@ public class Application extends SecureController {
 			for (int i = 2; line.length > i && !line[i].trim().isEmpty(); i++) {
 				series_descs.add(line[i].trim().toUpperCase());
 			}
-			String pat_id = line[0].trim();
+			String pat_id = line[0].trim().toUpperCase();
 			if (!pat_id.isEmpty()) {
 				if (!series_descs.isEmpty()) {
-					List<DomainModel> series = Series.find("study.patient.pat_id = ?1 and series_desc in ?2", pat_id, series_descs).<DomainModel>fetch();
-					if (!series.isEmpty()) {
-						objects.add(series);
+					List<DomainModel> serieses = new ArrayList<DomainModel>();
+					for (String series_desc : series_descs) {
+						DomainModel series = Series.find("study.patient.pat_id = ?1 and series_desc = ?2", pat_id, series_desc).first();
+						if (series != null) {
+							found.add(String.format("%s - %s", pat_id, series_desc));
+							serieses.add(series);
+						} else {
+							missing.add(String.format("%s - %s", pat_id, series_desc));
+						}
+					}
+					if (!serieses.isEmpty()) {
+						objects.add(serieses);
 					}
 				} else {
-					for (DomainModel study : Study.find("patient.pat_id", pat_id).<DomainModel>fetch()) {
-						objects.add(Collections.singletonList(study));
+					List<DomainModel> studies = Study.find("patient.pat_id", pat_id).<DomainModel>fetch();
+					if (!studies.isEmpty()) {
+						for (DomainModel study : studies) {
+							found.add(String.format("%s", pat_id));
+							objects.add(Collections.singletonList(study));
+						}
+					} else {
+						missing.add(String.format("%s", pat_id));
 					}
 				}
 			} else {
-				String participationID = line[1].trim();
+				String participationID = line[1].trim().toUpperCase();
 				if (!series_descs.isEmpty()) {
-					List<DomainModel> series = Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc in ?2", participationID, series_descs).<DomainModel>fetch();
-					if (!series.isEmpty()) {
-						objects.add(series);
+					List<DomainModel> serieses = new ArrayList<DomainModel>();
+					for (String series_desc : series_descs) {
+						DomainModel series = Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc = ?2", participationID, series_desc).first();
+						if (series != null) {
+							found.add(String.format("%s - %s", participationID, series_desc));
+							serieses.add(series);
+						} else {
+							missing.add(String.format("%s - %s", participationID, series_desc));
+						}
+					}
+					if (!serieses.isEmpty()) {
+						objects.add(serieses);
 					}
 				} else {
-					for (DomainModel study : Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<DomainModel>fetch()) {
-						objects.add(Collections.singletonList(study));
+					List<DomainModel> studies = Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<DomainModel>fetch();
+					if (!studies.isEmpty()) {
+						for (DomainModel study : studies) {
+							found.add(String.format("%s", participationID));
+							objects.add(Collections.singletonList(study));
+						}
+					} else {
+						missing.add(String.format("%s", participationID));
 					}
 				}
 			}
@@ -152,7 +184,7 @@ public class Application extends SecureController {
 			render();
 		}
 
-		renderTemplate("@batch2", objects);
+		renderTemplate("@batch2", objects, found, missing);
 	}
 
 	@Check("admin")
