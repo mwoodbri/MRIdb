@@ -19,6 +19,7 @@ $(function() {
 		$('#cancel').css('display', 'none');
 		document.applets[0].cancel();
 	});
+	pks = ${pks.toJson().raw()};
 });
 function init() {
 	$('#message').html('');
@@ -39,6 +40,9 @@ function error(err) {
 	$('#cancel').css('display', 'none');
 	$('#message').text('Export failed: ' + err);
 	$('#spinner').html('<i class="icon-remove icon-large"></i>');
+}
+function failure(pk) {
+	$('#failures').show().find('ul').append('<li>' + pks[pk])
 }
 function complete(cancelled) {
 	$('#cancel').css('display', 'none');
@@ -71,8 +75,13 @@ function complete(cancelled) {
 <p>Download destination: <span id="folder"><button id="choose" class="btn btn-small" style="margin-left: 1em">Browse...</button></span></p>
 <p id="download" style="display: none"><button class="btn btn-small" style="margin-top: 1em">Download</button></p>
 <p><span id="spinner" style='margin-right: 0.5em'><img src="@{'/public/images/spinner-small.gif'}"></span> <b id="message">Loading Java</b> <button id="cancel" class="btn btn-small" type="button" style="display: none; margin-left: 1em">Cancel</button></p>
+<div id="failures" style="display: none">
+	<p>The following studies could not be fully exported:</p>
+	<ul>
+	</ul>
+</div>
 <applet id="applet" archive="@{'/public/applets/download.jar'}" code="DownloadApplet.class" codebase="@{'/public/applets'}" width="1" height="1" MAYSCRIPT>
 	<param name="url" value="@@{Application.download()}?{0}">
-	<param name="pks" value="${objects.collect{'pk=' + util.Clipboard.Item.serialize(it).join('&pk=')}.join('|').raw()}">
+	<param name="pks" value="${pks.keySet().join('|').raw()}">
 	You must have Java to perform a batch download. Please visit java.com to install it.
 </applet>

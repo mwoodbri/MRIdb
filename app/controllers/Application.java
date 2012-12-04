@@ -184,7 +184,13 @@ public class Application extends SecureController {
 			render();
 		}
 
-		renderTemplate("@batch2", objects, found, missing);
+		Map<String, String> pks = new HashMap<String, String>();
+		for (List<DomainModel> object : objects) {
+			Study study = object.get(0) instanceof Study ? ((Study) object.get(0)) : ((Series) object.get(0)).study;
+			pks.put("pk=" + StringUtils.join(Item.serialize(object), "&pk="), study.patient.pat_id);
+		}
+
+		renderTemplate("@batch2", pks, found, missing);
 	}
 
 	@Check("admin")

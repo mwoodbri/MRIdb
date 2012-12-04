@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.commons.lang.WordUtils;
 import org.joda.time.DateTime;
@@ -13,6 +14,8 @@ import org.joda.time.format.DateTimeFormat;
 
 import play.Play;
 import util.Dicom;
+
+import com.google.gson.Gson;
 
 public class JavaExtensions extends play.templates.JavaExtensions {
 
@@ -58,6 +61,10 @@ public class JavaExtensions extends play.templates.JavaExtensions {
 		}
 		int exp = (int) (Math.log(bytes) / Math.log(unit));
 		return String.format("%.1f %siB", bytes / Math.pow(unit, exp), "KMGTPE".charAt(exp - 1));
+	}
+
+	public static String toJson(Map map) {
+		return new Gson().toJson(map);
 	}
 
 }
