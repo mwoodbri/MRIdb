@@ -23,6 +23,7 @@ public class Medcon {
 		List<String> prefix = new ArrayList(Arrays.asList(
 				new File(Properties.getString("xmedcon"), "bin/medcon").getPath(),
 				"-noprefix",
+				"-anon",
 				"-c", formats.get(format)
 				));
 		if (from.isDirectory() && !to.isDirectory()) {
