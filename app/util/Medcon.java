@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +41,7 @@ public class Medcon {
 		for (int i = 0; i < files.length; i++) {
 			command[prefix.size() + i] = files[i].getPath();
 		}
-		Util.exec(directory,
-				new HashMap<String, String>() {{
-					put("LD_LIBRARY_PATH", new File(Properties.getString("xmedcon"), "lib").getPath());
-				}},
-				command
-				);
+		Util.exec(directory, Collections.EMPTY_MAP, command);
 	}
 
 }
