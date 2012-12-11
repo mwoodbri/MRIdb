@@ -126,7 +126,7 @@ public class Application extends SecureController {
 					for (String series_desc : series_descs) {
 						Series series = null;
 						for (Series candidate : Series.find("study.patient.pat_id = ?1 and series_desc = ?2", pat_id, series_desc).<Series>fetch()) {
-							if (Dicom.renderable(series)) {
+							if (Dicom.renderable(candidate)) {
 								series = candidate;
 							}
 						}
@@ -158,7 +158,7 @@ public class Application extends SecureController {
 					for (String series_desc : series_descs) {
 						Series series = null;
 						for (Series candidate : Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc = ?2", participationID, series_desc).<Series>fetch()) {
-							if (Dicom.renderable(series)) {
+							if (Dicom.renderable(candidate)) {
 								series = candidate;
 							}
 						}
