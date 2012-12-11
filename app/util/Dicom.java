@@ -32,7 +32,16 @@ public class Dicom {
 	}
 
 	public static File file(Instance instance) {
-		return new File(Properties.getArchive(), instance.files.iterator().next().filepath);
+		return new File(Properties.getArchive(), files(instance).filepath);
+	}
+
+	static Files files(Instance instance) {
+		for (Files files : instance.files) {
+			if (new File(Properties.getArchive(), files.filepath).exists()) {
+				return files;
+			}
+		}
+		return null;
 	}
 
 	public static File collate(Series series) {
@@ -49,14 +58,14 @@ public class Dicom {
 		Collection singleFrames = Dicom.singleFrames(series);
 		if (singleFrames.size() > 0) {
 			for (Object instance : Dicom.singleFrames(series)) {
-				filesList.add(((Instance) instance).files.iterator().next());
+				filesList.add(files((Instance) instance));
 			}
 		} else {
 			Instance instance = Dicom.multiFrame(series);
 			if (instance == null) {
 				instance = spectrogram(series);
 			}
-			filesList.add(instance.files.iterator().next());
+			filesList.add(files(instance));
 		}
 		return filesList;
 	}
