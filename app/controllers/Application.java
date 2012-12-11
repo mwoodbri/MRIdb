@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -123,7 +124,12 @@ public class Application extends SecureController {
 				if (!series_descs.isEmpty()) {
 					List<DomainModel> serieses = new ArrayList<DomainModel>();
 					for (String series_desc : series_descs) {
-						DomainModel series = Series.find("study.patient.pat_id = ?1 and series_desc = ?2", pat_id, series_desc).first();
+						Series series = null;
+						for (Series candidate : Series.find("study.patient.pat_id = ?1 and series_desc = ?2", pat_id, series_desc).<Series>fetch()) {
+							if (Dicom.renderable(series)) {
+								series = candidate;
+							}
+						}
 						if (series != null) {
 							found.add(String.format("%s - %s", pat_id, series_desc));
 							serieses.add(series);
@@ -150,7 +156,12 @@ public class Application extends SecureController {
 				if (!series_descs.isEmpty()) {
 					List<DomainModel> serieses = new ArrayList<DomainModel>();
 					for (String series_desc : series_descs) {
-						DomainModel series = Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc = ?2", participationID, series_desc).first();
+						Series series = null;
+						for (Series candidate : Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc = ?2", participationID, series_desc).<Series>fetch()) {
+							if (Dicom.renderable(series)) {
+								series = candidate;
+							}
+						}
 						if (series != null) {
 							found.add(String.format("%s - %s", participationID, series_desc));
 							serieses.add(series);
