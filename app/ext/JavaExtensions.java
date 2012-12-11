@@ -32,10 +32,6 @@ public class JavaExtensions extends play.templates.JavaExtensions {
 	}
 
 	public static String formatAsRelativeAge(String string, Date date) {
-		if (string.length() == 7) {
-			//deal with strange patient.pat_birthdate e.g. 1989720 for series.pk = 212627 
-			string = string.substring(0, 4) + "0" + string.substring(4, 7);
-		}
 		int years = Years.yearsBetween(DateTimeFormat.forPattern("yyyyMMdd").parseDateTime(string), new DateTime(date)).getYears();
 		if (years > 0) {
 			return String.format("%s", years);
