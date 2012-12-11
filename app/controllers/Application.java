@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -195,7 +195,7 @@ public class Application extends SecureController {
 			render();
 		}
 
-		Map<String, String> pks = new HashMap<String, String>();
+		Map<String, String> pks = new LinkedHashMap<String, String>();
 		for (List<DomainModel> object : objects) {
 			Study study = object.get(0) instanceof Study ? ((Study) object.get(0)) : ((Series) object.get(0)).study;
 			pks.put("pk=" + StringUtils.join(Item.serialize(object), "&pk="), study.patient.pat_id);
