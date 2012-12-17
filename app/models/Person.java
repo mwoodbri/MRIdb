@@ -5,6 +5,8 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.PostUpdate;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
+
 import play.cache.Cache;
 import play.db.jpa.GenericModel;
 
@@ -13,12 +15,17 @@ public class Person extends GenericModel {
 
 	@Id
 	public String username;
+	public String password;
 	public Role role = Role.Visitor;
 	@Lob
 	public String clipboard;
 
 	public Person(String username) {
 		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
 	}
 
 	@PostUpdate

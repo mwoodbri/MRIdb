@@ -8,8 +8,10 @@ import javax.naming.directory.InitialDirContext;
 
 import models.Person;
 import models.Person.Role;
+
+import org.springframework.security.crypto.bcrypt.BCrypt;
+
 import play.Logger;
-import play.Play;
 import util.PersistentLogger;
 import util.Properties;
 
@@ -18,7 +20,8 @@ public class Security extends Secure.Security {
 	static boolean authenticate(String username, String password) {
 		boolean authenticated = false;
 		if (Properties.getString("ldap.server") == null) {
-			authenticated = password.equals(username);
+			Person user = Person.find("byUsername", username).first();
+			authenticated = user != null && user.password != null && BCrypt.checkpw(password, user.password);
 		} else {
 			if (!password.isEmpty()) {
 				Hashtable<String, String> env = new Hashtable<String, String>();
