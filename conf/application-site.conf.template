@@ -1,0 +1,5 @@
+%prod.ldap.server=ldap://localhost.localdomain
+%prod.ldap.domain=DOMAIN
+
+%prod.mail.from=root@localhost.localdomain
+%prod.mail.to=jsmith@example.org

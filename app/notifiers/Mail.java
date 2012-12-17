@@ -13,4 +13,5 @@ public class Mail extends Mailer {
 		setFrom(String.format("%s <%s>", Properties.getString("application.name"), Properties.getString("mail.from")));
 		send(request, session, exception);
 	}
+
 }

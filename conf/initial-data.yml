@@ -1,13 +1,5 @@
-Person(doregan):
-  username: doregan
-  role: Administrator
-
-Person(gfagiolo):
-  username: gfagiolo
-  role: Administrator
-
-Person(mwoodbri):
-  username: mwoodbri
+Person(mri1):
+  username: mri1
   role: Administrator
 
 Help(help):
@@ -15,4 +7,4 @@ Help(help):
     <dt>Where did my downloads go?
     <dd>Clipboard downloads are automatically deleted after 24 hours.
     <dt>How can I get more help?
-    <dd>Please contact the <a href="http://www.csc.mrc.ac.uk/ComputingServiceDesk">Computing Service Desk</a>
+    <dd>Please contact your MRIdb system administrator.

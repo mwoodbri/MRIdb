@@ -518,7 +518,7 @@ public class Application extends SecureController {
 
 	@Catch(Throwable.class)
 	static void log(Throwable e) {
-		if (!(e instanceof Invoker.Suspend) && Properties.getString("mail.from") != null) {
+		if (!(e instanceof Invoker.Suspend) && Properties.getString("mail.to") != null) {
 			Mail.exception(request, session, e);
 		}
 	}

@@ -12,7 +12,7 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
-          <a class="brand" href="@{Application.index}"><img src="@{'/public/images/title.png'}" alt="logo"></a>
+          <a class="brand" href="@{Application.index}"><img src="@{'/public/images/' + play.configuration.getProperty('application.name') + '-small.png'}" alt="logo"></a>
           <ul class="nav">
             *{<li#{if request.action == "Application.index"} class="active"#{/if}>#{a @index()}Search#{/a}}*
             <li#{if request.action == "Application.recent"} class="active"#{/if}>#{a @recent()}Recent#{/a}
