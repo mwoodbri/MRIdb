@@ -17,7 +17,7 @@ public class Security extends Secure.Security {
 
 	static boolean authenticate(String username, String password) {
 		boolean authenticated = false;
-		if (Play.mode.isDev() && Properties.getString("ldap.server") == null) {
+		if (Properties.getString("ldap.server") == null) {
 			authenticated = password.equals(username);
 		} else {
 			if (!password.isEmpty()) {
