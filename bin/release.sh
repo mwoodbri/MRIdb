@@ -18,4 +18,4 @@ find /tmp/$prog/app -mindepth 1 -maxdepth 1 ! -iname views -exec rm -r {} \;
 tar cfj /tmp/$prog-r$REV.tar.bz2 --exclude repo --exclude test -C /tmp $prog
 scp /tmp/$prog-r$REV.tar.bz2 bss-srv4:$DEST
 
-ssh bss-srv4 "sed -i 's/r[0-9]\+/r$REV/' $DEST/.htaccess"
+ssh bss-srv4 "sed -i 's/-r[0-9]\+/-r$REV/' $DEST/.htaccess"
