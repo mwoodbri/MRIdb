@@ -22,4 +22,6 @@ This exception has been logged with id ${exception.id}
 #{/if}
 #{else}
 ${exception.message}
+
+${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}
 #{/else}
