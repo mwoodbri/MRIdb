@@ -5,7 +5,7 @@ prog="mridb"
 rm -fr /tmp/$prog
 
 REV=$(svn export https://cisbic.bioinformatics.ic.ac.uk/svn/MRIdb/$prog /tmp/$prog | grep "^Exported revision" | egrep -o "[0-9]+")
-DEST=/data/www/80/cisbic.bioinformatics.ic.ac.uk/htdocs/static/$prog
+DEST=/data/www/80/cisbic.bioinformatics.ic.ac.uk/htdocs/files/$prog
 
 tar cfj /tmp/$prog-r$REV-src.tar.bz2 -C /tmp $prog
 scp /tmp/$prog-r$REV-src.tar.bz2 bss-srv4:$DEST
