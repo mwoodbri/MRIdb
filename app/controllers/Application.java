@@ -126,7 +126,7 @@ public class Application extends SecureController {
 				if (!series_descs.isEmpty()) {
 					List<DomainModel> serieses = new ArrayList<DomainModel>();
 					for (String series_desc : series_descs) {
-						Series series = (Series) CollectionUtils.find(Series.find("study.patient.pat_id = ?1 and series_desc = ?2", pat_id, series_desc).<Series>fetch(), new Predicate() {
+						Series series = (Series) CollectionUtils.find(Series.find("study.patient.pat_id = ? and series_desc = ?", pat_id, series_desc).<Series>fetch(), new Predicate() {
 							@Override
 							public boolean evaluate(Object candidate) {
 								return Dicom.renderable((Series) candidate);
@@ -158,7 +158,7 @@ public class Application extends SecureController {
 				if (!series_descs.isEmpty()) {
 					List<DomainModel> serieses = new ArrayList<DomainModel>();
 					for (String series_desc : series_descs) {
-						Series series = (Series) CollectionUtils.find(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc = ?2", pat_id, series_desc).<Series>fetch(), new Predicate() {
+						Series series = (Series) CollectionUtils.find(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ? and series_desc = ?", participationID, series_desc).<Series>fetch(), new Predicate() {
 							@Override
 							public boolean evaluate(Object candidate) {
 								return Dicom.renderable((Series) candidate);
