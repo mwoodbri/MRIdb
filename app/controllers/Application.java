@@ -111,15 +111,12 @@ public class Application extends SecureController {
 			render();
 		}
 
-		Logger.info("batch");
-
 		List<List<DomainModel>> objects = new ArrayList<List<DomainModel>>();
 		List<String> found = new ArrayList<String>();
 		List<String> missing = new ArrayList<String>();
 
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet), CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, 1);
 		for (String[] line : reader.readAll()) {
-			Logger.info(Arrays.toString(line));
 			List<String> series_descs = new ArrayList<String>();
 			for (int i = 2; line.length > i && !line[i].trim().isEmpty(); i++) {
 				series_descs.add(line[i].trim().toUpperCase());
@@ -161,7 +158,6 @@ public class Application extends SecureController {
 				if (!series_descs.isEmpty()) {
 					List<DomainModel> serieses = new ArrayList<DomainModel>();
 					for (String series_desc : series_descs) {
-						Logger.info(series_desc);
 						Series series = (Series) CollectionUtils.find(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ?1 and series_desc = ?2", pat_id, series_desc).<Series>fetch(), new Predicate() {
 							@Override
 							public boolean evaluate(Object candidate) {
@@ -174,7 +170,6 @@ public class Application extends SecureController {
 						} else {
 							missing.add(String.format("%s - %s", participationID, series_desc));
 						}
-						Logger.info(series.toString());
 					}
 					if (!serieses.isEmpty()) {
 						objects.add(serieses);
@@ -208,8 +203,6 @@ public class Application extends SecureController {
 			pks.put("pk=" + StringUtils.join(Item.serialize(object), "&pk="), study.patient.pat_id);
 		}
 
-		Logger.info("/batch %s", objects.size());
-
 		renderTemplate("@batch2", pks, found, missing);
 	}
 
@@ -218,7 +211,6 @@ public class Application extends SecureController {
 		if (spreadsheet == null) {
 			render();
 		}
-		Logger.info("audit");
 		response.contentType = "text/csv";
 		response.setHeader("Content-Disposition", "attachment; filename='audit.csv'");
 		CSVReader reader = new CSVReader(new FileReader(spreadsheet));
@@ -227,18 +219,15 @@ public class Application extends SecureController {
 		writer.writeNext(headers);
 		String[] line = null;
 		while ((line = reader.readNext()) != null) {
-			Logger.info("line %s", Arrays.toString(line));
 			if (StringUtils.isEmpty(line[3]) || StringUtils.isEmpty(line[9])) {
 				continue;
 			}
 			String pat_id = line[3].trim().toLowerCase();
 			Date study_datetime = new SimpleDateFormat("dd/MM/yyyy").parse(line[9]);
 			Study study = Study.find("lower(patient.pat_id) = ? and cast(study_datetime as date) = ?", pat_id, study_datetime).first();
-			Logger.info("study %s", study);
 			if (study != null) {
 				line[10] = "Yes";
 				Project project = Project.find("byName", line[1]).first();
-				Logger.info("project %s", project);
 				if (project == null) {
 					project = new Project(line[1]).save();
 				}
@@ -249,7 +238,6 @@ public class Application extends SecureController {
 			Boolean singleFrames = null;
 			for (int i = 12; i < headers.length; i++) {
 				Series series = Series.find("from Series where lower(series_desc) = ? and lower(study.patient.pat_id) = ? and cast(study.study_datetime as date) = ?", headers[i].toLowerCase(), pat_id, study_datetime).first();
-				Logger.info("series %s", series);
 				if (series != null) {
 					line[i] = "Yes";
 					singleFrames = (singleFrames == null ? true : singleFrames) && Dicom.singleFrame(series);
