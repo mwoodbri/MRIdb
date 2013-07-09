@@ -10,7 +10,7 @@ prog="mridb"
 PLAY=/opt/play-1.2.5/play
 APP_PATH=/opt/$prog
 
-PLAY_OPTS=""
+[ -f /etc/sysconfig/mridb ] && . /etc/sysconfig/mridb
 
 run(){
     $PLAY $1 $APP_PATH --%prod --pid_file=/var/lock/subsys/$prog -Dprecompiled=true $PLAY_OPTS >/dev/null
