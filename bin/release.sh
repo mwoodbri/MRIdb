@@ -15,6 +15,7 @@ touch /tmp/$prog/conf/application-site.conf
 play dependencies /tmp/$prog --forceCopy --forProd
 play precompile /tmp/$prog
 #find /tmp/$prog/app -mindepth 1 -maxdepth 1 ! -iname views -exec rm -r {} \;
+rm /tmp/$prog/conf/application-site.conf
 tar cfj /tmp/$prog-r$REV.tar.bz2 --exclude repo --exclude test -C /tmp $prog
 scp /tmp/$prog-r$REV.tar.bz2 bss-srv4:$DEST
 
