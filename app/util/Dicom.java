@@ -55,8 +55,7 @@ public class Dicom {
 
 	public static Collection<Files> getFiles(Series series) {
 		List<Files> filesList = new ArrayList<Files>();
-		Collection singleFrames = Dicom.singleFrames(series);
-		if (singleFrames.size() > 0) {
+		if (Dicom.singleFrame(series)) {
 			for (Object instance : Dicom.singleFrames(series)) {
 				filesList.add(files((Instance) instance));
 			}
@@ -157,6 +156,15 @@ public class Dicom {
 
 	public static Collection singleFrames(Series series) {
 		return CollectionUtils.select(series.instances, new Predicate() {
+			@Override
+			public boolean evaluate(Object arg0) {
+				return CUID.MRImageStorage.value.equals(((Instance) arg0).sop_cuid);
+			}
+		});
+	}
+
+	public static boolean singleFrame(Series series) {
+		return CollectionUtils.exists(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
 				return CUID.MRImageStorage.value.equals(((Instance) arg0).sop_cuid);

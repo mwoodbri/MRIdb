@@ -1,7 +1,6 @@
 package util;
 
 import java.io.File;
-import java.util.Collection;
 
 import jobs.Downloader.Format;
 import models.Files;
@@ -25,8 +24,7 @@ public class Download {
 		dir.mkdirs();
 
 		if (format == Format.nii) {
-			Collection singleFrames = Dicom.singleFrames(series);
-			if (singleFrames.size() > 0) {
+			if (Dicom.singleFrame(series)) {
 				//Medcon.convert(Dicom.collate(series), format, dir);
 				Util.exec("timeout", Properties.getString("exec.timeout"), Properties.getString("dcm2nii"), "-g", "n", "-p", "n", "-d", "n", "-o", dir.getPath(), Dicom.collate(series).getPath());
 			} else {
