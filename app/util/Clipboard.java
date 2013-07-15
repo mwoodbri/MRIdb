@@ -60,15 +60,16 @@ public class Clipboard {
 
 	public static class Item {
 
-		private static final char DELIMITER = ':';
+		private static final String DELIMITER = ":";
 		private static final List types = Arrays.asList(Study.class, Series.class);
 
 		public Class type;
 		public long pk;
 
 		public Item(String item) {
-			type = (Class) types.get(Integer.parseInt(item.split(String.valueOf(DELIMITER))[0]));
-			pk = Long.parseLong(item.split(String.valueOf(DELIMITER))[1]);
+			String[] parts = item.split(DELIMITER);
+			type = (Class) types.get(Integer.parseInt(parts[0]));
+			pk = Long.parseLong(parts[1]);
 		}
 
 		private Item(Class type, long pk) {
