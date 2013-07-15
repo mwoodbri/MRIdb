@@ -91,22 +91,24 @@ public class Dicom {
 		return echoes;
 	}
 
+	private final static String dcmodify = new File(Properties.getString("dcmtk"), "bin/dcmodify").getPath();
+	private final static String DCMDICTPATH = new File(Properties.getString("dcmtk"), "share/dcmtk/dicom.dic").getPath();
+	private final static int[] tags = new int[] {
+		Tags.PatientID,
+		Tags.PatientName,
+		Tags.PatientSex,
+		Tags.PatientBirthDate,
+		Tags.PatientAddress,
+		Tags.ReferringPhysicianName,
+		Tags.InstitutionName,
+		Tags.StationName,
+		Tags.ManufacturerModelName
+	};
 	public static void anonymise(File inFile, File outFile, String identifier) throws Exception {
 		FileUtils.copyFile(inFile, outFile);
-		int[] tags = new int[] {
-				Tags.PatientID,
-				Tags.PatientName,
-				Tags.PatientSex,
-				Tags.PatientBirthDate,
-				Tags.PatientAddress,
-				Tags.ReferringPhysicianName,
-				Tags.InstitutionName,
-				Tags.StationName,
-				Tags.ManufacturerModelName
-		};
 		String[] command = new String[3 + 2 * tags.length + 1];
 		int i = 0;
-		command[i++] = new File(Properties.getString("dcmtk"), "bin/dcmodify").getPath();
+		command[i++] = dcmodify;
 		command[i++] = "-nb";
 		command[i++] = "-imt";
 		for (int tag : tags) {
@@ -120,7 +122,7 @@ public class Dicom {
 		}
 		command[i++] = outFile.getPath();
 		Util.exec(null, new HashMap<String, String>() {{
-			put("DCMDICTPATH", new File(Properties.getString("dcmtk"), "share/dcmtk/dicom.dic").getPath());
+			put("DCMDICTPATH", DCMDICTPATH);
 		}}, command);
 	}
 
