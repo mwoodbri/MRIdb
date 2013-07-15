@@ -24,7 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import jobs.ClipboardExporter;
 import jobs.Downloader;
@@ -217,27 +219,42 @@ public class Application extends SecureController {
 		CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.out));
 		String[] headers = reader.readNext();
 		writer.writeNext(headers);
+		TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where lower(patient.pat_id) = lower(:pat_id) and cast(study_datetime as date) = :study_datetime", Study.class);
+		TypedQuery<Project> projectQuery = JPA.em().createQuery("from Project where lower(name) = lower(:name)", Project.class);
 		String[] line = null;
 		while ((line = reader.readNext()) != null) {
 			if (StringUtils.isEmpty(line[3]) || StringUtils.isEmpty(line[9])) {
 				continue;
 			}
-			String pat_id = line[3].trim().toLowerCase();
-			Date study_datetime = new SimpleDateFormat("dd/MM/yyyy").parse(line[9]);
-			Study study = Study.find("lower(patient.pat_id) = ? and cast(study_datetime as date) = ?", pat_id, study_datetime).first();
-			if (study != null) {
+			Study study = null;
+			try {
+				study = studyQuery.setParameter("pat_id", line[3].trim()).setParameter("study_datetime", new SimpleDateFormat("dd/MM/yyyy").parse(line[9])).getSingleResult();
 				line[10] = "Yes";
-				Project project = Project.find("byName", line[1]).first();
-				if (project == null) {
-					project = new Project(line[1]).save();
+				Project project = null;
+				String projectName = line[1].trim();
+				if (!projectName.isEmpty()) {
+					try {
+						project = projectQuery.setParameter("name", projectName).getSingleResult();
+					} catch (NoResultException e) {
+						project = new Project(projectName).save();
+					}
 				}
-				associate(study, project, line[2]);
-			} else {
+				associate(study, project, line[2].trim());
+			} catch (NoResultException e) {
 				line[10] = "No";
 			}
 			Boolean singleFrames = null;
 			for (int i = 12; i < headers.length; i++) {
-				Series series = Series.find("from Series where lower(series_desc) = ? and lower(study.patient.pat_id) = ? and cast(study.study_datetime as date) = ?", headers[i].toLowerCase(), pat_id, study_datetime).first();
+				final String header = headers[i];
+				Series series = null;
+				if (study != null) {
+					series = (Series) CollectionUtils.find(study.series, new Predicate() {
+						@Override
+						public boolean evaluate(Object arg0) {
+							return ((Series) arg0).series_desc.equalsIgnoreCase(header);
+						}
+					});
+				}
 				if (series != null) {
 					line[i] = "Yes";
 					singleFrames = (singleFrames == null ? true : singleFrames) && Dicom.singleFrame(series);
@@ -506,7 +523,13 @@ public class Application extends SecureController {
 			}
 		} else {
 			if (association != null) {
-				association.project = project;
+				if (association.project.id == project.id) {
+					if (association.participationID.equals(participationID)) {
+						return;
+					}
+				} else {
+					association.project = project;
+				}
 			} else {
 				association = new ProjectAssociation(project, study);
 			}
