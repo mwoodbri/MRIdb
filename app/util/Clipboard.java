@@ -18,13 +18,13 @@ import play.db.jpa.GenericModel;
 
 public class Clipboard {
 
-	static final char SEPARATOR = ',';
+	static final String SEPARATOR = ",";
 
 	private Set<Item> items = new HashSet<Item>();
 
 	public Clipboard(String clipboard) {
 		if (clipboard != null && !clipboard.isEmpty()) {
-			for (String item : clipboard.split(String.valueOf(SEPARATOR))) {
+			for (String item : clipboard.split(SEPARATOR)) {
 				items.add(new Item(item));
 			}
 		}
