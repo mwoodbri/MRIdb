@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -91,9 +92,11 @@ public class Dicom {
 		return echoes;
 	}
 
-	private final static String dcmodify = new File(Properties.getString("dcmtk"), "bin/dcmodify").getPath();
-	private final static String DCMDICTPATH = new File(Properties.getString("dcmtk"), "share/dcmtk/dicom.dic").getPath();
-	private final static int[] tags = new int[] {
+	private static final String dcmodify = new File(Properties.getString("dcmtk"), "bin/dcmodify").getPath();
+	private static final Map<String, String> environment = new HashMap<String, String>() {{
+		put("DCMDICTPATH", new File(Properties.getString("dcmtk"), "share/dcmtk/dicom.dic").getPath());
+	}};
+	private static final int[] tags = new int[] {
 		Tags.PatientID,
 		Tags.PatientName,
 		Tags.PatientSex,
@@ -121,9 +124,7 @@ public class Dicom {
 			}
 		}
 		command[i++] = outFile.getPath();
-		Util.exec(null, new HashMap<String, String>() {{
-			put("DCMDICTPATH", DCMDICTPATH);
-		}}, command);
+		Util.exec(null, environment, command);
 	}
 
 	public static int numberOfFrames(Series series) throws IOException {

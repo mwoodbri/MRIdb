@@ -306,7 +306,7 @@ public class Application extends SecureController {
 		renderTemplate("@index", studies, studyCount, page);
 	}
 
-	private static Map<String, String> comparators = new HashMap<String, String>() {{
+	private static final Map<String, String> comparators = new HashMap<String, String>() {{
 		put("before", "<=");
 		put("on", "=");
 		put("after", ">");
