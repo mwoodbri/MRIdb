@@ -251,7 +251,7 @@ public class Application extends SecureController {
 					series = (Series) CollectionUtils.find(study.series, new Predicate() {
 						@Override
 						public boolean evaluate(Object arg0) {
-							return ((Series) arg0).series_desc.equalsIgnoreCase(header);
+							return header.equalsIgnoreCase(((Series) arg0).series_desc);
 						}
 					});
 				}
