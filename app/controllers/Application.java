@@ -219,7 +219,8 @@ public class Application extends SecureController {
 		CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.out));
 		String[] headers = reader.readNext();
 		writer.writeNext(headers);
-		TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where lower(patient.pat_id) = lower(:pat_id) and cast(study_datetime as date) = :study_datetime", Study.class);
+		//TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where lower(patient.pat_id) = lower(:pat_id) and cast(study_datetime as date) = :study_datetime", Study.class);
+		TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where patient.pat_id = :pat_id and cast(study_datetime as date) = :study_datetime", Study.class);
 		TypedQuery<Project> projectQuery = JPA.em().createQuery("from Project where lower(name) = lower(:name)", Project.class);
 		String[] line = null;
 		while ((line = reader.readNext()) != null) {
