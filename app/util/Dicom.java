@@ -137,7 +137,7 @@ public class Dicom {
 		return singleFrames(series).size();
 	}
 
-	public enum CUID {
+	private enum CUID {
 		MRImageStorage("1.2.840.10008.5.1.4.1.1.4"),
 		EnhancedMRImageStorage("1.2.840.10008.5.1.4.1.1.4.1"),
 		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2");

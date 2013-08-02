@@ -62,7 +62,6 @@ import play.mvc.Catch;
 import util.Clipboard;
 import util.Clipboard.Item;
 import util.Dicom;
-import util.Dicom.CUID;
 import util.DomainModelBinder;
 import util.Medcon;
 import util.PersistentLogger;
@@ -222,8 +221,6 @@ public class Application extends SecureController {
 		writer.writeNext(headers);
 		TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where patient.pat_id = :pat_id and cast(study_datetime as date) = :study_datetime", Study.class);
 		TypedQuery<Project> projectQuery = JPA.em().createQuery("from Project where lower(name) = lower(:name)", Project.class);
-		TypedQuery<Series> seriesQuery = JPA.em().createQuery("from Series where study.pk = :study_pk and lower(series_desc) = lower(:series_desc)", Series.class);
-		TypedQuery<Long> instanceQuery = JPA.em().createQuery("select count(i) from Instance i where i.series.pk = :series_pk and i.sop_cuid = :sop_cuid", Long.class).setParameter("sop_cuid", CUID.MRImageStorage.value);
 		String[] line = null;
 		int lineNumber = 0;
 		while ((line = reader.readNext()) != null) {
@@ -251,11 +248,16 @@ public class Application extends SecureController {
 			for (int i = 12; i < headers.length; i++) {
 				final String header = headers[i];
 				if (study != null) {
-					try {
-						Series series = seriesQuery.setParameter("study_pk", study.pk).setParameter("series_desc", header).setMaxResults(1).getSingleResult();
+					Series series = (Series) CollectionUtils.find(study.series, new Predicate() {
+						@Override
+						public boolean evaluate(Object arg0) {
+							return header.equalsIgnoreCase(((Series) arg0).series_desc);
+						}
+					});
+					if (series != null) {
 						line[i] = "Yes";
-						singleFrames = (singleFrames == null ? true : singleFrames) && instanceQuery.setParameter("series_pk", series.pk).getSingleResult() > 0;
-					} catch (NoResultException e) {
+						singleFrames = (singleFrames == null ? true : singleFrames) && Dicom.singleFrame(series);
+					} else {
 						line[i] = "No";
 					}
 				}
@@ -436,6 +438,7 @@ public class Application extends SecureController {
 	}
 
 	//pk is EITHER a Study OR a list of Series from a common Study
+	//@Transactional(readOnly=true)
 	public static void download(@As(binder=DomainModelBinder.class) List<DomainModel> pk, Format format) throws InterruptedException, IOException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
 		{
 			Study study = pk.get(0) instanceof Study ? (Study) pk.get(0) : ((Series) pk.get(0)).study;
