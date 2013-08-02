@@ -261,11 +261,8 @@ public class Application extends SecureController {
 			}
 			line[11] = Boolean.TRUE.equals(singleFrames) ? "Yes" : "No";
 			writer.writeNext(line);
-			//http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html
-			//https://groups.google.com/forum/#!msg/play-framework/CHVqhyUhJ9A/VpXSo5j3-yYJ
-			//http://stackoverflow.com/questions/6882447/how-do-i-perform-batch-insert-with-playframewok-jpa
-			//JPA.em().flush();
-			//JPA.em().clear();
+			JPA.em().flush();
+			JPA.em().clear();
 		}
 		reader.close();
 		writer.close();
