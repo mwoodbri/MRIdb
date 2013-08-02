@@ -225,6 +225,7 @@ public class Application extends SecureController {
 		TypedQuery<Series> seriesQuery = JPA.em().createQuery("from Series where study.pk = :study_pk and lower(series_desc) = lower(:series_desc)", Series.class);
 		TypedQuery<Long> instanceQuery = JPA.em().createQuery("select count(i) from Instance i where i.series.pk = :series_pk and i.sop_cuid = :sop_cuid", Long.class).setParameter("sop_cuid", CUID.MRImageStorage.value);
 		String[] line = null;
+		int lineNumber = 0;
 		while ((line = reader.readNext()) != null) {
 			if (StringUtils.isEmpty(line[3]) || StringUtils.isEmpty(line[9])) {
 				continue;
@@ -261,8 +262,10 @@ public class Application extends SecureController {
 			}
 			line[11] = Boolean.TRUE.equals(singleFrames) ? "Yes" : "No";
 			writer.writeNext(line);
-			JPA.em().flush();
-			JPA.em().clear();
+			if (lineNumber++ % 100 == 0) {
+				JPA.em().flush();
+				JPA.em().clear();
+			}
 		}
 		reader.close();
 		writer.close();
