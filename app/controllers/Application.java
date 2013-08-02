@@ -262,7 +262,7 @@ public class Application extends SecureController {
 			}
 			line[11] = Boolean.TRUE.equals(singleFrames) ? "Yes" : "No";
 			writer.writeNext(line);
-			if (lineNumber++ % 100 == 0) {
+			if (++lineNumber % 100 == 0) {
 				JPA.em().flush();
 				JPA.em().clear();
 			}
