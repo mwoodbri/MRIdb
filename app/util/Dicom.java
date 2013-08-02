@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,17 +56,15 @@ public class Dicom {
 	}
 
 	public static Collection<Files> getFiles(Series series) {
+		Collection<Instance> instances = Dicom.singleFrames(series);
+		if (instances.isEmpty()) {
+			instances = Collections.singleton(Dicom.multiFrame(series));
+			if (instances.isEmpty()) {
+				instances = Collections.singleton(Dicom.spectrogram(series));
+			}
+		}
 		List<Files> filesList = new ArrayList<Files>();
-		Collection<Instance> singleFrames = Dicom.singleFrames(series);
-		if (singleFrames.size() > 0) {
-			for (Instance instance : singleFrames) {
-				filesList.add(files(instance));
-			}
-		} else {
-			Instance instance = Dicom.multiFrame(series);
-			if (instance == null) {
-				instance = spectrogram(series);
-			}
+		for (Instance instance : instances) {
 			filesList.add(files(instance));
 		}
 		return filesList;
@@ -138,12 +137,12 @@ public class Dicom {
 		return singleFrames(series).size();
 	}
 
-	private enum CUID {
+	public enum CUID {
 		MRImageStorage("1.2.840.10008.5.1.4.1.1.4"),
 		EnhancedMRImageStorage("1.2.840.10008.5.1.4.1.1.4.1"),
 		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2");
 
-		final String value;
+		public final String value;
 		CUID(String value) {
 			this.value = value;
 		}

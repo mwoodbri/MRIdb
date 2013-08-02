@@ -62,6 +62,7 @@ import play.mvc.Catch;
 import util.Clipboard;
 import util.Clipboard.Item;
 import util.Dicom;
+import util.Dicom.CUID;
 import util.DomainModelBinder;
 import util.Medcon;
 import util.PersistentLogger;
@@ -191,7 +192,7 @@ public class Application extends SecureController {
 		}
 		reader.close();
 
-		if (objects.size() == 0) {
+		if (objects.isEmpty()) {
 			Validation.addError(null, "No studies or series found");
 		}
 
@@ -219,9 +220,10 @@ public class Application extends SecureController {
 		CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.out));
 		String[] headers = reader.readNext();
 		writer.writeNext(headers);
-		//TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where lower(patient.pat_id) = lower(:pat_id) and cast(study_datetime as date) = :study_datetime", Study.class);
 		TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where patient.pat_id = :pat_id and cast(study_datetime as date) = :study_datetime", Study.class);
 		TypedQuery<Project> projectQuery = JPA.em().createQuery("from Project where lower(name) = lower(:name)", Project.class);
+		TypedQuery<Series> seriesQuery = JPA.em().createQuery("from Series where study.pk = :study_pk and lower(series_desc) = lower(:series_desc)", Series.class);
+		TypedQuery<Long> instanceQuery = JPA.em().createQuery("select count(i) from Instance i where i.series.pk = :series_pk and i.sop_cuid = :sop_cuid", Long.class).setParameter("sop_cuid", CUID.MRImageStorage.value);
 		String[] line = null;
 		while ((line = reader.readNext()) != null) {
 			if (StringUtils.isEmpty(line[3]) || StringUtils.isEmpty(line[9])) {
@@ -247,24 +249,23 @@ public class Application extends SecureController {
 			Boolean singleFrames = null;
 			for (int i = 12; i < headers.length; i++) {
 				final String header = headers[i];
-				Series series = null;
 				if (study != null) {
-					series = (Series) CollectionUtils.find(study.series, new Predicate() {
-						@Override
-						public boolean evaluate(Object arg0) {
-							return header.equalsIgnoreCase(((Series) arg0).series_desc);
-						}
-					});
-				}
-				if (series != null) {
-					line[i] = "Yes";
-					singleFrames = (singleFrames == null ? true : singleFrames) && Dicom.singleFrame(series);
-				} else {
-					line[i] = "No";
+					try {
+						Series series = seriesQuery.setParameter("study_pk", study.pk).setParameter("series_desc", header).getSingleResult();
+						line[i] = "Yes";
+						singleFrames = (singleFrames == null ? true : singleFrames) && instanceQuery.setParameter("series_pk", series.pk).getSingleResult() > 0;
+					} catch (NoResultException e) {
+						line[i] = "No";
+					}
 				}
 			}
 			line[11] = Boolean.TRUE.equals(singleFrames) ? "Yes" : "No";
 			writer.writeNext(line);
+			//http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html
+			//https://groups.google.com/forum/#!msg/play-framework/CHVqhyUhJ9A/VpXSo5j3-yYJ
+			//http://stackoverflow.com/questions/6882447/how-do-i-perform-batch-insert-with-playframewok-jpa
+			//JPA.em().flush();
+			//JPA.em().clear();
 		}
 		reader.close();
 		writer.close();
@@ -392,7 +393,7 @@ public class Application extends SecureController {
 		Instance instance = Dicom.multiFrame(series);
 		if (instance == null) {
 			Collection instances = Dicom.singleFrames(series);
-			instance = instances.size() > 0 ? (Instance) instances.iterator().next() : Dicom.spectrogram(series);
+			instance = instances.isEmpty() ? Dicom.spectrogram(series) : (Instance) instances.iterator().next();
 		}
 		Dataset dataset = Dicom.dataset(Dicom.file(instance));
 		Set<String> echoes = Dicom.echoes(dataset);
@@ -442,12 +443,12 @@ public class Application extends SecureController {
 		}
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		await(new Downloader(format == null ? Format.dcm : format, tmpDir, Item.serialize(pk)).now());
-		if (FileUtils.listFiles(tmpDir.listFiles()[0], TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).size() == 0) {
+		File outDir = await(new Downloader(format == null ? Format.dcm : format, tmpDir, Item.serialize(pk)).now());
+		if (FileUtils.listFiles(outDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).isEmpty()) {
 			error("Failed to convert files");
 		}
-		File zip = new File(tmpDir, String.format("%s.zip", tmpDir.listFiles()[0].getName()));
-		Files.zip(tmpDir.listFiles()[0], zip);
+		File zip = new File(tmpDir, String.format("%s.zip", outDir.getName()));
+		Files.zip(outDir, zip);
 		renderBinary(zip);
 	}
 

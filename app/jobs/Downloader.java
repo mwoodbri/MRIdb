@@ -9,7 +9,7 @@ import play.jobs.Job;
 import util.Clipboard.Item;
 import util.Download;
 
-public class Downloader extends Job<Void> {
+public class Downloader extends Job<File> {
 
 	public static enum Format {
 		dcm, //DICOM
@@ -28,7 +28,7 @@ public class Downloader extends Job<Void> {
 	}
 
 	@Override
-	public void doJob() {
+	public File doJobWithResult() throws Exception {
 		try {
 			for (Item item : items) {
 				DomainModel model = item.getModel();
@@ -38,6 +38,7 @@ public class Downloader extends Job<Void> {
 					Download.series((Series) model, tmpDir, format);
 				}
 			}
+			return tmpDir.listFiles()[0];
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
