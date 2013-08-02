@@ -5,6 +5,7 @@ import java.io.File;
 import models.DomainModel;
 import models.Series;
 import models.Study;
+import play.db.jpa.JPA;
 import play.jobs.Job;
 import util.Clipboard.Item;
 import util.Download;
@@ -37,6 +38,7 @@ public class Downloader extends Job<File> {
 				} else if (model instanceof Series) {
 					Download.series((Series) model, tmpDir, format);
 				}
+				JPA.em().clear();
 			}
 			return tmpDir.listFiles()[0];
 		} catch (Exception e) {
