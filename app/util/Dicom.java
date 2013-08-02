@@ -142,7 +142,7 @@ public class Dicom {
 		EnhancedMRImageStorage("1.2.840.10008.5.1.4.1.1.4.1"),
 		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2");
 
-		public final String value;
+		final String value;
 		CUID(String value) {
 			this.value = value;
 		}
