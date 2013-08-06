@@ -1,6 +1,7 @@
 package jobs;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 
 import models.DomainModel;
 import models.Series;
@@ -30,20 +31,16 @@ public class Downloader extends Job<File> {
 
 	@Override
 	public File doJobWithResult() throws Exception {
-		try {
-			for (Item item : items) {
-				DomainModel model = item.getModel();
-				if (model instanceof Study) {
-					Download.study((Study) model, tmpDir, format);
-				} else if (model instanceof Series) {
-					Download.series((Series) model, tmpDir, format);
-				}
-				JPA.em().clear();
+		for (Item item : items) {
+			DomainModel model = item.getModel();
+			if (model instanceof Study) {
+				Download.study((Study) model, tmpDir, format);
+			} else if (model instanceof Series) {
+				Download.series((Series) model, tmpDir, format);
 			}
-			return tmpDir.listFiles()[0];
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			JPA.em().clear();
 		}
+		return tmpDir.listFiles()[0];
 	}
 
 }
