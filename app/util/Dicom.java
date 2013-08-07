@@ -25,6 +25,8 @@ import org.dcm4che.data.Dataset;
 import org.dcm4che.data.DcmObjectFactory;
 import org.dcm4che.dict.Tags;
 
+import play.Logger;
+
 public class Dicom {
 
 	public static String attribute(byte[] dataset, String tag) throws IOException {
@@ -65,7 +67,12 @@ public class Dicom {
 		}
 		List<Files> filesList = new ArrayList<Files>();
 		for (Instance instance : instances) {
-			filesList.add(files(instance));
+			Files files = files(instance);
+			if (files == null) {
+				Logger.warn("No Files found for Instance %s of Series %s", instance, series.toDownloadString());
+				continue;
+			}
+			filesList.add(files);
 		}
 		return filesList;
 	}
