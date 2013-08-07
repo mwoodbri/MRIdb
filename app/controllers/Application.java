@@ -448,7 +448,7 @@ public class Application extends SecureController {
 		tmpDir.mkdir();
 		File outDir = await(new Downloader(format == null ? Format.dcm : format, tmpDir, Item.serialize(pk)).now());
 		if (FileUtils.listFiles(outDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).isEmpty()) {
-			error("Failed to convert files");
+			error("Failed to retrieve files");
 		}
 		File zip = new File(tmpDir, String.format("%s.zip", outDir.getName()));
 		Files.zip(outDir, zip);
