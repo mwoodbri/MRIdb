@@ -60,10 +60,11 @@ public class Dicom {
 	public static Collection<Files> getFiles(Series series) {
 		Collection<Instance> instances = Dicom.singleFrames(series);
 		if (instances.isEmpty()) {
-			instances = Collections.singleton(Dicom.multiFrame(series));
-			if (instances.isEmpty()) {
-				instances = Collections.singleton(Dicom.spectrogram(series));
+			Instance instance = Dicom.multiFrame(series);
+			if (instance == null) {
+				instance = Dicom.spectrogram(series);
 			}
+			instances = Collections.singleton(instance);
 		}
 		List<Files> filesList = new ArrayList<Files>();
 		for (Instance instance : instances) {
