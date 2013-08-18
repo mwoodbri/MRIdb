@@ -17,6 +17,9 @@ In ${exception.sourceFile} (around line ${exception.lineNumber})
 ${exception.lineNumber == line_index+from ? '>':' '} ${line_index+from}: ${line}
 #{/list}
 #{/if}
+#{else}
+${org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(exception)}
+#{/else}
  
 This exception has been logged with id ${exception.id}
 #{/if}
