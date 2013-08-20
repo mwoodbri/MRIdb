@@ -7,7 +7,7 @@
 		var select = $("select[name=projectID]");
 		var input = $("input[name=participationID]");
 		select.on('change', function() {
-			if ($("option:last", this).attr('selected')) {
+			if ($("option:last", this).prop('selected')) {
 				var projectName = window.prompt("Project name", "");
 				var existing = $.map(select.children(), function(n, i) { return n.text; });
 				if (!$.trim(projectName) || $.inArray(projectName, existing) !== -1) {
@@ -18,7 +18,7 @@
 				$(this).hide();
 			}
 			input.val('');
-			input.prop('disabled', $("option:first", this).attr('selected') ? 'disabled' : '');
+			input.prop('disabled', $("option:first", this).prop('selected') ? 'disabled' : '');
 		});
 		$("a.download").click(function(e) {
 			var selected = $("a.selected");
