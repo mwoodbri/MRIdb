@@ -1,7 +1,6 @@
 package jobs;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 
 import models.DomainModel;
 import models.Series;
