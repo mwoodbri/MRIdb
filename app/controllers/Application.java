@@ -227,9 +227,8 @@ public class Application extends SecureController {
 			if (StringUtils.isEmpty(line[3]) || StringUtils.isEmpty(line[9])) {
 				continue;
 			}
-			Study study = null;
-			try {
-				study = studyQuery.setParameter("pat_id", line[3].trim()).setParameter("study_datetime", new SimpleDateFormat("dd/MM/yyyy").parse(line[9])).getSingleResult();
+			List<Study> studies = studyQuery.setParameter("pat_id", line[3].trim()).setParameter("study_datetime", new SimpleDateFormat("dd/MM/yyyy").parse(line[9])).getResultList();
+			if (!studies.isEmpty()) {
 				line[10] = "Yes";
 				Project project = null;
 				String projectName = line[1].trim();
@@ -240,14 +239,14 @@ public class Application extends SecureController {
 						project = new Project(projectName).save();
 					}
 				}
-				associate(study, project, line[2].trim());
-			} catch (NoResultException e) {
-				line[10] = "No";
+				for (Study study : studies) {
+					associate(study, project, line[2].trim());
+				}
 			}
 			Boolean singleFrames = null;
 			for (int i = 12; i < headers.length; i++) {
 				final String header = headers[i];
-				if (study != null) {
+				for (Study study : studies) {
 					Series series = (Series) CollectionUtils.find(study.series, new Predicate() {
 						@Override
 						public boolean evaluate(Object arg0) {
@@ -257,12 +256,12 @@ public class Application extends SecureController {
 					if (series != null) {
 						line[i] = "Yes";
 						singleFrames = (singleFrames == null ? true : singleFrames) && Dicom.singleFrame(series);
-					} else {
-						line[i] = "No";
 					}
 				}
 			}
-			line[11] = Boolean.TRUE.equals(singleFrames) ? "Yes" : "No";
+			if (Boolean.TRUE.equals(singleFrames)) {
+				line[11] = "Yes";
+			}
 			writer.writeNext(line);
 			if (++lineNumber % 100 == 0) {
 				JPA.em().flush();
