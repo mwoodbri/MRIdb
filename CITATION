@@ -2,18 +2,6 @@
 
 Woodbridge, M., Fagiolo, G., and O’Regan, D.P. (2013). MRIdb: Medical Image Management for Biobank Research. Journal of Digital Imaging. doi:10.1007/s10278-013-9604-9
 
-# BibTeX
+# Other styles for DOI 10.1007/s10278-013-9604-9
 
-@article{
-year={2013},
-issn={0897-1889},
-journal={Journal of Digital Imaging},
-doi={10.1007/s10278-013-9604-9},
-title={MRIdb: Medical Image Management for Biobank Research},
-url={http://dx.doi.org/10.1007/s10278-013-9604-9},
-publisher={Springer-Verlag},
-keywords={PACS; Digital imaging and communications in medicine (DICOM); MR imaging},
-author={Woodbridge, Mark and Fagiolo, Gianlorenzo and O’Regan, DeclanP.},
-pages={1-5},
-language={English}
-}
+http://citation.labs.crossref.org/
