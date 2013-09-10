@@ -516,7 +516,6 @@ public class Application extends SecureController {
 		}
 		associate(study, project, participationID);
 		PersistentLogger.log("study %s linked to project: %s (%s)", study.pk, project, participationID);
-		redirect(request.headers.get("referer").value());
 	}
 
 	static void associate(Study study, Project project, String participationID) {
@@ -528,7 +527,7 @@ public class Application extends SecureController {
 		} else {
 			if (association != null) {
 				if (association.project.id == project.id) {
-					if (association.participationID.equals(participationID)) {
+					if (participationID.equals(association.participationID)) {
 						return;
 					}
 				} else {
