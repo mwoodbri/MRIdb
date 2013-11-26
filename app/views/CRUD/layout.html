@@ -5,6 +5,9 @@
         <title>#{get 'title' /}</title>
         <meta charset="${_response_encoding}" />
         <link rel="stylesheet" media="screen" href="@{'/public/stylesheets/crud.css'}" />
+        <style>
+          #crudBreadcrumb ul { display: inline-block; }
+        </style>
     </head>
     <body id="crud">
 
@@ -12,11 +15,10 @@
             <h1><a href="@{CRUD.index()}">&{'crud.title'}</a></h1>
         </div>
 
-#{if request.actionMethod != 'index'}
             <div id="crudBreadcrumb">
-                #{crud.navigation /}
+                <a href="..">${play.configuration.getProperty('application.name')}</a> >
+                #{if request.actionMethod != 'index'}#{crud.navigation /}#{/if}#{else}<ul><li><a href="@{CRUD.index()}">&{'crud.home'}</a></li></ul>#{/else}
             </div>
-#{/if}
 
 #{if flash.success}
             <div class="crudFlash flashSuccess">

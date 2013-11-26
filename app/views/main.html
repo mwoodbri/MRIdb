@@ -22,9 +22,9 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li>#{a @crud.Persons.list(), target: '_blank'}Users#{/a}
-                <li>#{a @crud.Projects.list(), target: '_blank'}Projects#{/a}
-                <li>#{a @crud.Logs.list(order: 'DESC'), target: '_blank'}Usage#{/a}
+                <li>#{a @crud.Persons.list()}Users#{/a}
+                <li>#{a @crud.Projects.list()}Projects#{/a}
+                <li>#{a @crud.Logs.list(order: 'DESC')}Usage#{/a}
                 <li>#{a @audit()}Audit#{/a}
               </ul>
             </li>

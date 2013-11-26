@@ -6,3 +6,4 @@ secure.disclaimer=This system is not certified for primary diagnosis and is for 
 #CRUD
 Persons=People
 Helps=Help
+crud.home=Admin
