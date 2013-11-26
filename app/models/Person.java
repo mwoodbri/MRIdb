@@ -16,7 +16,7 @@ public class Person extends GenericModel {
 	@Id
 	public String username;
 	public String password;
-	public Role role = Role.Visitor;
+	public Role role = Role.Guest;
 	@Lob
 	public String clipboard;
 
@@ -39,7 +39,7 @@ public class Person extends GenericModel {
 	}
 
 	public static enum Role {
-		Researcher, Administrator, Visitor
+		Researcher, Administrator, Visitor, Guest;
 	}
 
 }

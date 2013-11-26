@@ -76,12 +76,19 @@ public class Application extends SecureController {
 	public static final String CLIPBOARD = "clipboard";
 	public static final String EXPORTS = "exports";
 
-	@Before
+	@Before(unless="guest")
 	static void before() {
 		if (Security.isConnected()) {
+			if (getUser().role == Role.Guest) {
+				guest();
+			}
 			renderArgs.put(CLIPBOARD, new Clipboard(getUser().clipboard));
 			renderArgs.put(EXPORTS, ClipboardExporter.getExports(session));
 		}
+	}
+
+	public static void guest() {
+		render();
 	}
 
 	public static void index(Integer page, String order, String sort) {

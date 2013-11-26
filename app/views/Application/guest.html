@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MRIdb Guest</title>
+    #{stylesheet 'bootstrap.min.css'/}
+    #{stylesheet 'main.css'/}
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="@{Application.index}"><img src="@{'/public/images/' + play.configuration.getProperty('application.name') + '-small.png'}" alt="logo"></a>
+          <p class="navbar-text pull-right">Logged in as ${session.username} <a href='@{Secure.logout()}'>Log out</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <h2>Guest account</h2>
+        <h4 style="margin-bottom: 0.5em">In order to use ${play.configuration.getProperty('application.name')} your login must be approved by an administrator</h4>
+        <p>Please contact your Head of Department for access</p>
+      </div>
+    </div>
+  </body>
+</html>
