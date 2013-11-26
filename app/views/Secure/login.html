@@ -4,7 +4,7 @@
 	
 	<h1>&{'secure.title'}</h1>
 
-	#{form @authenticate()}
+	#{form @authenticate(), autocomplete: 'off'}
 		
 		<img style="display: block; margin: 0 auto 10px auto" width="460" src="@{'/public/images/' + play.configuration.getProperty('application.name') + '.png'}">
 		
