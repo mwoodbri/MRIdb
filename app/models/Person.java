@@ -35,7 +35,7 @@ public class Person extends GenericModel {
 
 	@Override
 	public String toString() {
-		return username;
+		return String.format("%s (%s)", username, role);
 	}
 
 	public static enum Role {
