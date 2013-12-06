@@ -32,13 +32,15 @@ public class ClipboardExporter extends Job {
 	private String password;
 	private Session session;
 	private String username;
+	private boolean preferMultiframe;
 
-	public ClipboardExporter(Clipboard clipboard, File tmpDir, String password, Session session, String username) {
+	public ClipboardExporter(Clipboard clipboard, File tmpDir, String password, Session session, String username, boolean preferMultiframe) {
 		this.clipboard = clipboard;
 		this.tmpDir = tmpDir;
 		this.password = password;
 		this.session = session;
 		this.username = username;
+		this.preferMultiframe = preferMultiframe;
 		addExport();
 	}
 
@@ -47,10 +49,10 @@ public class ClipboardExporter extends Job {
 		for (GenericModel object : clipboard.getObjects()) {
 			if (object instanceof Study) {
 				Study study = (Study) object;
-				Download.study(study, tmpDir, Format.dcm);
+				Download.study(study, tmpDir, Format.dcm, preferMultiframe);
 			} else if (object instanceof Series) {
 				Series series = (Series) object;
-				Download.series(series, tmpDir, Format.dcm);
+				Download.series(series, tmpDir, Format.dcm, preferMultiframe);
 			}
 		}
 

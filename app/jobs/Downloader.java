@@ -21,10 +21,12 @@ public class Downloader extends Job<File> {
 	private Item[] items;
 	private Format format;
 	private File tmpDir;
+	boolean preferMultiframe;
 
-	public Downloader(Format format, File tmpDir, Item... items) {
+	public Downloader(Format format, File tmpDir, boolean preferMultiframe, Item... items) {
 		this.format = format;
 		this.tmpDir = tmpDir;
+		this.preferMultiframe = preferMultiframe;
 		this.items = items;
 	}
 
@@ -33,9 +35,9 @@ public class Downloader extends Job<File> {
 		for (Item item : items) {
 			DomainModel model = item.getModel();
 			if (model instanceof Study) {
-				Download.study((Study) model, tmpDir, format);
+				Download.study((Study) model, tmpDir, format, preferMultiframe);
 			} else if (model instanceof Series) {
-				Download.series((Series) model, tmpDir, format);
+				Download.series((Series) model, tmpDir, format, preferMultiframe);
 			}
 			JPA.em().clear();
 		}

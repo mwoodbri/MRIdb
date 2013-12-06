@@ -19,6 +19,7 @@ public class Person extends GenericModel {
 	public Role role = Role.Guest;
 	@Lob
 	public String clipboard;
+	public Boolean preferMultiframe;
 
 	public Person(String username) {
 		this.username = username;

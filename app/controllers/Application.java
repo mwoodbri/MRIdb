@@ -108,6 +108,15 @@ public class Application extends SecureController {
 		render();
 	}
 
+	public static void preferences(String frame) {
+		Person user = Person.find("username", Security.connected()).first();
+		if ("POST".equals(request.method)) {
+			user.preferMultiframe = "multi".equals(frame);
+			user.save();
+		}
+		render(user);
+	}
+
 	public static void advanced() {
 		render();
 	}
@@ -452,7 +461,7 @@ public class Application extends SecureController {
 		}
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		File outDir = await(new Downloader(format == null ? Format.dcm : format, tmpDir, Item.serialize(pk)).now());
+		File outDir = await(new Downloader(format == null ? Format.dcm : format, tmpDir, Boolean.TRUE.equals(getUser().preferMultiframe), Item.serialize(pk)).now());
 		if (FileUtils.listFiles(outDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).isEmpty()) {
 			error("Failed to retrieve files");
 		}
@@ -466,7 +475,7 @@ public class Application extends SecureController {
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		new ClipboardExporter(clipboard, tmpDir, password, session, getUser().username).now();
+		new ClipboardExporter(clipboard, tmpDir, password, session, getUser().username, Boolean.TRUE.equals(getUser().preferMultiframe)).now();
 		clipboard(null, null, null);
 	}
 
@@ -502,12 +511,12 @@ public class Application extends SecureController {
 		File dcm;
 		Instance instance = Dicom.multiFrame(series);
 		if (instance != null) {
-			await(new Downloader(Format.dcm, tmpDir, new Item(series)).now());
+			await(new Downloader(Format.dcm, tmpDir, Boolean.TRUE.equals(getUser().preferMultiframe), new Item(series)).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
 			File unanonymised = new File(tmpDir, String.format("%s.unanonymised.dcm", series.pk));
 			//medcon has a -anon flag but it doesn't work with -stack3d, so we anonymise manually in line with other exports
-			Medcon.convert(Dicom.collate(series), Format.dcm, unanonymised);
+			Medcon.convert(Dicom.collate(series, Boolean.TRUE.equals(getUser().preferMultiframe)), Format.dcm, unanonymised);
 			dcm = new File(tmpDir, String.format("%s.dcm", series.pk));
 			Dicom.anonymise(unanonymised, dcm, null);
 		}

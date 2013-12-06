@@ -48,23 +48,31 @@ public class Dicom {
 		return null;
 	}
 
-	public static File collate(Series series) {
+	public static File collate(Series series, boolean preferMultiframe) {
 		File collated = new File(Properties.getCollations(), UUID.randomUUID().toString());
 		collated.mkdir();
-		for (Files files : Dicom.getFiles(series)) {
+		for (Files files : Dicom.getFiles(series, preferMultiframe)) {
 			play.libs.Files.copy(new File(Properties.getArchive(), files.filepath), new File(collated, files.toDownloadString()));
 		}
 		return collated;
 	}
 
-	public static Collection<Files> getFiles(Series series) {
+	public static Collection<Files> getFiles(Series series, boolean preferMultiframe) {
 		Collection<Instance> instances = Dicom.singleFrames(series);
-		if (instances.isEmpty()) {
-			Instance instance = Dicom.multiFrame(series);
-			if (instance == null) {
-				instance = Dicom.spectrogram(series);
+		{
+			Instance instance = null;
+			if (preferMultiframe || instances.isEmpty()) {
+				instance = Dicom.multiFrame(series);
+				if (instance != null) {
+					instances = Collections.EMPTY_SET;
+				}
 			}
-			instances = Collections.singleton(instance);
+			if (instances.isEmpty()) {
+				if (instance == null) {
+					instance = Dicom.spectrogram(series);
+				}
+				instances = Collections.singleton(instance);
+			}
 		}
 		List<Files> filesList = new ArrayList<Files>();
 		for (Instance instance : instances) {

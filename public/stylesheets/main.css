@@ -66,3 +66,12 @@ a.single.enabled {
 button {
   color: black;
 }
+
+legend {
+  margin-bottom: 0.2em;
+  padding-top: 0.8em;
+}
+
+fieldset {
+  margin-bottom: 1em;
+}
