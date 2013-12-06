@@ -144,15 +144,17 @@ public class Application extends SecureController {
 				if (!series_descs.isEmpty()) {
 					List<DomainModel> serieses = new ArrayList<DomainModel>();
 					for (String series_desc : series_descs) {
-						Series series = (Series) CollectionUtils.find(Series.find("study.patient.pat_id = ? and series_desc = ?", pat_id, series_desc).<Series>fetch(), new Predicate() {
+						List<Series> candidates = (List<Series>) CollectionUtils.select(Series.find("study.patient.pat_id = ? and series_desc = ?", pat_id, series_desc).<Series>fetch(), new Predicate() {
 							@Override
 							public boolean evaluate(Object candidate) {
 								return Dicom.renderable((Series) candidate);
 							}
 						});
-						if (series != null) {
-							found.add(String.format("%s - %s", pat_id, series_desc));
-							serieses.add(series);
+						if (!candidates.isEmpty()) {
+							for (Series series : candidates) {
+								found.add(String.format("%s - %s", pat_id, series_desc));
+								serieses.add(series);
+							}
 						} else {
 							missing.add(String.format("%s - %s", pat_id, series_desc));
 						}
@@ -176,17 +178,19 @@ public class Application extends SecureController {
 				if (!series_descs.isEmpty()) {
 					List<DomainModel> serieses = new ArrayList<DomainModel>();
 					for (String series_desc : series_descs) {
-						Series series = (Series) CollectionUtils.find(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ? and series_desc = ?", participationID, series_desc).<Series>fetch(), new Predicate() {
+						List<Series> candidates = (List<Series>) CollectionUtils.select(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ? and series_desc = ?", participationID, series_desc).<Series>fetch(), new Predicate() {
 							@Override
 							public boolean evaluate(Object candidate) {
 								return Dicom.renderable((Series) candidate);
 							}
 						});
-						if (series != null) {
-							found.add(String.format("%s - %s", participationID, series_desc));
-							serieses.add(series);
-						} else {
+						if (candidates.isEmpty()) {
 							missing.add(String.format("%s - %s", participationID, series_desc));
+						} else {
+							for (Series series : candidates) {
+								found.add(String.format("%s - %s", participationID, series_desc));
+								serieses.add(series);
+							}
 						}
 					}
 					if (!serieses.isEmpty()) {
