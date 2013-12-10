@@ -21,7 +21,7 @@ public class Properties {
 	}
 
 	public static int pageSize() {
-		return Integer.parseInt(Play.configuration.getProperty("page.size", String.valueOf(15)));
+		return Integer.parseInt(Play.configuration.getProperty("page.size", String.valueOf(20)));
 	}
 
 	public static File getDownloads() {

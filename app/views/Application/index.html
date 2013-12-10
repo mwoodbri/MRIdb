@@ -2,24 +2,28 @@
 #{set title:'Studies'/}
 
 #{set 'moreScripts'}
+#{script 'waypoints.min.js'/}
+#{script 'waypoints-infinite.min.js'/}
 <script>
-	$(function() {
-		"use strict";
-		$('th.header').on('click', function() {
-			window.location = URI(window.location.href)
-				.removeSearch({
-					order: undefined,
-					sort: undefined,
-					page: undefined
-				})
-				.addSearch({
-					order: this.id,
-					sort: $(this).hasClass('headerSortDown') ? "desc" : "asc",
-					page: 0
-				})
-				.toString();
-		});
+	$('th.header').on('click', function() {
+		window.location = URI(window.location.href)
+			.removeSearch({
+				order: undefined,
+				sort: undefined,
+				page: undefined
+			})
+			.addSearch({
+				order: this.id,
+				sort: $(this).hasClass('headerSortDown') ? "desc" : "asc",
+				page: 0
+			})
+			.toString();
 	});
+	$('tbody').waypoint('infinite', {
+		items: '#studies tbody tr',
+		more: '.pagination .next:not(.disabled) a'
+	});
+	$('.pagination').hide();
 </script>
 #{/set}
 

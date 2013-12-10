@@ -42,43 +42,47 @@
       </div>
     </div>
 
+    #{if play.mode.dev}
+    <script>
+      window.onerror = function(errorMsg, url, lineNumber) {
+        alert(errorMsg + '\n' + url + ':' + lineNumber);
+      };
+    </script>
+    #{/if}
     #{script 'jquery.min.js'/}
     #{script 'jquery-ui-1.10.3.custom.min.js'/}
     #{script 'bootstrap.min.js'/}
     #{script 'jquery.form.min.js'/}
     #{script 'URI.min.js'/}
     <script>
-        $(function() {
-            "use strict";
-            $.datepicker.setDefaults({
-                dateFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true
-            });
-            $(".container-fluid").on("click", "a.clipboard", function(event) {
+        $.datepicker.setDefaults({
+            dateFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true
+        });
+        $(".container-fluid").on("click", "a.clipboard", function(event) {
+            $('#clipboard').load(this.href);
+            return false;
+        });
+        $("#clipboard").on("click", "a.export", function(event) {
+            if($(this).data('size') > ${play.configuration.getProperty("clipboard.limit", "5")}) {
+                window.alert("Clipboard export is limited to 5 items");
+                return false;
+            }
+            var password = window.prompt("Encryption password", "");
+            if (password) {
+                this.href += "?" + $.param({password: password});
                 $('#clipboard').load(this.href);
-                return false;
-            });
-            $("#clipboard").on("click", "a.export", function(event) {
-                if($(this).data('size') > ${play.configuration.getProperty("clipboard.limit", "5")}) {
-                    window.alert("Clipboard export is limited to 5 items");
-                    return false;
-                }
-                var password = window.prompt("Encryption password", "");
-                if (password) {
-                    this.href += "?" + $.param({password: password});
-                    $('#clipboard').load(this.href);
-                }
-                return false;
-            });
-            setInterval(function() {
-                $('#clipboard').load('@{clipboard()}');
-            }, 10000);
-            $(".thumbnail img").each(function() {
-                var img = this;
-                $("<img />").attr('src', this.alt).load(function() {
-                    $(img).before(this).remove();
-                });
+            }
+            return false;
+        });
+        setInterval(function() {
+            $('#clipboard').load('@{clipboard()}');
+        }, 10000);
+        $(".thumbnail img").each(function() {
+            var img = this;
+            $("<img />").attr('src', this.alt).load(function() {
+                $(img).before(this).remove();
             });
         });
     </script>
