@@ -537,6 +537,11 @@ public class Application extends SecureController {
 		renderBinary(dcm);
 	}
 
+	public static void studyComments(Study study) {
+		study.save();
+		study(study.pk);
+	}
+
 	public static void associate(Study study, Long projectID, String participationID, String projectName) {
 		Project project = null;
 		if (!projectName.isEmpty()) {

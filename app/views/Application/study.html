@@ -107,7 +107,7 @@
 			});
 			return false;
 		});
-		$('#myModal').on('hide', function() {
+		$('#projectModal').on('hide', function() {
 			$('#associate')[0].reset();
 		});
 	});
@@ -118,7 +118,8 @@
 	<h2>${study.patient.pat_id}#{ifNotVisitor} - ${study.patient.pat_name?.formatAsName()} - ${study.patient.pat_birthdate?.formatAsDate()}#{/ifNotVisitor}</h2>
 	<h3 style="display: inline" class="study" data-pk="${study.pk}">${study.study_desc} - ${study.study_datetime?.format()}</h3>
 	&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
-	<p style="margin: 1em 0"><span style="padding-right: 1em">Project: #{if projectAssociation}<span style="color: white; font-weight: bold">${projectAssociation.project.name}</span>#{/if}#{else}None#{/else}</span><span style="padding-right: 1em">Identifier: #{if projectAssociation && projectAssociation.participationID}<span style="color: white; font-weight: bold">${projectAssociation.participationID}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#myModal">#{if projectAssociation && projectAssociation.participationID}Change#{/if}#{else}Add#{/else} ID code</a></p>
+	<p style="margin: 1em 0"><span style="padding-right: 1em">Project: #{if projectAssociation}<span style="color: white; font-weight: bold">${projectAssociation.project.name}</span>#{/if}#{else}None#{/else}</span><span style="padding-right: 1em">Identifier: #{if projectAssociation && projectAssociation.participationID}<span style="color: white; font-weight: bold">${projectAssociation.participationID}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#projectModal">#{if projectAssociation && projectAssociation.participationID}Change#{/if}#{else}Add#{/else} ID code</a></p>
+	<p style="margin: 1em 0"><span style="padding-right: 1em">Comments: #{if study.study_custom1}<span style="color: white; font-weight: bold">${study.study_custom1}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#commentsModal">Update</a></p>
 	#{a @download(null, 'dcm'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
 	#{a @download(null, 'nii'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
 	#{a @download(null, 'img'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
@@ -146,7 +147,7 @@
 	</div>
 </div>
 <div id="imagej"></div>
-<div class="modal hide" id="myModal">
+<div class="modal hide" id="projectModal">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">×</button>
 		<h3>Assign study to project</h3>
@@ -170,4 +171,21 @@
 		<a href="#" class="btn" data-dismiss="modal" id="close">Close</a>
 		<a href="#" class="btn btn-primary" id="submit">Save changes</a>
 	</div>
+</div>
+<div class="modal hide" id="commentsModal">
+	#{form @studyComments(), method: 'post', class: 'modal-form', style: 'margin: 0'}
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">×</button>
+			<h3>Project comments</h3>
+		</div>
+		<div class="modal-body">
+			<span style="display: inline-block; width: 8em; text-align: right; padding-right: 1em">Comments:</span>
+			<input type="text" name="study.study_custom1" value="${study.study_custom1}">
+			<input type="hidden" name="study.pk" value="${study.pk}">
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" data-dismiss="modal">Close</a>
+			<button type="submit" class="btn btn-primary">Save changes</button>
+		</div>
+	#{/form}
 </div>
