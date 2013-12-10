@@ -239,28 +239,38 @@ public class Application extends SecureController {
 		CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.out));
 		String[] headers = reader.readNext();
 		writer.writeNext(headers);
-		TypedQuery<Study> studyQuery = JPA.em().createQuery("from Study where patient.pat_id = :pat_id and cast(study_datetime as date) = :study_datetime", Study.class);
+		TypedQuery<Study> studyQueryByPatientID = JPA.em().createQuery("from Study where patient.pat_id = :pat_id and cast(study_datetime as date) = :study_datetime", Study.class);
+		TypedQuery<Study> studyQueryByParticipationID = JPA.em().createQuery("select study from Study study left join study.projectAssociations projectAssociation where cast(study.study_datetime as date) = :study_datetime and projectAssociation.participationID = :participationID", Study.class);
 		TypedQuery<Project> projectQuery = JPA.em().createQuery("from Project where lower(name) = lower(:name)", Project.class);
 		String[] line = null;
 		int lineNumber = 0;
 		while ((line = reader.readNext()) != null) {
-			if (StringUtils.isEmpty(line[3]) || StringUtils.isEmpty(line[9])) {
+			if ((StringUtils.isEmpty(line[3].trim()) && StringUtils.isEmpty(line[2].trim())) || StringUtils.isEmpty(line[9].trim())) {
 				continue;
 			}
-			List<Study> studies = studyQuery.setParameter("pat_id", line[3].trim()).setParameter("study_datetime", new SimpleDateFormat("dd/MM/yyyy").parse(line[9])).getResultList();
+			List<Study> studies;
+			if (!StringUtils.isEmpty(line[3].trim())) {
+				//Lookup using 3 and 9, link using 1 and 2
+				studies = studyQueryByPatientID.setParameter("pat_id", line[3].trim()).setParameter("study_datetime", new SimpleDateFormat("dd/MM/yyyy").parse(line[9].trim())).getResultList();
+			} else {
+				//Lookup using 2 and 9, no link
+				studies = studyQueryByParticipationID.setParameter("participationID", line[2].trim()).setParameter("study_datetime", new SimpleDateFormat("dd/MM/yyyy").parse(line[9].trim())).getResultList();
+			}
 			if (!studies.isEmpty()) {
 				line[10] = "Yes";
-				Project project = null;
-				String projectName = line[1].trim();
-				if (!projectName.isEmpty()) {
-					try {
-						project = projectQuery.setParameter("name", projectName).getSingleResult();
-					} catch (NoResultException e) {
-						project = new Project(projectName).save();
+				if (!StringUtils.isEmpty(line[3].trim())) {
+					Project project = null;
+					String projectName = line[1].trim();
+					if (!projectName.isEmpty()) {
+						try {
+							project = projectQuery.setParameter("name", projectName).getSingleResult();
+						} catch (NoResultException e) {
+							project = new Project(projectName).save();
+						}
 					}
-				}
-				for (Study study : studies) {
-					associate(study, project, line[2].trim());
+					for (Study study : studies) {
+						associate(study, project, line[2].trim());
+					}
 				}
 			}
 			Boolean singleFrames = null;
