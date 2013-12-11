@@ -1,21 +1,35 @@
 #{extends 'main.html' /}
 #{set title:'Preferences' /}
 
-
-
 <h3>Preferences</h3>
 #{form @preferences()}
-<fieldset>
-<legend>Downloads</legend>
-<p>Default format when downloading a series that has both singleframe and multiframe images available:</p>
-<label class="radio">
-  <input type="radio" name="frame" id="optionsRadios1" value="single" #{ifnot user.preferMultiframe}checked#{/ifnot}>
-  Singleframe (multiple files)
-</label>
-<label class="radio">
-  <input type="radio" name="frame" id="optionsRadios2" value="multi" #{if user.preferMultiframe}checked#{/if}>
-  Multiframe (single file)
-</label>
-</fieldset>
-<button type="submit" class="btn">Submit</button>
+  <fieldset>
+    <legend>Downloads</legend>
+    <p>Default format when downloading a series that has both singleframe and multiframe images available:</p>
+    <label class="radio">
+      <input type="radio" name="frame" id="optionsRadios1" value="single" #{ifnot person.preferMultiframe}checked#{/ifnot}>
+      Singleframe (multiple files)
+    </label>
+    <label class="radio">
+      <input type="radio" name="frame" id="optionsRadios2" value="multi" #{if person.preferMultiframe}checked#{/if}>
+      Multiframe (single file)
+    </label>
+    <legend>NIfTI conversion script</legend>
+    <p>Singleframe:</p>
+    <label class="radio">
+      <input type="radio" value="dcm2nii" checked>
+      dcm2nii
+    </label>
+    <p>Multiframe:</p>
+    <label class="radio">
+      <input type="radio" name="person.niftiMultiframeScript" value="dcm2nii" #{if person.niftiMultiframeScript == 'dcm2nii'}checked#{/if}>
+      dcm2nii
+    </label>
+    <label class="radio">
+      <input type="radio" name="person.niftiMultiframeScript" value="dicom_2_nifti" #{ifnot person.niftiMultiframeScript == 'dcm2nii'}checked#{/ifnot}>
+      dicom_2_nifti
+    </label>
+  </fieldset>
+  <input type="hidden" name="person.username" value="${session.username}">
+  <button type="submit" class="btn" style="margin-top: 1em">Submit</button>
 #{/form}

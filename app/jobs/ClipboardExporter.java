@@ -33,14 +33,16 @@ public class ClipboardExporter extends Job {
 	private Session session;
 	private String username;
 	private boolean preferMultiframe;
+	private String niftiMultiframeScript;
 
-	public ClipboardExporter(Clipboard clipboard, File tmpDir, String password, Session session, String username, boolean preferMultiframe) {
+	public ClipboardExporter(Clipboard clipboard, File tmpDir, String password, Session session, String username, boolean preferMultiframe, String niftiMultiframeScript) {
 		this.clipboard = clipboard;
 		this.tmpDir = tmpDir;
 		this.password = password;
 		this.session = session;
 		this.username = username;
 		this.preferMultiframe = preferMultiframe;
+		this.niftiMultiframeScript = niftiMultiframeScript;
 		addExport();
 	}
 
@@ -49,10 +51,10 @@ public class ClipboardExporter extends Job {
 		for (GenericModel object : clipboard.getObjects()) {
 			if (object instanceof Study) {
 				Study study = (Study) object;
-				Download.study(study, tmpDir, Format.dcm, preferMultiframe);
+				Download.study(study, tmpDir, Format.dcm, preferMultiframe, niftiMultiframeScript);
 			} else if (object instanceof Series) {
 				Series series = (Series) object;
-				Download.series(series, tmpDir, Format.dcm, preferMultiframe);
+				Download.series(series, tmpDir, Format.dcm, preferMultiframe, niftiMultiframeScript);
 			}
 		}
 

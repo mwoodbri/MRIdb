@@ -20,6 +20,7 @@ public class Person extends GenericModel {
 	@Lob
 	public String clipboard;
 	public Boolean preferMultiframe;
+	public String niftiMultiframeScript;
 
 	public Person(String username) {
 		this.username = username;

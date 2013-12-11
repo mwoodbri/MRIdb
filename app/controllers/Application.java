@@ -108,13 +108,12 @@ public class Application extends SecureController {
 		render();
 	}
 
-	public static void preferences(String frame) {
-		Person user = Person.find("username", Security.connected()).first();
+	public static void preferences(Person person, String frame) {
 		if ("POST".equals(request.method)) {
-			user.preferMultiframe = "multi".equals(frame);
-			user.save();
+			person.preferMultiframe = "multi".equals(frame);
+			person.save();
 		}
-		render(user);
+		render(person);
 	}
 
 	public static void advanced() {
@@ -475,7 +474,7 @@ public class Application extends SecureController {
 		}
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		File outDir = await(new Downloader(format == null ? Format.dcm : format, tmpDir, Boolean.TRUE.equals(getUser().preferMultiframe), Item.serialize(pk)).now());
+		File outDir = await(new Downloader(format == null ? Format.dcm : format, tmpDir, Boolean.TRUE.equals(getUser().preferMultiframe), getUser().niftiMultiframeScript, Item.serialize(pk)).now());
 		if (FileUtils.listFiles(outDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).isEmpty()) {
 			error("Failed to retrieve files");
 		}
@@ -489,7 +488,7 @@ public class Application extends SecureController {
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		new ClipboardExporter(clipboard, tmpDir, password, session, getUser().username, Boolean.TRUE.equals(getUser().preferMultiframe)).now();
+		new ClipboardExporter(clipboard, tmpDir, password, session, getUser().username, Boolean.TRUE.equals(getUser().preferMultiframe), getUser().niftiMultiframeScript).now();
 		clipboard(null, null, null);
 	}
 
@@ -525,7 +524,7 @@ public class Application extends SecureController {
 		File dcm;
 		Instance instance = Dicom.multiFrame(series);
 		if (instance != null) {
-			await(new Downloader(Format.dcm, tmpDir, Boolean.TRUE.equals(getUser().preferMultiframe), new Item(series)).now());
+			await(new Downloader(Format.dcm, tmpDir, Boolean.TRUE.equals(getUser().preferMultiframe), getUser().niftiMultiframeScript, new Item(series)).now());
 			dcm = tmpDir.listFiles()[0].listFiles()[0].listFiles()[0];
 		} else {
 			File unanonymised = new File(tmpDir, String.format("%s.unanonymised.dcm", series.pk));
