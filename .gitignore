@@ -8,4 +8,4 @@ modules
 server.pid
 logs
 precompiled
-conf/application-site.conf
+conf/application-site.conf*
