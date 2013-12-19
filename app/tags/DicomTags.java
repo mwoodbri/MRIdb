@@ -22,93 +22,141 @@ public class DicomTags extends FastTags {
 	public static void _PixelSpacing(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
 		String axis = (String) args.get("axis");
-		float[] pixelSpacing = dataset.getFloats(Tags.PixelSpacing);
-		if (pixelSpacing == null) {
-			pixelSpacing = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.PixelMeasuresSeq).getFloats(Tags.PixelSpacing);
+		try{
+			float[] pixelSpacing = dataset.getFloats(Tags.PixelSpacing);
+			if (pixelSpacing == null) {
+				pixelSpacing = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.PixelMeasuresSeq).getFloats(Tags.PixelSpacing);
+			}
+			out.println(pixelSpacing["X".equals(axis) ? 0 : 1]);
+		} catch (Exception e) {
+			out.println("N/A");
 		}
-		out.println(pixelSpacing["X".equals(axis) ? 0 : 1]);
 	}
 
 	public static void _SliceThickness(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
 		Dataset dataset = (Dataset) args.get("arg");
-		if (!dataset.contains(Tags.SliceThickness)) {
-			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
-			if (dataset.get(Tags.valueOf("(2005,140F)")).hasItems()) {
-				dataset = dataset.getItem(Tags.valueOf("(2005,140F)"));
-			} else {
-				byte[] buf = dataset.get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
-				dataset = DcmObjectFactory.getInstance().newDataset();
-				dataset.readFile(new ByteArrayInputStream(buf), null, -1);
+		try{
+			if (!dataset.contains(Tags.SliceThickness)) {
+				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
+				if (dataset.get(Tags.valueOf("(2005,140F)")).hasItems()) {
+					dataset = dataset.getItem(Tags.valueOf("(2005,140F)"));
+				} else {
+					byte[] buf = dataset.get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
+					dataset = DcmObjectFactory.getInstance().newDataset();
+					dataset.readFile(new ByteArrayInputStream(buf), null, -1);
+				}
 			}
-		}
-		out.println(dataset.getFloat(Tags.SliceThickness));
+			out.println(dataset.getFloat(Tags.SliceThickness));
+		} catch (Exception e) {
+			out.println("N/A");
+		} 
 	}
 
 	public static void _InPlanePhaseEncodingDirection(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
-		if (!dataset.contains(Tags.InPlanePhaseEncodingDirection)) {
-			if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
-				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
-			} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
-				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
+		try {
+			if (!dataset.contains(Tags.InPlanePhaseEncodingDirection)) {
+				if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
+					dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
+				} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
+					dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
+				}
 			}
+			out.println(dataset.getString(Tags.InPlanePhaseEncodingDirection));
+		} catch (Exception e) {
+			out.println("N/A");
 		}
-		out.println(dataset.getString(Tags.InPlanePhaseEncodingDirection));
+
 	}
 
 	public static void _MRAcquisitionPhaseEncodingStepsInPlane(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
-		Integer numberOfPhaseEncodingSteps = dataset.getInteger(Tags.NumberOfPhaseEncodingSteps);
-		if (numberOfPhaseEncodingSteps == null) {
-			if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
-				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
-			} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
-				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
+		try {
+			Integer numberOfPhaseEncodingSteps = dataset.getInteger(Tags.NumberOfPhaseEncodingSteps);
+			if (numberOfPhaseEncodingSteps == null) {
+				if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRFOVGeometrySeq)) {
+					dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
+				} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
+					dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRFOVGeometrySeq);
+				}
+				numberOfPhaseEncodingSteps = dataset.getInteger(Tags.MRAcquisitionPhaseEncodingStepsInPlane);
 			}
-			numberOfPhaseEncodingSteps = dataset.getInteger(Tags.MRAcquisitionPhaseEncodingStepsInPlane);
+			out.println(numberOfPhaseEncodingSteps);
+		} catch (Exception e) {
+			out.println("N/A");
 		}
-		out.println(numberOfPhaseEncodingSteps);
+
 	}
 
 	public static void _ReceiveCoilName(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
-		if (!dataset.contains(Tags.ReceiveCoilName)) {
-			if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRReceiveCoilSeq)) {
-				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
-			} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
-				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
+		try {
+			if (!dataset.contains(Tags.ReceiveCoilName)) {
+				if (dataset.contains(Tags.SharedFunctionalGroupsSeq) && dataset.getItem(Tags.SharedFunctionalGroupsSeq).contains(Tags.MRReceiveCoilSeq)) {
+					dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
+				} else if (dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
+					dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq).getItem(Tags.MRReceiveCoilSeq);
+				}
 			}
+			out.println(dataset.getString(Tags.ReceiveCoilName));
+		} catch (Exception e) {
+			out.println("N/A");
 		}
-		out.println(dataset.getString(Tags.ReceiveCoilName));
+
 	}
 
 	public static void _RepetitionTime(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
 		Dataset dataset = (Dataset) args.get("arg");
-		if (!dataset.contains(Tags.RepetitionTime)) {
-			dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRTimingAndRelatedParametersSeq);
+		try {
+			if (!dataset.contains(Tags.RepetitionTime)) {
+				dataset = dataset.getItem(Tags.SharedFunctionalGroupsSeq).getItem(Tags.MRTimingAndRelatedParametersSeq);
+			}
+			out.println(dataset.getFloat(Tags.RepetitionTime));
+		} catch (Exception e) {
+			out.println("N/A");
 		}
-		out.println(dataset.getFloat(Tags.RepetitionTime));
+
 	}
 
+	public static void _SeriesTime(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) {
+		Dataset dataset = (Dataset) args.get("arg");
+		try {
+			String setime = dataset.getString(Tags.SeriesTime); 
+			out.println(setime.substring(0,2) + ":" + setime.substring(0+2,2+2) + ":" +setime.substring(0+4,2+4));
+		} catch (Exception e) {
+			out.println("N/A");
+		}
+
+	}
+	
 	public static void _attr(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
 		Dataset dataset = (Dataset) args.get("arg");
 		int tag = Tags.forName((String) args.get("tag"));
-		if (!dataset.contains(tag) && dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
-			dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
-			if (dataset.get(Tags.valueOf("(2005,140F)")).hasItems()) {
-				dataset = dataset.getItem(Tags.valueOf("(2005,140F)"));
-			} else {
-				byte[] buf = dataset.get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
-				dataset = DcmObjectFactory.getInstance().newDataset();
-				dataset.readFile(new ByteArrayInputStream(buf), null, -1);
+		try{
+			if (!dataset.contains(tag) && dataset.contains(Tags.PerFrameFunctionalGroupsSeq)) {
+				dataset = dataset.getItem(Tags.PerFrameFunctionalGroupsSeq);
+				if (dataset.get(Tags.valueOf("(2005,140F)")).hasItems()) {
+					dataset = dataset.getItem(Tags.valueOf("(2005,140F)"));
+				} else {
+					byte[] buf = dataset.get(Tags.valueOf("(2005,140F)")).getDataFragment(0).array();
+					dataset = DcmObjectFactory.getInstance().newDataset();
+					dataset.readFile(new ByteArrayInputStream(buf), null, -1);
+				}
 			}
+			out.println(Boolean.TRUE.equals(args.get("float")) ? dataset.getFloat(tag) : dataset.getString(tag));
+		} catch (Exception e) {
+			out.println("N/A");
 		}
-		out.println(Boolean.TRUE.equals(args.get("float")) ? dataset.getFloat(tag) : dataset.getString(tag));
 	}
 
 	public static void _NumberOfFrames(Map<?, ?> args, Closure body, PrintWriter out, ExecutableTemplate template, int fromLine) throws IOException {
 		Series series = (Series) args.get("arg");
-		out.println(String.valueOf(Dicom.numberOfFrames(series)));
+		try {
+			out.println(String.valueOf(Dicom.numberOfFrames(series)));
+		} catch (Exception e) {
+			out.println("N/A");
+		}
+
 	}
 
 }

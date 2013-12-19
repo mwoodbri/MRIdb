@@ -10,17 +10,13 @@
 	<li class="nav-header">Study details
 	<li>Time of scan: ${series.study.study_datetime?.time()}</td>
 	<li>Study ID: ${series.study.study_id}</td>
-	
-	#{if util.Dicom.renderable(series)}
-	<li class="nav-header">Image description
-	<li>Matrix: #{attr dataset, tag:'Columns'/} / #{attr dataset, tag:'Rows'/} / #{NumberOfFrames series/}
-	<li>Pixel spacing: #{PixelSpacing dataset, axis: 'X'/} / #{PixelSpacing dataset, axis: 'Y'/} / #{SliceThickness dataset/}
-	<li>In plane phase encoding: #{InPlanePhaseEncodingDirection dataset/}
-	<li>Phase encoding steps: #{MRAcquisitionPhaseEncodingStepsInPlane dataset/}
-	
+
 	<li class="nav-header">Sequence description
 	<li>Seq #${series.series_no}: #{stats series}%s file(s), %s#{/stats}
+	<li>Seq time: #{SeriesTime dataset/}
 	<li>Protocol name: ${series.series_custom1}
+	
+	#{if util.Dicom.renderable(series)}
 	<li>Sequence: #{attr dataset, tag:'ScanningSeq'/}
 	<li>Variant: #{attr dataset, tag:'SeqVariant'/}
 	<li>Receive coil: #{ReceiveCoilName dataset/}
@@ -28,6 +24,13 @@
 	<li>Echo time: ${echoes.collect{it + ' ms'}.join(' / ')}
 	<li>Number of echoes: ${echoes.size()}
 	<li>Temporal positions: #{attr dataset, tag:'NumberOfTemporalPositions'/}
+	
+	<li class="nav-header">Image description
+	<li>Matrix: #{attr dataset, tag:'Columns'/} / #{attr dataset, tag:'Rows'/} / #{NumberOfFrames series/}
+	<li>Pixel spacing: #{PixelSpacing dataset, axis: 'X'/} / #{PixelSpacing dataset, axis: 'Y'/} / #{SliceThickness dataset/}
+	<li>In plane phase encoding: #{InPlanePhaseEncodingDirection dataset/}
+	<li>Phase encoding steps: #{MRAcquisitionPhaseEncodingStepsInPlane dataset/}
+	
 	#{/if}
 
 </ul>

@@ -98,11 +98,17 @@ public class Dicom {
 		if (dataset.contains(Tags.EchoTime)) {
 			echoes.add(dataset.getString(Tags.EchoTime));
 		} else {
-			for (int i = 0; i < dataset.get(Tags.PerFrameFunctionalGroupsSeq).countItems(); i++) {
-				boolean unseen = echoes.add(dataset.getItem(Tags.PerFrameFunctionalGroupsSeq, i).getItem(Tags.MREchoSeq).getString(Tags.EffectiveEchoTime));
-				if (!unseen) {
-					break;
+			try {
+				for (int i = 0; i < dataset.get(Tags.PerFrameFunctionalGroupsSeq).countItems(); i++) {
+					boolean unseen = echoes.add(dataset.getItem(Tags.PerFrameFunctionalGroupsSeq, i).getItem(Tags.MREchoSeq).getString(Tags.EffectiveEchoTime));
+					if (!unseen) {
+						break;
+					}
 				}
+			} catch (Exception e) {
+				//This dicom does not contain echo information (e.g. secondary capture).
+				// nothing to do
+				
 			}
 		}
 		return echoes;
@@ -156,8 +162,8 @@ public class Dicom {
 	private enum CUID {
 		MRImageStorage("1.2.840.10008.5.1.4.1.1.4"),
 		EnhancedMRImageStorage("1.2.840.10008.5.1.4.1.1.4.1"),
-		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2");
-
+		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2"),
+		SecondaryCaptureImageStorage("1.2.840.10008.5.1.4.1.1.7");
 		final String value;
 		CUID(String value) {
 			this.value = value;
@@ -177,7 +183,7 @@ public class Dicom {
 		return CollectionUtils.select(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
-				return CUID.MRImageStorage.value.equals(((Instance) arg0).sop_cuid);
+				return CUID.MRImageStorage.value.equals(((Instance) arg0).sop_cuid) | CUID.SecondaryCaptureImageStorage.value.equals(((Instance) arg0).sop_cuid);
 			}
 		});
 	}
@@ -200,7 +206,7 @@ public class Dicom {
 		});
 	}
 
-	private static final List<String> renderable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value);
+	private static final List<String> renderable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value, CUID.SecondaryCaptureImageStorage.value);
 	public static boolean renderable(Series series) {
 		return CollectionUtils.exists(series.instances, new Predicate() {
 			@Override
@@ -210,7 +216,7 @@ public class Dicom {
 		});
 	}
 
-	private static final List<String> downloadable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value, CUID.MRSpectroscopyStorage.value);
+	private static final List<String> downloadable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value, CUID.MRSpectroscopyStorage.value, CUID.SecondaryCaptureImageStorage.value);
 	public static boolean downloadable(Series series) {
 		return CollectionUtils.exists(series.instances, new Predicate() {
 			@Override
