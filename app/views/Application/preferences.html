@@ -1,5 +1,12 @@
 #{extends 'main.html' /}
 #{set title:'Preferences' /}
+#{set 'moreStyles'}
+<style>
+  fieldset p { margin-top: 1em; }
+  .radio { padding-left: 2em; }
+  button { margin-top: 2em; }
+</style>
+#{/set}
 
 <h3>Preferences</h3>
 #{form @preferences()}
@@ -31,5 +38,5 @@
     </label>
   </fieldset>
   <input type="hidden" name="person.username" value="${session.username}">
-  <button type="submit" class="btn" style="margin-top: 1em">Submit</button>
+  <button type="submit" class="btn">Save</button>
 #{/form}
