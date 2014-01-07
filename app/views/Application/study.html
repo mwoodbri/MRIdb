@@ -124,7 +124,7 @@
 	#{a @download(null, 'nii'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
 	#{a @download(null, 'img'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;Analyze#{/a}&nbsp;
 	<a href="#" class="btn btn-info single imagej"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;ImageJ</a>&nbsp;
-	#{ifNotVisitor}<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Weasis</a>#{/ifNotVisitor}
+	#{ifNotVisitor}<a href="//${request.domain}:8080/weasis-pacs-connector/viewer.jnlp?seriesUID=" class="btn btn-info single weasis"><i class="icon-zoom-in icon-large"></i>&nbsp;&nbsp;Viewer</a>#{/ifNotVisitor}
 	<p style="margin: 1em 0">Ctrl-click or ⌘-click to select multiple exams | <a href="#" class="all update">Select all</a> | <a class="none update" href="#">Select none</a></p>
 	<div class="row-fluid">
 		<ul class="thumbnails">
