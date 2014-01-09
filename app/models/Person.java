@@ -27,7 +27,9 @@ public class Person extends GenericModel {
 	}
 
 	public void setPassword(String password) {
-		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+		if (!password.startsWith("$2a$")) {
+			this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+		}
 	}
 
 	@PostUpdate
