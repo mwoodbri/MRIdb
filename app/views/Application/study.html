@@ -110,6 +110,11 @@
 		$('#projectModal').on('hide', function() {
 			$('#associate')[0].reset();
 		});
+		$('#commentsModal').on('shown', function() {
+			var textarea = $(this).find('textarea');
+			var text = textarea.val();
+			textarea.focus().val('').val(text);
+		});
 	});
 </script>
 #{/set}
