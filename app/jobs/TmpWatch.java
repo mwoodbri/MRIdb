@@ -11,7 +11,7 @@ import play.jobs.Job;
 import play.libs.Files;
 import util.Properties;
 
-@Every("1d")
+@Every("1h")
 public class TmpWatch extends Job {
 
 	private static final List<String> watchedFolders = Arrays.asList(Properties.getDownloads().getName(), Properties.getCollations().getName());
