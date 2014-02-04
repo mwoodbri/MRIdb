@@ -1,2 +1,2 @@
-HVOL NO.,PROJECT NAME,BRU ID,Hospital No.,Surname,Forename(s),Ethnicity,Gender,DOB,Date of MRI,In DCM4CHEE,Singleframe DICOMs,SURVEY,Anatomy,Anatomy_CORONAL,Anatomy 3D,VLA,near SA,4CH,RVLA,LVOT,RVOT,RVOT_cor,LVSA,LVSA,3D LVSA,3D LVSA HD,3DTAGph-7MM,REC WIP 3DTA,Qflow Aorta,Aorta,Arch,ME Liver BH
-1,GENSCAN,14SD01314,1213456H,DOO,SCOOBY,c,f,01/07/1969,09/02/2011,,,,,,,,,,,,,,,,,,,,,,,
+HVOL NO.,PROJECT NAME,BRU ID,Hospital No.,Surname,Forename(s),Ethnicity,Gender,DOB,Date of MRI,In DCM4CHEE,Singleframe DICOMs,Comments,SURVEY,Anatomy,Anatomy_CORONAL,Anatomy 3D,VLA,near SA,4CH,RVLA,LVOT,RVOT,RVOT_cor,LVSA,LVSA,3D LVSA,3D LVSA HD,3DTAGph-7MM,REC WIP 3DTA,Qflow Aorta,Aorta,Arch,ME Liver BH
+1,GENSCAN,14SD01314,1213456H,DOO,SCOOBY,c,f,01/07/1969,09/02/2011,,,,,,,,,,,,,,,,,,,,,,,,

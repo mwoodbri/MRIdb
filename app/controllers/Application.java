@@ -257,6 +257,11 @@ public class Application extends SecureController {
 			}
 			if (!studies.isEmpty()) {
 				line[10] = "Yes";
+				List<String> comments = new ArrayList<String>();
+				for (Study study : studies) {
+					comments.add(study.study_custom1);
+				}
+				line[12] = StringUtils.join(comments, "\n");
 				if (!StringUtils.isEmpty(line[3].trim())) {
 					Project project = null;
 					String projectName = line[1].trim();
@@ -273,7 +278,7 @@ public class Application extends SecureController {
 				}
 			}
 			Boolean singleFrames = null;
-			for (int i = 12; i < headers.length; i++) {
+			for (int i = 13; i < headers.length; i++) {
 				final String header = headers[i];
 				for (Study study : studies) {
 					Series series = (Series) CollectionUtils.find(study.series, new Predicate() {
