@@ -141,7 +141,7 @@ public class Application extends SecureController {
 			String pat_id = line[0].trim().toUpperCase();
 			if (!pat_id.isEmpty()) {
 				if (!series_descs.isEmpty()) {
-					List<DomainModel> serieses = new ArrayList<DomainModel>();
+					Map<Study, List<DomainModel>> studySerieses = new LinkedHashMap<Study, List<DomainModel>>();
 					for (String series_desc : series_descs) {
 						List<Series> candidates = (List<Series>) CollectionUtils.select(Series.find("study.patient.pat_id = ? and series_desc = ?", pat_id, series_desc).<Series>fetch(), new Predicate() {
 							@Override
@@ -152,15 +152,18 @@ public class Application extends SecureController {
 						if (!candidates.isEmpty()) {
 							for (Series series : candidates) {
 								found.add(String.format("%s - %s", pat_id, series_desc));
+								List serieses = studySerieses.get(series.study);
+								if (serieses == null) {
+									serieses = new ArrayList<DomainModel>();
+									studySerieses.put(series.study, serieses);
+								}
 								serieses.add(series);
 							}
 						} else {
 							missing.add(String.format("%s - %s", pat_id, series_desc));
 						}
 					}
-					if (!serieses.isEmpty()) {
-						objects.add(serieses);
-					}
+					objects.addAll(studySerieses.values());
 				} else {
 					List<DomainModel> studies = Study.find("patient.pat_id", pat_id).<DomainModel>fetch();
 					if (!studies.isEmpty()) {
@@ -175,7 +178,7 @@ public class Application extends SecureController {
 			} else {
 				String participationID = line[1].trim().toUpperCase();
 				if (!series_descs.isEmpty()) {
-					List<DomainModel> serieses = new ArrayList<DomainModel>();
+					Map<Study, List<DomainModel>> studySerieses = new LinkedHashMap<Study, List<DomainModel>>();
 					for (String series_desc : series_descs) {
 						List<Series> candidates = (List<Series>) CollectionUtils.select(Series.find("select series from Series series, in(series.study.projectAssociations) projectAssociation where projectAssociation.participationID = ? and series_desc = ?", participationID, series_desc).<Series>fetch(), new Predicate() {
 							@Override
@@ -188,13 +191,16 @@ public class Application extends SecureController {
 						} else {
 							for (Series series : candidates) {
 								found.add(String.format("%s - %s", participationID, series_desc));
+								List serieses = studySerieses.get(series.study);
+								if (serieses == null) {
+									serieses = new ArrayList<DomainModel>();
+									studySerieses.put(series.study, serieses);
+								}
 								serieses.add(series);
 							}
 						}
 					}
-					if (!serieses.isEmpty()) {
-						objects.add(serieses);
-					}
+					objects.addAll(studySerieses.values());
 				} else {
 					List<DomainModel> studies = Study.find("select study from Study study, in(study.projectAssociations) projectAssociation where projectAssociation.participationID = ?", participationID).<DomainModel>fetch();
 					if (!studies.isEmpty()) {
