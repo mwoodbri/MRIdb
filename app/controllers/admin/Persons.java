@@ -1,4 +1,4 @@
-package controllers.crud;
+package controllers.admin;
 
 import play.mvc.With;
 import controllers.CRUD;
