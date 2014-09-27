@@ -86,6 +86,7 @@
 		});
 		$('#submit').on('click', function() {
 			var participationID = input.val();
+			#{ifnot Boolean.valueOf(play.configuration.getProperty("projectIdentifier.validationDisabled"))}
 			if (participationID && !participationID.match(/(3T)|(1.5T)|(NNU)/)) {
 				var disallowed = ["${study.patient.pat_id.toLowerCase()}"]#{ifNotVisitor}.concat("${study.patient.pat_name?.formatAsName()}".split(/[\s,']/))#{/ifNotVisitor};
 				for (var i in disallowed) {
@@ -95,6 +96,7 @@
 					}
 				}
 			}
+			#{/ifnot}
 			if ((input.data("value") && (input.val() !== input.data("value"))) || (select.data("value") && (Number(select.val()) !== select.data("value")))) {
 				if (!window.confirm("Changing a patient's project or identifier will affect all other users of the system. Are you sure?")) {
 					$(this)[0].reset();
