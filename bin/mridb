@@ -13,6 +13,7 @@ APP_PATH=/opt/$prog
 [ -f /etc/sysconfig/mridb ] && . /etc/sysconfig/mridb
 
 run(){
+    . /opt/rh/python27/enable
     $PLAY $1 $APP_PATH --%prod --pid_file=/var/lock/subsys/$prog -Dprecompiled=true $PLAY_OPTS >/dev/null
     RETVALUE=$?
     if [ $RETVALUE -eq 0 ]
@@ -28,7 +29,7 @@ case "$1" in
 start)
     echo -n $"Starting $prog: "
     run $1
-    ;;  
+    ;;
 stop)
     echo -n $"Stopping $prog: "
     run $1
