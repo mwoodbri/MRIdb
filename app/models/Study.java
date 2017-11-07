@@ -65,8 +65,4 @@ public class Study extends DomainModel {
 		return scannedSeries == null ? null : scannedSeries.station_name;
 	}
 
-	public String toClipboardString() {
-		return String.format("%s on %s", patient.pat_name == null ? "UNKNOWN" : JavaExtensions.formatAsName(patient.pat_name), study_datetime == null ? "" : JavaExtensions.format(study_datetime));
-	}
-
 }
