@@ -6,8 +6,8 @@
     <span>
       #{a @clipboard(controllers.Application.ClipboardOp.REMOVE, _.type.simpleName, _.pk), class: 'clipboard'}<i class="icon-remove-sign icon-large"></i>#{/a}
       #{a @study(_.pk)}
-        #{if _.type == models.Study.class}${models.Study.findById(_.pk).toClipboardString()}#{/if}
-        #{if _.type == models.Series.class}${models.Series.findById(_.pk).toClipboardString()}#{/if}
+        #{set study: models.Study.findById(_.pk)/}
+        #{if controllers.SecureController.user.role != models.Person.Role.Visitor && study.patient.pat_name}${study.patient.pat_name.formatAsName()}#{/if}#{else}UNKNOWN#{/else}#{if study.study_datetime} on ${study.study_datetime.format()}#{/if}
       #{/a}
     </span>
   </li>

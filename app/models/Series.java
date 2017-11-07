@@ -26,8 +26,4 @@ public class Series extends DomainModel {
 		return String.format("%s_%s_%s", study.toDownloadString(), series_no, series_custom1).replaceAll("\\W+", "");
 	}
 
-	public String toClipboardString() {
-		return String.format("%s of %s", series_custom1, study.toClipboardString());
-	}
-
 }
