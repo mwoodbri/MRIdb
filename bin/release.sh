@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/bin/bash
+
+set -euo pipefail
 
 cd "$(dirname "$0")"/..
 
