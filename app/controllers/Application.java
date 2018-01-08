@@ -328,7 +328,7 @@ public class Application extends SecureController {
 		//	query += " and studyfulltext.fulltext like ?";
 		//}
 		//full text
-		String query = String.format("from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || %s' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '')) @@ plainto_tsquery('english_nostop', ?)", getUser().role == Role.Visitor ? "" : "' ' || pat_name || ");
+		String query = String.format("from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || %s' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '') || ' ' || coalesce(study.study_custom1, '')) @@ plainto_tsquery('english_nostop', ?)", getUser().role == Role.Visitor ? "" : "' ' || pat_name || ");
 
 		Query studyCountQuery = JPA.em().createNativeQuery("select count(*) " + query);
 		//		for (int i = 0; i < termsArray.length; i++) {
