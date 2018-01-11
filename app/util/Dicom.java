@@ -26,7 +26,6 @@ import org.dcm4che.data.DcmObjectFactory;
 import org.dcm4che.dict.Tags;
 
 import play.Logger;
-import play.Play;
 
 public class Dicom {
 
@@ -113,29 +112,17 @@ public class Dicom {
 	private static final Map<String, String> environment = new HashMap<String, String>() {{
 		put("DCMDICTPATH", new File(Properties.getString("dcmtk"), "share/dcmtk/dicom.dic").getPath());
 	}};
-	private static final int[] tags;
-	static {
-		String tagsString = Play.configuration.getProperty("anonymisation.tags");
-		if (tagsString != null) {
-			String[] tagsArray = tagsString.split(", ?");
-			tags = new int[tagsArray.length];
-			for (int i = 0; i < tagsArray.length; i++) {
-				tags[i] = Tags.forName(tagsArray[i]);
-			}
-		} else {
-			tags = new int[] {
-				Tags.PatientID,
-				Tags.PatientName,
-				Tags.PatientSex,
-				Tags.PatientBirthDate,
-				Tags.PatientAddress,
-				Tags.ReferringPhysicianName,
-				Tags.InstitutionName,
-				Tags.StationName,
-				Tags.ManufacturerModelName
-			};
-		}
-	}
+	private static final int[] tags = new int[] {
+		Tags.PatientID,
+		Tags.PatientName,
+		Tags.PatientSex,
+		Tags.PatientBirthDate,
+		Tags.PatientAddress,
+		Tags.ReferringPhysicianName,
+		Tags.InstitutionName,
+		Tags.StationName,
+		Tags.ManufacturerModelName
+	};
 	public static void anonymise(File inFile, File outFile, String identifier) throws Exception {
 		FileUtils.copyFile(inFile, outFile);
 		String[] command = new String[3 + 2 * tags.length + 1];
