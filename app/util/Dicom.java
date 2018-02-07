@@ -156,7 +156,8 @@ public class Dicom {
 	private enum CUID {
 		MRImageStorage("1.2.840.10008.5.1.4.1.1.4"),
 		EnhancedMRImageStorage("1.2.840.10008.5.1.4.1.1.4.1"),
-		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2");
+		MRSpectroscopyStorage("1.2.840.10008.5.1.4.1.1.4.2"),
+		PrivateSiemensCSANonImageStorage("1.3.12.2.1107.5.9.1");
 
 		final String value;
 		CUID(String value) {
@@ -195,7 +196,7 @@ public class Dicom {
 		return (Instance) CollectionUtils.find(series.instances, new Predicate() {
 			@Override
 			public boolean evaluate(Object arg0) {
-				return CUID.MRSpectroscopyStorage.value.equals(((Instance) arg0).sop_cuid);
+				return Arrays.asList(CUID.MRSpectroscopyStorage.value, CUID.PrivateSiemensCSANonImageStorage.value).contains(((Instance) arg0).sop_cuid);
 			}
 		});
 	}
@@ -210,7 +211,7 @@ public class Dicom {
 		});
 	}
 
-	private static final List<String> downloadable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value, CUID.MRSpectroscopyStorage.value);
+	private static final List<String> downloadable = Arrays.asList(CUID.MRImageStorage.value, CUID.EnhancedMRImageStorage.value, CUID.MRSpectroscopyStorage.value, CUID.PrivateSiemensCSANonImageStorage.value);
 	public static boolean downloadable(Series series) {
 		return CollectionUtils.exists(series.instances, new Predicate() {
 			@Override
