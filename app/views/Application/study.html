@@ -136,10 +136,10 @@
 	<div class="row-fluid">
 		<ul class="thumbnails">
 		#{list study.series.findAll{util.Dicom.downloadable(it)}.sort{it.series_no as int}, as: 'series'}
-		<li class="span2" style="margin-right: 2.127659574%; margin-left: 0" title="${series.series_no + " " + series.series_custom1}">
+		<li class="span2" style="margin-right: 2.127659574%; margin-left: 0" title="${series.series_no + " " + series.series_desc}">
 			<a href="#" class="thumbnail update" data-pk="${series.pk}" data-iuid="${series.series_iuid}" data-renderable="${util.Dicom.renderable(series)}">
 				<img src="@{'/public/images/spinner.gif'}" alt="@{image(series.pk)}">
-				<h5 class="caption">${(series.series_no + " " + series.series_custom1).ellipsis(16)}</h5>
+				<h5 class="caption">${(series.series_no + " " + series.series_desc).ellipsis(16)}</h5>
 			</a>
 		</li>
 		#{/list}

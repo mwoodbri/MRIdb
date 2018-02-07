@@ -14,7 +14,6 @@ public class Series extends DomainModel {
 	public String series_iuid;
 	public String station_name;
 	public String series_desc;
-	public String series_custom1;
 	public String modality;
 	@ManyToOne
 	@JoinColumn(name="study_fk")
@@ -23,7 +22,7 @@ public class Series extends DomainModel {
 	public Set<Instance> instances;
 
 	public String toDownloadString() {
-		return String.format("%s_%s_%s", study.toDownloadString(), series_no, series_custom1).replaceAll("\\W+", "");
+		return String.format("%s_%s_%s", study.toDownloadString(), series_no, series_desc).replaceAll("\\W+", "");
 	}
 
 }
