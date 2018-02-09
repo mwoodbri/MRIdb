@@ -334,7 +334,7 @@ public class Application extends SecureController {
 		//		for (int i = 0; i < termsArray.length; i++) {
 		//			studyCountQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
 		//		}
-		studyCountQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
+		studyCountQuery.setParameter(1, terms);
 		int studyCount = ((BigInteger) studyCountQuery.getSingleResult()).intValue();
 
 		order = order.contains(".") ? order.split("[.]")[1] : order;
@@ -343,7 +343,7 @@ public class Application extends SecureController {
 		//		for (int i = 0; i < termsArray.length; i++) {
 		//			studiesQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
 		//		}
-		studiesQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
+		studiesQuery.setParameter(1, terms);
 		List studies = studiesQuery.getResultList();
 
 		renderTemplate("@index", studies, studyCount, page);
