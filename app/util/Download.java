@@ -33,9 +33,11 @@ public class Download {
 			Medcon.convert(Dicom.collate(series, preferMultiframe), format, dir);
 		} else {
 			String identifier = null;
-			ProjectAssociation projectAssociation = series.study.getProjectAssociation();
-			if (projectAssociation != null && projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
-				identifier = projectAssociation.participationID;
+			if (series.study.getProjectAssociations().size() > 0) {
+				ProjectAssociation projectAssociation = series.study.getProjectAssociations().iterator().next();
+				if (projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
+					identifier = projectAssociation.participationID;
+				}
 			}
 			for (Files files : Dicom.getFiles(series, preferMultiframe)) {
 				Dicom.anonymise(new File(Properties.getArchive(), files.filepath), new File(dir, String.format("%s.dcm", files.toDownloadString())), identifier);

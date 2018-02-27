@@ -34,14 +34,15 @@ public class Study extends DomainModel {
 	@OneToMany(mappedBy = "study")
 	public Set<ProjectAssociation> projectAssociations;
 
-	public ProjectAssociation getProjectAssociation() {
-		return ProjectAssociation.find("select projectAssociation from Project project, in(project.projectAssociations) projectAssociation where projectAssociation.study = ?", this).first();
+	public List<ProjectAssociation> getProjectAssociations() {
+		return ProjectAssociation.find("select projectAssociation from Project project, in(project.projectAssociations) projectAssociation where projectAssociation.study = ?", this).fetch();
 	}
 
 	public String toDownloadString() {
 		List<String> parts = new ArrayList<String>();
-		ProjectAssociation projectAssociation = getProjectAssociation();
-		if (projectAssociation != null) {
+		List<ProjectAssociation> projectAssociations = getProjectAssociations();
+		if (projectAssociations.size() > 0) {
+			ProjectAssociation projectAssociation = projectAssociations.iterator().next();
 			if (projectAssociation.participationID != null && !projectAssociation.participationID.isEmpty()) {
 				parts.add(projectAssociation.participationID);
 			}

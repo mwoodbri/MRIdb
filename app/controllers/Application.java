@@ -279,7 +279,15 @@ public class Application extends SecureController {
 						}
 					}
 					for (Study study : studies) {
-						associate(study, project, line[2].trim());
+						String participationID = line[2].trim();
+						ProjectAssociation association = null;
+						if (!projectName.isEmpty()) {
+							List<ProjectAssociation> associations = ProjectAssociation.find("study.pk = ? and project.id = ? and participationID = ?", study.pk, project.id, participationID).<ProjectAssociation>fetch();
+							if (!associations.isEmpty()) {
+								association = associations.iterator().next();
+							}
+						}
+						associate(association, study, project, participationID);
 					}
 				}
 			}
@@ -338,7 +346,7 @@ public class Application extends SecureController {
 		int studyCount = ((BigInteger) studyCountQuery.getSingleResult()).intValue();
 
 		order = order.contains(".") ? order.split("[.]")[1] : order;
-		query = "select study.* " + query + String.format(" order by %s %s", order, "desc".equals(sort) ? "desc" : "asc");
+		query = "select distinct study.* " + query + String.format(" order by %s %s", order, "desc".equals(sort) ? "desc" : "asc");
 		Query studiesQuery = JPA.em().createNativeQuery(query, Study.class).setFirstResult(page * Properties.pageSize()).setMaxResults(Properties.pageSize());
 		//		for (int i = 0; i < termsArray.length; i++) {
 		//			studiesQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
@@ -425,8 +433,7 @@ public class Application extends SecureController {
 
 	public static void study(long pk) {
 		Study study = Study.findById(pk);
-		ProjectAssociation projectAssociation = study.getProjectAssociation();
-		render(study, projectAssociation);
+		render(study);
 	}
 
 	public static void series(long pk) throws IOException {
@@ -552,19 +559,22 @@ public class Application extends SecureController {
 		study(study.pk);
 	}
 
-	public static void associate(Study study, Long projectID, String participationID, String projectName) {
+	public static void associate(Long projectAssociationID, Study study, Long projectID, String projectName, String participationID) {
 		Project project = null;
 		if (!projectName.isEmpty()) {
 			project = new Project(projectName).save();
 		} else if (projectID != null) {
 			project = Project.findById(projectID);
 		}
-		associate(study, project, participationID);
+		ProjectAssociation association = null;
+		if (projectAssociationID != null) {
+			association = ProjectAssociation.findById(projectAssociationID);
+		}
+		associate(association, study, project, participationID);
 		PersistentLogger.log("study %s linked to project: %s (%s)", study.pk, project, participationID);
 	}
 
-	static void associate(Study study, Project project, String participationID) {
-		ProjectAssociation association = ProjectAssociation.find("byStudy", study).first();
+	static void associate(ProjectAssociation association, Study study, Project project, String participationID) {
 		if (project == null) {
 			if (association != null) {
 				association.delete();

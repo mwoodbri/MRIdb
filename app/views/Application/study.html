@@ -85,8 +85,8 @@
 			return false;
 		});
 		$('#submit').on('click', function() {
-			var participationID = input.val();
 			#{ifnot Boolean.valueOf(play.configuration.getProperty("projectIdentifier.validationDisabled"))}
+			var participationID = input.val();
 			if (participationID && !participationID.match(/(3T)|(1.5T)|(NNU)/)) {
 				var disallowed = ["${study.patient.pat_id.toLowerCase()}"]#{ifNotVisitor}.concat("${study.patient.pat_name?.formatAsName()}".split(/[\s,']/))#{/ifNotVisitor};
 				for (var i in disallowed) {
@@ -97,17 +97,26 @@
 				}
 			}
 			#{/ifnot}
-			if ((input.data("value") && (input.val() !== input.data("value"))) || (select.data("value") && (Number(select.val()) !== select.data("value")))) {
+			if ((input.data("value") && input.val() !== input.data("value")) || (select.data("value") && select.val() !== select.data("value"))) {
 				if (!window.confirm("Changing a patient's project or identifier will affect all other users of the system. Are you sure?")) {
-					$(this)[0].reset();
+					$('#associate')[0].reset();
 					return false;
 				}
 			}
-			input.data("value", participationID);
 			$('#associate').ajaxSubmit(function() {
 				window.location.reload();
 			});
 			return false;
+		});
+		$('a[href=#projectModal]').on('click', function() {
+		  select.find('option[value=' + $(this).data('project-id') + ']').attr('selected', true);
+		  input.attr('value', $(this).data('participation-id'));
+		  input.prop('disabled', !$(this).data('project-id'));
+		  $('#associate input[name="projectAssociationID"]').attr('value', $(this).data('id'));
+		});
+		$('#projectModal').on('shown', function() {
+			select.data('value', select.val());
+			input.data('value', input.val());
 		});
 		$('#projectModal').on('hide', function() {
 			$('#associate')[0].reset();
@@ -125,7 +134,12 @@
 	<h2>${study.patient.pat_id}#{ifNotVisitor} - ${study.patient.pat_name?.formatAsName()} - ${study.patient.pat_birthdate?.formatAsDate()}#{/ifNotVisitor}</h2>
 	<h3 style="display: inline" class="study" data-pk="${study.pk}">${study.study_desc} - ${study.study_datetime?.format()}</h3>
 	&nbsp;&nbsp;#{a @clipboard(controllers.Application.ClipboardOp.ADD, study.class.simpleName, study.pk), class: 'clipboard'}<i class="icon-download-alt icon-large"></i>#{/a}
-	<p style="margin: 1em 0"><span style="padding-right: 1em">Project: #{if projectAssociation}<span style="color: white; font-weight: bold">${projectAssociation.project.name}</span>#{/if}#{else}None#{/else}</span><span style="padding-right: 1em">Identifier: #{if projectAssociation && projectAssociation.participationID}<span style="color: white; font-weight: bold">${projectAssociation.participationID}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#projectModal">#{if projectAssociation && projectAssociation.participationID}Change#{/if}#{else}Add#{/else} ID code</a></p>
+	#{list study.projectAssociations, as: 'projectAssociation'}
+	<p style="margin: 1em 0"><span style="padding-right: 1em">Project: <span style="color: white; font-weight: bold">${projectAssociation.project.name}</span></span><span style="padding-right: 1em">Identifier: #{if projectAssociation.participationID}<span style="color: white; font-weight: bold">${projectAssociation.participationID}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#projectModal" data-id="${projectAssociation.id}" data-project-id="${projectAssociation.project?.id}" data-participation-id="${projectAssociation.participationID}">#{if projectAssociation.participationID}Change#{/if}#{else}Add#{/else} ID code</a></p>
+	#{/list}
+	#{if study.projectAssociations.size() < Integer.parseInt(play.configuration.getProperty("associations.limit", "3"))}
+    <p style="margin: 1em 0"><span style="padding-right: 1em">Project: None</span><span style="padding-right: 1em">Identifier: None</span><a class="btn btn-info" data-toggle="modal" href="#projectModal">Add ID code</a></p>
+	#{/if}
 	<p style="margin: 1em 0"><span style="padding-right: 1em">Comments: #{if study.study_custom1}<span style="color: white; font-weight: bold">${study.study_custom1}</span>#{/if}#{else}None#{/else}</span><a class="btn btn-info" data-toggle="modal" href="#commentsModal">Update</a></p>
 	#{a @download(null, 'dcm'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;DICOM#{/a}&nbsp;
 	#{a @download(null, 'nii'), class: "btn btn-info download"}<i class="icon-share icon-large"></i>&nbsp;&nbsp;NIfTI#{/a}&nbsp;
@@ -161,18 +175,19 @@
 	</div>
 	#{form @associate(), id: 'associate', method: 'post', class: 'modal-body', style: 'margin: 0'}
 		<span style="display: inline-block; width: 8em; text-align: right; padding-right: 1em">Project:</span>
-		<select name="projectID" data-value="${projectAssociation ? projectAssociation.project.id : ''}">
-			<option>None</option>
+		<select name="projectID">
+			<option value="">None</option>
 			#{list models.Project.find("order by name").fetch()}
-			<option value="${_.id}"#{if _.equals(projectAssociation?.project)} selected#{/if}>${_.name}</option>
+			<option value="${_.id}">${_.name}</option>
 			#{/list}
 			<option value="-1">New project...</option>
 		</select>
 		<input type="text" readonly name="projectName" style="display: none">
 		<br><br>
 		<span style="display: inline-block; width: 8em; text-align: right; padding-right: 1em">Identifier:</span>
-		<input type="text" name="participationID" value="${projectAssociation?.participationID}" data-value="${projectAssociation?.participationID}"#{ifnot projectAssociation} disabled#{/ifnot}>
+		<input type="text" name="participationID">
 		<input type="hidden" name="study.pk" value="${study.pk}">
+		<input type="hidden" name="projectAssociationID">
 	#{/form}
 	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal" id="close">Close</a>
