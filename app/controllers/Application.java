@@ -328,13 +328,13 @@ public class Application extends SecureController {
 		//	query += " and studyfulltext.fulltext like ?";
 		//}
 		//full text
-		String query = String.format("from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || %s' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '') || ' ' || coalesce(study.study_custom1, '')) @@ plainto_tsquery('english_nostop', ?)", getUser().role == Role.Visitor ? "" : "' ' || pat_name || ");
+		String query = String.format("from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', study_desc || %s' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '') || ' ' || coalesce(study.study_custom1, '')) @@ to_tsquery('english_nostop', ?)", getUser().role == Role.Visitor ? "" : "' ' || pat_name || ");
 
 		Query studyCountQuery = JPA.em().createNativeQuery("select count(*) " + query);
 		//		for (int i = 0; i < termsArray.length; i++) {
 		//			studyCountQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
 		//		}
-		studyCountQuery.setParameter(1, terms);
+		studyCountQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
 		int studyCount = ((BigInteger) studyCountQuery.getSingleResult()).intValue();
 
 		order = order.contains(".") ? order.split("[.]")[1] : order;
@@ -343,7 +343,7 @@ public class Application extends SecureController {
 		//		for (int i = 0; i < termsArray.length; i++) {
 		//			studiesQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
 		//		}
-		studiesQuery.setParameter(1, terms);
+		studiesQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
 		List studies = studiesQuery.getResultList();
 
 		renderTemplate("@index", studies, studyCount, page);
