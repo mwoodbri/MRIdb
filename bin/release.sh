@@ -13,4 +13,4 @@ touch /tmp/$prog/conf/application-site.conf
 play dependencies /tmp/$prog --forceCopy --forProd
 play precompile /tmp/$prog
 rm /tmp/$prog/conf/application-site.conf
-tar cfj /tmp/$prog-$VERSION.tar.bz2 --exclude repo --exclude test -C /tmp $prog
+tar cfz /tmp/$prog-$VERSION.tar.gz --exclude repo --exclude test -C /tmp $prog
