@@ -65,15 +65,11 @@
             return false;
         });
         $("#clipboard").on("click", "a.export", function(event) {
-            if($(this).data('size') > ${play.configuration.getProperty("clipboard.limit", "5")}) {
-                window.alert("Clipboard export is limited to 5 items");
+            if($(this).data('size') > ${play.configuration.getProperty("clipboard.limit", "100")}) {
+                window.alert("Clipboard export is limited to 100 items");
                 return false;
             }
-            var password = window.prompt("Encryption password", "");
-            if (password) {
-                this.href += "?" + $.param({password: password});
-                $('#clipboard').load(this.href);
-            }
+            $('#clipboard').load(this.href);
             return false;
         });
         setInterval(function() {

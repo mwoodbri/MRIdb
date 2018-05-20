@@ -8,37 +8,33 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import jobs.Downloader.Format;
-import models.Series;
-import models.Study;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
-import play.Logger;
+import controllers.Application;
+import jobs.Downloader.Format;
+import models.Series;
+import models.Study;
 import play.db.jpa.GenericModel;
 import play.jobs.Job;
+import play.libs.Files;
 import play.mvc.Scope.Session;
 import util.Clipboard;
 import util.Download;
 import util.Properties;
-import controllers.Application;
 
 public class ClipboardExporter extends Job {
 
 	private Clipboard clipboard;
 	private File tmpDir;
-	private String password;
 	private Session session;
 	private String username;
 	private boolean preferMultiframe;
 	private String niftiMultiframeScript;
 
-	public ClipboardExporter(Clipboard clipboard, File tmpDir, String password, Session session, String username, boolean preferMultiframe, String niftiMultiframeScript) {
+	public ClipboardExporter(Clipboard clipboard, File tmpDir, Session session, String username, boolean preferMultiframe, String niftiMultiframeScript) {
 		this.clipboard = clipboard;
 		this.tmpDir = tmpDir;
-		this.password = password;
 		this.session = session;
 		this.username = username;
 		this.preferMultiframe = preferMultiframe;
@@ -57,17 +53,9 @@ public class ClipboardExporter extends Job {
 				Download.series(series, tmpDir, Format.dcm, preferMultiframe, niftiMultiframeScript);
 			}
 		}
-
-		File zipFile = new File(String.format("%s.7z", tmpDir.getPath()));
-		for (File folder : tmpDir.listFiles()) {
-			ProcessBuilder processBuilder = new ProcessBuilder("7za", "a", "-mhe=on", "-mx0", String.format("-p%s", password), zipFile.getPath(), folder.getPath());
-			processBuilder.redirectErrorStream(true);
-			Logger.info("%s %s", zipFile, folder);
-			Process process = processBuilder.start();
-			Logger.info(IOUtils.toString(process.getInputStream()));
-			Logger.info("" + process.waitFor());
-		}
-		zipFile.renameTo(getDest());
+		File dest = getDest();
+		getDest().getParentFile().mkdirs();
+		Files.copyDir(tmpDir, dest);
 	}
 
 	private void addExport() {
@@ -76,12 +64,18 @@ public class ClipboardExporter extends Job {
 			exports = "";
 		}
 		String name;
-		for (int i = 1; ; i++) {
-			name = String.format("%s-%s-%s", username, new SimpleDateFormat("yyyyMMdd").format(new Date()), i);
-			if (!new File(tmpDir.getParentFile(), String.format("%s.7z", name)).exists()) {
+		search:
+			for (int i = 1; ; i++) {
+				name = String.format("%s-%s-%s", username, new SimpleDateFormat("yyyyMMdd").format(new Date()), i);
+				if (!exports.isEmpty()) {
+					for (String export : exports.split(",")) {
+						if (name.equals(export.split(":")[1])) {
+							continue search;
+						}
+					}
+				}
 				break;
 			}
-		}
 		String fullName = String.format("%s:%s", tmpDir.getName(), name);
 		session.put(Application.EXPORTS, exports.isEmpty() ? fullName : StringUtils.join(ArrayUtils.add(exports.split(","), fullName), ','));
 	}
@@ -90,7 +84,7 @@ public class ClipboardExporter extends Job {
 		String exports = session.get(Application.EXPORTS);
 		for (String export : Arrays.asList(exports.split(","))) {
 			if (tmpDir.getName().equals(export.split(":")[0])) {
-				return new File(tmpDir.getParentFile(), String.format("%s.7z", export.split(":")[1]));
+				return new File(new File(Properties.getExports(), export.split(":")[1].split("-")[0]), export.split(":")[1]);
 			}
 		}
 		return null;
@@ -105,7 +99,7 @@ public class ClipboardExporter extends Job {
 				String export = i.next();
 				File tmpDir = new File(Properties.getDownloads(), export.split(":")[0]);
 				if (tmpDir.exists()) {
-					archives.add(new File(tmpDir.getParentFile(), String.format("%s.7z", export.split(":")[1])));
+					archives.add(new File(new File(Properties.getExports(), export.split(":")[1].split("-")[0]), export.split(":")[1]));
 				} else {
 					i.remove();
 				}
@@ -117,18 +111,6 @@ public class ClipboardExporter extends Job {
 			}
 		}
 		return archives;
-	}
-
-	public static File getExport(String name, Session session) {
-		String exports = session.get(Application.EXPORTS);
-		if (exports != null) {
-			for (String export : Arrays.asList(exports.split(","))) {
-				if (name.equals(export.split(":")[1])) {
-					return new File(Properties.getDownloads(), String.format("%s.7z", name));
-				}
-			}
-		}
-		return null;
 	}
 
 }

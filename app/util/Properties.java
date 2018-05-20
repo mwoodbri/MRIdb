@@ -30,6 +30,10 @@ public class Properties {
 		return downloads;
 	}
 
+	public static File getExports() {
+		return new File(getString("exports"));
+	}
+
 	public static File getCollations() {
 		File downloads = new File(Play.tmpDir, "collations");
 		downloads.mkdir();

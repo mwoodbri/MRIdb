@@ -28,6 +28,17 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.lang.StringUtils;
+import org.dcm4che.data.Dataset;
+
+import au.com.bytecode.opencsv.CSVParser;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+import controllers.Secure.Security;
 import jobs.ClipboardExporter;
 import jobs.Downloader;
 import jobs.Downloader.Format;
@@ -40,14 +51,6 @@ import models.ProjectAssociation;
 import models.Series;
 import models.Study;
 import notifiers.Mail;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang.StringUtils;
-import org.dcm4che.data.Dataset;
-
 import play.Invoker;
 import play.Logger;
 import play.Play;
@@ -66,10 +69,6 @@ import util.DomainModelBinder;
 import util.Medcon;
 import util.PersistentLogger;
 import util.Properties;
-import au.com.bytecode.opencsv.CSVParser;
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-import controllers.Secure.Security;
 
 public class Application extends SecureController {
 	//session variables
@@ -501,19 +500,13 @@ public class Application extends SecureController {
 		renderBinary(zip);
 	}
 
-	public static void export(String password) throws InterruptedException, IOException, ClassNotFoundException {
+	public static void export() throws InterruptedException, IOException, ClassNotFoundException {
 		PersistentLogger.log("exported clipboard %s", getUser().clipboard);
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);
 		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
 		tmpDir.mkdir();
-		new ClipboardExporter(clipboard, tmpDir, password, session, getUser().username, Boolean.TRUE.equals(getUser().preferMultiframe), getUser().niftiMultiframeScript).now();
+		new ClipboardExporter(clipboard, tmpDir, session, getUser().username, Boolean.TRUE.equals(getUser().preferMultiframe), getUser().niftiMultiframeScript).now();
 		clipboard(null, null, null);
-	}
-
-	public static void retrieve(String filename) {
-		File download = ClipboardExporter.getExport(filename, session);
-		notFoundIfNull(download);
-		renderBinary(download);
 	}
 
 	public enum ClipboardOp { ADD, REMOVE, CLEAR }

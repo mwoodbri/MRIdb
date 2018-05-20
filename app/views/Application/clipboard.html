@@ -18,9 +18,9 @@
   <li>Use&nbsp;&nbsp;<i class="icon-download-alt icon-large"></i>&nbsp;&nbsp;to add to clipboard
   #{/else}
   #{if exports}
-  <li class="nav-header">Downloads
+  <li class="nav-header">Downloads<span>#{a @help()}<i class="icon-question-sign icon-large" style="margin-left: 0.5em; vertical-align: text-bottom"></i>#{/a}</span>
   #{list exports}
-  <li>#{if _.exists()}#{a @retrieve(org.apache.commons.io.FilenameUtils.getBaseName(_.name))}${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}#{/a}#{/if}#{else}<span class="loading">${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}</span>#{/else}
+  <li><span class="#{ifnot _.exists()}loading#{/ifnot}">${org.apache.commons.io.FilenameUtils.getBaseName(_.name)}</span>
   #{/list}
   #{/if}
 </ul>
