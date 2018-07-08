@@ -24,6 +24,12 @@
 		more: '.pagination .next:not(.disabled) a'
 	});
 	$('.pagination').hide();
+	$('#exportAll').one('click', function() {
+		$(this).addClass('disabled');
+		$.ajax({method: 'POST'}).done(function(data) {
+			$('#clipboard').load('@{clipboard()}');
+		});
+	});
 </script>
 #{/set}
 
@@ -36,6 +42,9 @@
 		<input name="page" type="hidden" value="0">
 		#{a @advanced(), class: "btn btn-primary"}Advanced search#{/a}
 		<span style="margin-left: 1em">Showing ${studyCount} ${studyCount == 1 ? "study" : "studies"}</span>
+		#{if studyCount > 0 && studyCount <= util.Properties.getMaximumExportSize()}
+		<a id="exportAll" class="btn btn-info" style="margin-left: 1em">Download all</a>
+		#{/if}
 	#{/form}
 	<table id="studies" class="table table-striped table-bordered">
 		<thead>

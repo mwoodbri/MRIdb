@@ -34,6 +34,10 @@ public class Properties {
 		return new File(getString("exports"));
 	}
 
+	public static int getMaximumExportSize() {
+		return Integer.parseInt(Play.configuration.getProperty("export.maxsize", String.valueOf(100)));
+	}
+
 	public static File getCollations() {
 		File downloads = new File(Play.tmpDir, "collations");
 		downloads.mkdir();

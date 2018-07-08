@@ -57,6 +57,7 @@ import play.Play;
 import play.cache.Cache;
 import play.data.binding.As;
 import play.data.validation.Validation;
+import play.db.jpa.GenericModel.JPAQuery;
 import play.db.jpa.JPA;
 import play.libs.Files;
 import play.libs.IO;
@@ -90,13 +91,19 @@ public class Application extends SecureController {
 		render();
 	}
 
-	public static void index(Integer page, String order, String sort) {
+	public static void index(Integer page, String order, String sort) throws ClassNotFoundException {
 		if (page == null) {
 			index(0, order, sort);
 		}
-		List<Study> studies = Study.find(String.format("from Study where study_datetime is not null order by %s %s", order == null || order.isEmpty() ? "study_datetime" : order, "asc".equals(sort) ? "asc" : "desc")).fetch(page + 1, Properties.pageSize());
-		int studyCount = (int) Study.count();
-		render(studies, studyCount, page);
+		JPAQuery studiesQuery = Study.find(String.format("from Study where study_datetime is not null order by %s %s", order == null || order.isEmpty() ? "study_datetime" : order, "asc".equals(sort) ? "asc" : "desc"));
+		if ("POST".equals(request.method)) {
+			List<DomainModel> studies = studiesQuery.fetch(Properties.getMaximumExportSize());
+			exportAll(studies);
+		} else {
+			List<Study> studies = studiesQuery.fetch(page + 1, Properties.pageSize());
+			int studyCount = (int) Study.count();
+			render(studies, studyCount, page, order, sort);
+		}
 	}
 
 	public static void recent() {
@@ -319,41 +326,31 @@ public class Application extends SecureController {
 		writer.close();
 	}
 
-	public static void simpleSearch(String terms, int page, String order, String sort) {
+	public static void simpleSearch(String terms, int page, String order, String sort) throws ClassNotFoundException {
 		if (terms.trim().isEmpty()) {
 			index(0, null, null);
 		}
-		//String[] termsArray = terms.toLowerCase().split(" ");
-		//no view, no full text
-		//String query = "from study, (select study.pk, patient.pk pat_pk, pat_name, pat_id, pat_birthdate, study_desc, study_datetime, lower(study_desc || ' ' || pat_name || ' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '')) result from study join patient on (study.patient_fk = patient.pk) left join projectassociation on (projectassociation.study_pk = study.pk) left join project on (projectassociation.project_id = project.id)) as subquery where study.pk = subquery.pk";
-		//for (int i = 0; i < termsArray.length; i++) {
-		//	query += " and subquery.result like ?";
-		//}
-		//view, no full text
-		//String query = "from study, studyfulltext where study.pk = studyfulltext.pk";
-		//for (int i = 0; i < termsArray.length; i++) {
-		//	query += " and studyfulltext.fulltext like ?";
-		//}
-		//full text
+
 		String query = String.format("from study join patient on study.patient_fk = patient.pk left join projectassociation on projectassociation.study_pk = study.pk left join project on projectassociation.project_id = project.id where to_tsvector('english_nostop', coalesce(study_desc, '') || %s' ' || pat_id || ' ' || coalesce(projectassociation.participationid, '') || ' ' || coalesce(project.name, '') || ' ' || coalesce(study.study_custom1, '')) @@ to_tsquery('english_nostop', ?)", getUser().role == Role.Visitor ? "" : "' ' || pat_name || ");
 
-		Query studyCountQuery = JPA.em().createNativeQuery("select count(*) " + query);
-		//		for (int i = 0; i < termsArray.length; i++) {
-		//			studyCountQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
-		//		}
-		studyCountQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
-		int studyCount = ((BigInteger) studyCountQuery.getSingleResult()).intValue();
-
 		order = order.contains(".") ? order.split("[.]")[1] : order;
-		query = "select distinct study.* " + query + String.format(" order by %s %s", order, "desc".equals(sort) ? "desc" : "asc");
-		Query studiesQuery = JPA.em().createNativeQuery(query, Study.class).setFirstResult(page * Properties.pageSize()).setMaxResults(Properties.pageSize());
-		//		for (int i = 0; i < termsArray.length; i++) {
-		//			studiesQuery.setParameter(i + 1, "%" + termsArray[i] + "%");
-		//		}
+		Query studiesQuery = JPA.em().createNativeQuery("select distinct study.* " + query + String.format(" order by %s %s", order, "desc".equals(sort) ? "desc" : "asc"), Study.class);
+		if ("POST".equals(request.method)) {
+			studiesQuery.setMaxResults(Properties.getMaximumExportSize());
+		} else {
+			studiesQuery.setFirstResult(page * Properties.pageSize()).setMaxResults(Properties.pageSize());
+		}
 		studiesQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
-		List studies = studiesQuery.getResultList();
+		List<DomainModel> studies = studiesQuery.getResultList();
 
-		renderTemplate("@index", studies, studyCount, page);
+		if ("POST".equals(request.method)) {
+			exportAll(studies);
+		} else {
+			Query studyCountQuery = JPA.em().createNativeQuery("select count(*) " + query);
+			studyCountQuery.setParameter(1, StringUtils.join(terms.split(" "), " & "));
+			int studyCount = ((BigInteger) studyCountQuery.getSingleResult()).intValue();
+			renderTemplate("@index", studies, studyCount, page);
+		}
 	}
 
 	private static final Map<String, String> comparators = new HashMap<String, String>() {{
@@ -420,14 +417,20 @@ public class Application extends SecureController {
 			query += " where " + StringUtils.join(where, " and ");
 		}
 		String entityQuery = String.format("select study %s order by study.%s %s", query, order.isEmpty() ? "patient.pk" : order, "desc".equals(sort) ? "desc" : "asc");
-		List<Study> studies = Study.find(entityQuery, args.toArray()).fetch(page + 1, Properties.pageSize());
-		String countQuery = String.format("select count(study) %s", query);
-		Query count = JPA.em().createQuery(countQuery);
-		for (int i = 0; i < args.size(); i++) {
-			count.setParameter(i + 1, args.get(i));
+		JPAQuery studiesQuery = Study.find(entityQuery, args.toArray());
+		if ("POST".equals(request.method)) {
+			List<DomainModel> studies = studiesQuery.fetch(Properties.getMaximumExportSize());
+			exportAll(studies);
+		} else {
+			List<Study> studies = studiesQuery.fetch(page + 1, Properties.pageSize());
+			String countQuery = String.format("select count(study) %s", query);
+			Query count = JPA.em().createQuery(countQuery);
+			for (int i = 0; i < args.size(); i++) {
+				count.setParameter(i + 1, args.get(i));
+			}
+			int studyCount = ((Long) count.getSingleResult()).intValue();
+			renderTemplate("@index", studies, studyCount, page);
 		}
-		int studyCount = ((Long) count.getSingleResult()).intValue();
-		renderTemplate("@index", studies, studyCount, page);
 	}
 
 	public static void study(long pk) {
@@ -507,6 +510,17 @@ public class Application extends SecureController {
 		tmpDir.mkdir();
 		new ClipboardExporter(clipboard, tmpDir, session, getUser().username, Boolean.TRUE.equals(getUser().preferMultiframe), getUser().niftiMultiframeScript).now();
 		clipboard(null, null, null);
+	}
+
+	static void exportAll(List<DomainModel> objects) throws ClassNotFoundException {
+		Clipboard clipboard = new Clipboard(null);
+		for (DomainModel object : objects) {
+			clipboard.add(object instanceof Study ? "Study" : "Series", object.pk);
+		}
+		File tmpDir = new File(Properties.getDownloads(), UUID.randomUUID().toString());
+		tmpDir.mkdir();
+		new ClipboardExporter(clipboard, tmpDir, session, getUser().username, Boolean.TRUE.equals(getUser().preferMultiframe), getUser().niftiMultiframeScript).now();
+		PersistentLogger.log("exported %s", clipboard);
 	}
 
 	public enum ClipboardOp { ADD, REMOVE, CLEAR }
