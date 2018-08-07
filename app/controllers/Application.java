@@ -503,6 +503,13 @@ public class Application extends SecureController {
 		renderBinary(zip);
 	}
 
+	public static void direct(String pks) throws NoSuchMethodException, IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+		Clipboard clipboard = new Clipboard(pks.replaceAll("pk=", "").replace('|', ',').replace('&', ','));
+		PersistentLogger.log("exported %s", clipboard);
+		List<DomainModel> objects = new ArrayList(clipboard.getObjects());
+		exportAll(objects);
+	}
+
 	public static void export() throws InterruptedException, IOException, ClassNotFoundException {
 		PersistentLogger.log("exported clipboard %s", getUser().clipboard);
 		Clipboard clipboard = (Clipboard) renderArgs.get(CLIPBOARD);

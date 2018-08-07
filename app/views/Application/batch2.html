@@ -20,6 +20,10 @@ $(function() {
 		document.applets[0].cancel();
 	});
 	pks = ${pks.toJson().raw()};
+	$('form').ajaxForm(function() {
+		$('form button').prop('disabled', true);
+		$('#clipboard').load('@{clipboard()}');
+	});
 });
 function init() {
 	$('#message').html('');
@@ -57,31 +61,47 @@ function complete(cancelled) {
 </script>
 #{/set}
 
-<h3>Batch export</h3>
-<p style="margin-top: 1em">${found.size()} studies or series selected:</p>
-<ul>
-#{list found}
-<li>${_}
-#{/list}
-</ul>
-#{if missing}
-<p>${missing.size()} were not found:</p>
-<ul>
-#{list missing}
-<li>${_}
-#{/list}
-</ul>
-#{/if}
-<p>Download destination: <span id="folder"><button id="choose" class="btn btn-small" style="margin-left: 1em">Browse...</button></span></p>
-<p id="download" style="display: none"><button class="btn btn-small" style="margin-top: 1em">Download</button></p>
-<p><span id="spinner" style='margin-right: 0.5em'><img src="@{'/public/images/spinner-small.gif'}"></span> <b id="message">Loading Java</b> <button id="cancel" class="btn btn-small" type="button" style="display: none; margin-left: 1em">Cancel</button></p>
-<div id="failures" style="display: none">
-	<p>The following studies could not be fully exported:</p>
+<div class="span9">
+	<h3>Batch export</h3>
+	<p style="margin-top: 1em">${found.size()} studies or series selected:</p>
 	<ul>
+	#{list found}
+	<li>${_}
+	#{/list}
 	</ul>
+	#{if missing}
+	<p>${missing.size()} were not found:</p>
+	<ul>
+	#{list missing}
+	<li>${_}
+	#{/list}
+	</ul>
+	#{/if}
+        #{ifnot request.headers["user-agent"].value().contains("Edge")}
+	<h4 style="margin-top: 1.5em">Download via browser (requires Java)</h4>
+	<p style="margin-top: 1em">Download destination: <span id="folder"><button id="choose" class="btn btn-small" style="margin-left: 1em">Browse...</button></span></p>
+	<p id="download" style="display: none"><button class="btn btn-small" style="margin-top: 1em">Download</button></p>
+	<div id="failures" style="display: none">
+		<p>The following studies could not be fully exported:</p>
+		<ul>
+		</ul>
+	</div>
+	<applet id="applet" archive="@{'/public/applets/download.jar'}" code="DownloadApplet.class" codebase="@{'/public/applets'}" width="1" height="1" MAYSCRIPT>
+		<param name="url" value="@@{Application.download()}?{0}">
+		<param name="pks" value="${pks.keySet().join('|').raw()}">
+		You must have Java to download via your browser. Please visit java.com to install it.
+	</applet>
+        #{/ifnot}
+	<h4 style="margin-top: 1.5em">Download via temp$</h4>
+	#{form @direct(), enctype:'multipart/form-data', style:'margin-top: 1.5em'}
+		<input name="pks" type="hidden" value="${pks.keySet().join('|').raw()}">
+		<button type="submit" class="btn btn-small">Download</button>
+	#{/form}
 </div>
-<applet id="applet" archive="@{'/public/applets/download.jar'}" code="DownloadApplet.class" codebase="@{'/public/applets'}" width="1" height="1" MAYSCRIPT>
-	<param name="url" value="@@{Application.download()}?{0}">
-	<param name="pks" value="${pks.keySet().join('|').raw()}">
-	You must have Java to perform a batch download. Please visit java.com to install it.
-</applet>
+<div class="span3">
+	<div class="well" id="clipboard">
+	#{include 'Application/clipboard.html'/}
+	</div>
+	<div class="well sidebar-nav" id="series" style="display: none">
+	</div>
+</div>
